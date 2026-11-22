@@ -16,6 +16,18 @@ import {
 import { DEMO_USERS, useActiveUser } from './ActiveUserProvider';
 import { AuthModal } from './AuthModal';
 
+const PRODUCT_CATEGORIES = [
+  'Carro',
+  'Moto',
+  'Barco',
+  'Caminhão',
+  'Rebocáveis',
+  'UTVs/Triciclos',
+  'Residencial',
+  'Comercial',
+  'Rural',
+] as const;
+
 export function Navbar() {
   const router = useRouter();
   const {
@@ -35,6 +47,7 @@ export function Navbar() {
 
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>('Carro');
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,9 +97,9 @@ export function Navbar() {
           </div>
         </form>
 
-        {/* LADO DIREITO — ÍCONES: Engrenagem, Perfil/Entrar (após login Entrar vira ícone de Perfil), Coração (Favoritos + Comunicação) */}
-        <div className="order-2 flex shrink-0 items-center gap-2 sm:order-3">
-          {/* 1. Ícone de Engrenagem (Configurações / Central Admin / Seletor de Perfil Demo) */}
+        {/* LADO DIREITO — Apenas palavras e ícones (sem caixas/bordas de botão) */}
+        <div className="order-2 flex shrink-0 items-center gap-4 sm:order-3">
+          {/* 1. Engrenagem (Configurações / Central Admin) */}
           <div className="relative">
             <button
               type="button"
@@ -94,7 +107,7 @@ export function Navbar() {
                 setShowSettingsMenu((v) => !v);
                 setShowProfileMenu(false);
               }}
-              className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"
+              className="inline-flex items-center gap-1.5 py-1 text-sm font-semibold text-slate-700 transition hover:text-uva-700 sm:text-xs"
               title="Configurações e Central de Moderação"
               aria-label="Configurações"
             >
@@ -149,7 +162,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={openAuthModal}
-              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-uva-700 bg-uva-700 px-3.5 text-xs font-bold text-white transition hover:bg-uva-600"
+              className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-uva-700 transition hover:text-uva-600 sm:text-xs"
               title="Cadastrar ou Entrar com Google / Facebook"
             >
               <LogIn className="h-4 w-4" />
@@ -163,7 +176,7 @@ export function Navbar() {
                   setShowProfileMenu((v) => !v);
                   setShowSettingsMenu(false);
                 }}
-                className="relative flex h-10 items-center gap-2 rounded-xl border border-uva-200 bg-uva-50 px-3 text-xs font-bold text-uva-900 transition hover:bg-uva-100"
+                className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-slate-800 transition hover:text-uva-700 sm:text-xs"
                 title={`Logado como ${currentUser.label}`}
                 aria-label="Perfil do Usuário"
               >
@@ -219,27 +232,27 @@ export function Navbar() {
           {/* 3. Ícone de Sino ao lado do Perfil — abre diretamente a página de Negociações */}
           <Link
             href="/negociacoes"
-            className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"
+            className="relative inline-flex items-center gap-1 py-1 text-slate-700 transition hover:text-uva-700"
             title="Abrir página de negociações"
             aria-label="Abrir página de negociações"
           >
             <Bell className="h-4 w-4" />
             {notifications.length > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-uva-700 px-1 text-[10px] font-bold text-white">
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-uva-700 px-1 text-[10px] font-bold text-white">
                 {notifications.length}
               </span>
             )}
           </Link>
 
-          {/* 3. Ícone de Coração — Favoritos & Central de Comunicação entre os Usuários */}
+          {/* 4. Ícone de Coração — Favoritos & Central de Comunicação entre os Usuários */}
           <Link
             href="/negociacoes"
-            className="relative flex h-10 items-center gap-1.5 rounded-xl border border-uva-200 bg-uva-50 px-3 text-uva-800 transition hover:bg-uva-100"
+            className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-slate-800 transition hover:text-uva-700 sm:text-xs"
             title="Favoritos e Sala de Comunicação entre Usuários"
             aria-label="Favoritos e Comunicação"
           >
             <Heart className="h-4 w-4 fill-uva-700 text-uva-700" />
-            <span className="hidden text-xs font-bold md:inline">Favoritos & Chat</span>
+            <span className="hidden md:inline">Favoritos & Chat</span>
             {(favorites.length > 0 || notifications.length > 0) && (
               <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-uva-700 px-1 text-[10px] font-bold text-white">
                 {favorites.length + notifications.length}
@@ -247,7 +260,7 @@ export function Navbar() {
             )}
           </Link>
 
-          {/* 4. Botão direto de Sair no cabeçalho quando autenticado */}
+          {/* 5. Sair diretamente no cabeçalho quando autenticado */}
           {isAuthenticated && (
             <button
               type="button"
@@ -256,7 +269,7 @@ export function Navbar() {
                 setShowProfileMenu(false);
                 setShowSettingsMenu(false);
               }}
-              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 text-xs font-bold text-red-700 transition hover:bg-red-100"
+              className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-red-600 transition hover:text-red-700 sm:text-xs"
               title="Sair da conta"
               aria-label="Sair"
             >
@@ -266,6 +279,35 @@ export function Navbar() {
           )}
         </div>
       </div>
+
+      {/* LINHA INFERIOR DO CABEÇALHO — Categorias com espaçamento horizontal idêntico */}
+      <nav
+        aria-label="Categorias de produtos"
+        className="border-t border-slate-100 bg-white"
+      >
+        <div className="mx-auto flex w-full max-w-[1024px] items-center justify-between gap-6 overflow-x-auto px-3 py-2 [scrollbar-width:none] sm:px-0 [&::-webkit-scrollbar]:hidden">
+          {PRODUCT_CATEGORIES.map((category) => {
+            const isActive = activeCategory === category;
+            return (
+              <button
+                key={category}
+                type="button"
+                onClick={() => {
+                  setActiveCategory(category);
+                  router.push('/');
+                }}
+                className={`shrink-0 whitespace-nowrap text-sm font-semibold transition sm:text-xs ${
+                  isActive
+                    ? 'text-uva-700 underline decoration-2 underline-offset-4'
+                    : 'text-slate-600 hover:text-uva-700'
+                }`}
+              >
+                {category}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
       <AuthModal />
     </header>
   );
