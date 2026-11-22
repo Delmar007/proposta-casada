@@ -10,6 +10,8 @@ import {
   Repeat,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react';
 import { PublicVehicle } from '@/lib/domain/types';
 import { BrandLogo } from './BrandLogo';
@@ -91,13 +93,15 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
   const fav = isFavorite(vehicle.id);
   const isLocked = vehicle.status === 'negotiation_locked';
 
-  // Movimenta o carrossel de miniaturas de um lado para o outro e alterna a imagem ativa
+  // Movimenta o carrossel de miniaturas (vertical no desktop, horizontal no mobile) e alterna a imagem ativa
   const handleCarouselStep = (direction: -1 | 1) => {
     const nextIdx = (activeImageIdx + direction + galleryImages.length) % galleryImages.length;
     setActiveImageIdx(nextIdx);
     if (thumbsContainerRef.current) {
+      const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
       thumbsContainerRef.current.scrollBy({
-        left: direction * 88,
+        top: isDesktop ? direction * 52 : 0,
+        left: isDesktop ? 0 : direction * 88,
         behavior: 'smooth',
       });
     }
@@ -163,14 +167,15 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
 
   return (
     <article
-      className="mx-auto flex w-full max-w-[440px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:shadow-md md:h-[320px] md:max-w-[1024px] md:flex-row"
+      className="mx-auto flex w-full max-w-[440px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:shadow-md md:h-[250px] md:max-w-[1024px] md:flex-row"
     >
       {/* =====================================================================
-          PARTE 1 (ESQUERDA): Foto Horizontal encostada no topo + Logo no canto esquerdo superior + Carrossel de Miniaturas embaixo
+          PARTE 1 (ESQUERDA): Imagem ocupando 100% da lateral esquerda +
+          Carrossel de miniaturas na vertical do lado direito da imagem
          ===================================================================== */}
-      <div className="flex w-full shrink-0 flex-col bg-uva-900 md:h-full md:w-[360px]">
-        {/* Imagem Principal Horizontal encostada na borda superior da caixa */}
-        <div className="relative h-56 w-full overflow-hidden md:h-auto md:flex-1">
+      <div className="flex w-full shrink-0 flex-col bg-uva-900 md:h-full md:w-[376px] md:flex-row">
+        {/* Imagem Principal Horizontal ocupando 100% da altura na lateral esquerda */}
+        <div className="relative h-56 w-full overflow-hidden md:h-full md:flex-1">
           <img
             src={galleryImages[activeImageIdx] ?? vehicle.imageUrl}
             alt={`${vehicle.brand} ${specs.model} - Foto ${activeImageIdx + 1}`}
@@ -206,7 +211,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
             <Heart className={`h-4 w-4 ${fav ? 'fill-white' : ''}`} />
           </button>
 
-          {/* Ano e Localização sobre a foto horizontal */}
+          {/* Ano e Localização sobre a foto */}
           <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between gap-2">
             <span className="rounded-md bg-uva-900/85 px-2.5 py-0.5 text-xs font-bold text-white backdrop-blur-xs md:px-2 md:text-[10px]">
               {vehicle.manufactureYear}/{vehicle.modelYear}
@@ -218,21 +223,22 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           </div>
         </div>
 
-        {/* Faixa Inferior: Carrossel Horizontal de Miniaturas que movimenta de um lado para o outro */}
-        <div className="relative flex h-[64px] w-full shrink-0 items-center gap-1 border-t border-uva-700 bg-uva-800 px-1.5">
+        {/* Carrossel de Miniaturas: Vertical do lado direito da imagem no desktop */}
+        <div className="relative flex h-[60px] w-full shrink-0 flex-row items-center gap-1 border-t border-uva-700 bg-uva-800 px-1.5 md:h-full md:w-[68px] md:flex-col md:border-t-0 md:border-l md:px-1 md:py-1">
           <button
             type="button"
             onClick={() => handleCarouselStep(-1)}
-            className="flex h-8 w-7 shrink-0 items-center justify-center rounded-md bg-uva-700 text-uva-100 transition hover:bg-uva-600 hover:text-white md:h-7 md:w-6"
+            className="flex h-8 w-7 shrink-0 items-center justify-center rounded-md bg-uva-700 text-uva-100 transition hover:bg-uva-600 hover:text-white md:h-5 md:w-full"
             title="Imagem anterior"
-            aria-label="Mover carrossel para a esquerda"
+            aria-label="Imagem anterior"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 md:hidden" />
+            <ChevronUp className="hidden h-3.5 w-3.5 md:block" />
           </button>
 
           <div
             ref={thumbsContainerRef}
-            className="flex flex-1 items-center gap-1.5 overflow-x-auto scroll-smooth py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex flex-1 flex-row items-center gap-1.5 overflow-x-auto scroll-smooth py-1 [scrollbar-width:none] md:w-full md:flex-col md:overflow-x-hidden md:overflow-y-auto md:py-0 [&::-webkit-scrollbar]:hidden"
           >
             {galleryImages.map((imgUrl, idx) => {
               const isSelected = idx === activeImageIdx;
@@ -241,7 +247,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
                   key={`${vehicle.id}-thumb-${idx}`}
                   type="button"
                   onClick={() => handleSelectThumb(idx)}
-                  className={`relative h-[46px] w-[72px] shrink-0 overflow-hidden rounded-md border-2 transition ${
+                  className={`relative h-[44px] w-[68px] shrink-0 overflow-hidden rounded-md border-2 transition md:h-[40px] md:w-full ${
                     isSelected
                       ? 'border-uva-300 ring-1 ring-uva-300/60'
                       : 'border-transparent opacity-65 hover:opacity-100'
@@ -261,22 +267,22 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           <button
             type="button"
             onClick={() => handleCarouselStep(1)}
-            className="flex h-8 w-7 shrink-0 items-center justify-center rounded-md bg-uva-700 text-uva-100 transition hover:bg-uva-600 hover:text-white md:h-7 md:w-6"
+            className="flex h-8 w-7 shrink-0 items-center justify-center rounded-md bg-uva-700 text-uva-100 transition hover:bg-uva-600 hover:text-white md:h-5 md:w-full"
             title="Próxima imagem"
-            aria-label="Mover carrossel para a direita"
+            aria-label="Próxima imagem"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 md:hidden" />
+            <ChevronDown className="hidden h-3.5 w-3.5 md:block" />
           </button>
         </div>
       </div>
 
       {/* =====================================================================
-          PARTE 2 (MEIO): 2 colunas x 4 linhas compactas (Modelo, Versão,
-          Combustível, Motor, Potência, Tração, KM e Ano) + 1 linha inferior
-          (col-span-2) para Informações do veículo (até 200 caracteres)
+          PARTE 2 (MEIO): Botões compactos (altura e largura reduzidas) +
+          Informações do veículo (até 200 caracteres)
          ===================================================================== */}
-      <div className="flex w-full flex-col border-y border-slate-100 p-3 md:h-full md:w-[332px] md:border-y-0 md:border-x md:p-2.5">
-        <div className="grid grid-cols-2 gap-2 md:h-full md:grid-rows-[1fr_1fr_1fr_1fr_1.85fr] md:gap-1.5">
+      <div className="flex w-full flex-col border-y border-slate-100 p-3 md:h-full md:w-[316px] md:border-y-0 md:border-x md:p-2">
+        <div className="grid grid-cols-2 gap-2 md:h-full md:grid-rows-[repeat(4,minmax(0,1fr))_1.8fr] md:gap-1">
           {[
             { label: 'Modelo', value: specs.model },
             { label: 'Versão', value: specs.version },
@@ -289,22 +295,22 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           ].map((item) => (
             <div
               key={item.label}
-              className="flex min-w-0 flex-col justify-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 md:px-2.5 md:py-0.5"
+              className="flex min-w-0 flex-col justify-center rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 md:px-2 md:py-0.5"
             >
-              <span className="text-[11px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[9px]">
+              <span className="text-[11px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[8px]">
                 {item.label}
               </span>
-              <strong className="mt-0.5 truncate text-sm font-extrabold leading-tight text-slate-900 md:text-xs">
+              <strong className="mt-0.5 truncate text-sm font-extrabold leading-none text-slate-900 md:text-[11px]">
                 {item.value}
               </strong>
             </div>
           ))}
 
-          <div className="col-span-2 flex min-w-0 flex-col justify-start rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 md:px-2.5 md:py-1.5">
-            <span className="text-[11px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[9px]">
+          <div className="col-span-2 flex min-w-0 flex-col justify-start rounded-md border border-slate-200 bg-slate-50 px-3 py-2 md:px-2 md:py-1">
+            <span className="text-[11px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[8px]">
               Informações do veículo
             </span>
-            <p className="mt-1 line-clamp-4 break-words text-xs font-medium leading-snug text-slate-700 md:text-[11px]">
+            <p className="mt-0.5 line-clamp-3 break-words text-xs font-medium leading-tight text-slate-700 md:text-[10px]">
               {(vehicle.description || '4 pneus novos, lataria com polimento cristalizado.').slice(0, 200)}
             </p>
           </div>
@@ -315,12 +321,12 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           PARTE 3 (DIREITA): Botão FIPE no topo, Grade 4x3 de Propostas no meio,
           Input à esquerda + Botão duplo (Salvar proposta | Propor permuta) embaixo
          ===================================================================== */}
-      <div className="flex w-full flex-col justify-between gap-2.5 bg-slate-50/70 p-3 md:h-full md:w-[332px] md:gap-2 md:p-2.5">
+      <div className="flex w-full flex-col justify-between gap-2.5 bg-slate-50/70 p-3 md:h-full md:w-[332px] md:gap-1.5 md:p-2">
         {/* Caixa superior: apenas valor FIPE dentro de um botão */}
         <button
           type="button"
           onClick={() => router.push(`/vehicles/${vehicle.id}`)}
-          className="flex h-11 w-full shrink-0 items-center justify-center rounded-xl bg-uva-700 px-3 text-base font-extrabold tracking-tight text-white shadow-xs transition hover:bg-uva-600 md:h-9 md:text-sm"
+          className="flex h-11 w-full shrink-0 items-center justify-center rounded-xl bg-uva-700 px-3 text-base font-extrabold tracking-tight text-white shadow-xs transition hover:bg-uva-600 md:h-8 md:text-xs"
         >
           {formatBRL(vehicle.fipePrice)} FIPE
         </button>
@@ -335,14 +341,14 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
         ) : (
           <>
             {/* Caixa quadrada central: 4 linhas x 3 colunas (inicia vazia; maior proposta sempre em 1ª linha, 1ª coluna) */}
-            <div className="grid grid-cols-3 grid-rows-4 gap-1.5 rounded-xl border border-slate-200 bg-white p-2 md:flex-1 md:gap-1 md:p-1.5">
+            <div className="grid grid-cols-3 grid-rows-4 gap-1.5 rounded-xl border border-slate-200 bg-white p-2 md:flex-1 md:gap-1 md:p-1">
               {Array.from({ length: 12 }, (_, idx) => {
                 const item = proposals[idx];
                 const isWinner = idx === 0 && Boolean(item);
                 return (
                   <div
                     key={idx}
-                    className={`flex min-h-[38px] items-center justify-center rounded-lg border px-1 text-center text-xs font-bold transition md:min-h-0 md:text-[11px] ${
+                    className={`flex min-h-[38px] items-center justify-center rounded-md border px-1 text-center text-xs font-bold transition md:min-h-0 md:text-[10px] ${
                       isWinner
                         ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-2xs'
                         : item
@@ -377,20 +383,20 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
                 onChange={(e) => setProposalAmount(e.target.value)}
                 placeholder="Valor R$"
                 aria-label="Valor da proposta"
-                className="h-11 w-[124px] shrink-0 rounded-xl border border-slate-300 bg-white px-3 text-base font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none md:h-9 md:w-[112px] md:px-2.5 md:text-xs"
+                className="h-11 w-[124px] shrink-0 rounded-xl border border-slate-300 bg-white px-3 text-base font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none md:h-8 md:w-[104px] md:px-2 md:text-xs"
               />
 
-              <div className="grid h-11 flex-1 grid-cols-2 overflow-hidden rounded-xl border border-uva-700 shadow-xs md:h-9">
+              <div className="grid h-11 flex-1 grid-cols-2 overflow-hidden rounded-xl border border-uva-700 shadow-xs md:h-8">
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex items-center justify-center bg-uva-700 px-2 text-xs font-bold leading-tight text-white transition hover:bg-uva-600 disabled:opacity-50 md:px-1.5 md:text-[11px]"
+                  className="flex items-center justify-center bg-uva-700 px-2 text-xs font-bold leading-tight text-white transition hover:bg-uva-600 disabled:opacity-50 md:px-1 md:text-[10px]"
                 >
                   {submitting ? 'Salvando...' : 'Salvar proposta'}
                 </button>
                 <Link
                   href={`/vehicles/${vehicle.id}?modality=trade_in_plus_cash`}
-                  className="flex items-center justify-center gap-1 border-l border-uva-600 bg-white px-2 text-xs font-bold leading-tight text-uva-700 transition hover:bg-uva-50 md:px-1.5 md:text-[11px]"
+                  className="flex items-center justify-center gap-1 border-l border-uva-600 bg-white px-2 text-xs font-bold leading-tight text-uva-700 transition hover:bg-uva-50 md:px-1 md:text-[10px]"
                 >
                   <Repeat className="h-3.5 w-3.5 shrink-0 md:h-3 md:w-3" />
                   Propor permuta
