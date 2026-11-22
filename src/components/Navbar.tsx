@@ -296,7 +296,7 @@ export function Navbar() {
         aria-label="Categorias de produtos"
         className="border-t border-slate-100 bg-white"
       >
-        <div className="mx-auto flex w-full max-w-[1024px] items-center justify-between gap-6 overflow-x-auto px-3 py-2 [scrollbar-width:none] sm:px-0 [&::-webkit-scrollbar]:hidden">
+        <div className="mx-auto flex w-full max-w-[1024px] items-center justify-between gap-4 overflow-x-auto px-3 py-2.5 [scrollbar-width:none] sm:px-0 [&::-webkit-scrollbar]:hidden">
           {PRODUCT_CATEGORIES.map((category) => {
             const isActive = activeCategory === category;
             return (
@@ -307,7 +307,7 @@ export function Navbar() {
                   setActiveCategory(category);
                   router.push('/');
                 }}
-                className={`shrink-0 whitespace-nowrap text-sm font-semibold transition sm:text-xs ${
+                className={`shrink-0 whitespace-nowrap text-[15px] font-semibold transition ${
                   isActive
                     ? 'text-uva-700 underline decoration-2 underline-offset-4'
                     : 'text-slate-600 hover:text-uva-700'
