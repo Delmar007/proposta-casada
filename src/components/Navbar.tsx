@@ -13,7 +13,6 @@ import {
   X,
   Bell,
   MessageSquare,
-  ChevronDown,
 } from 'lucide-react';
 import { DEMO_USERS, useActiveUser } from './ActiveUserProvider';
 import { AuthModal } from './AuthModal';
@@ -148,8 +147,9 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
-      <div className="mx-auto flex w-full max-w-[1024px] flex-wrap items-center justify-between gap-3 px-3 py-3 sm:px-0">
+    <>
+      <header className="border-b border-slate-100 bg-white">
+        <div className="mx-auto flex w-full max-w-[1024px] flex-wrap items-center justify-between gap-3 px-3 py-3 sm:px-0">
         {/* LOGO — 280 px de largura no desktop */}
         <Link
           href="/"
@@ -381,12 +381,13 @@ export function Navbar() {
           )}
         </div>
       </div>
+      </header>
 
-      {/* LINHA INFERIOR DO CABEÇALHO — Categorias com menu vertical de subcategorias */}
+      {/* BARRA DE CATEGORIAS — Travada no topo ao rolar o feed */}
       <nav
         ref={categoryNavRef}
         aria-label="Categorias de produtos"
-        className="relative border-t border-slate-100 bg-white"
+        className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-2xs"
       >
         <div className="mx-auto flex w-full max-w-[1024px] items-center justify-between gap-4 overflow-x-auto px-3 py-2.5 [scrollbar-width:none] sm:px-0 [&::-webkit-scrollbar]:hidden">
           {PRODUCT_CATEGORIES.map((category) => {
@@ -400,77 +401,72 @@ export function Navbar() {
                   setActiveCategory(category);
                   setOpenCategoryMenu((prev) => (prev === category ? null : category));
                 }}
-                className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[15px] font-semibold transition ${
+                className={`shrink-0 whitespace-nowrap text-[15px] font-semibold transition ${
                   isActive || isOpen
                     ? 'text-uva-700 underline decoration-2 underline-offset-4'
                     : 'text-slate-600 hover:text-uva-700'
                 }`}
               >
-                <span>{category}</span>
-                <ChevronDown
-                  className={`h-3.5 w-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                />
+                {category}
               </button>
             );
           })}
         </div>
 
-        {/* Menu Vertical de Subcategorias */}
+        {/* Menu Vertical de Subcategorias — 940 px no desktop, vertical no mobile */}
         {openCategoryMenu && CATEGORY_SUBCATEGORIES[openCategoryMenu] && (
-          <div className="absolute left-0 right-0 top-full z-50 border-t border-slate-100 bg-transparent">
-            <div className="mx-auto w-full max-w-[1024px] px-3 sm:px-0">
-              <div className="mt-1 w-full max-w-xs rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">
-                <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-uva-700">
-                    {openCategoryMenu}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveCategory(openCategoryMenu);
-                      setActiveSubcategory(null);
-                      setSearchQuery('');
-                      setOpenCategoryMenu(null);
-                      router.push('/');
-                    }}
-                    className="text-[11px] font-semibold text-slate-500 hover:text-uva-700"
-                  >
-                    Ver todos
-                  </button>
-                </div>
-
-                <ul className="flex max-h-72 flex-col gap-0.5 overflow-y-auto">
-                  {CATEGORY_SUBCATEGORIES[openCategoryMenu].map((sub) => {
-                    const isSubSelected =
-                      activeCategory === openCategoryMenu && activeSubcategory === sub;
-                    return (
-                      <li key={sub}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setActiveCategory(openCategoryMenu);
-                            setActiveSubcategory(sub);
-                            setOpenCategoryMenu(null);
-                            router.push('/');
-                          }}
-                          className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition ${
-                            isSubSelected
-                              ? 'bg-uva-50 font-bold text-uva-700'
-                              : 'text-slate-700 hover:bg-slate-50 hover:text-uva-700'
-                          }`}
-                        >
-                          <span>{sub}</span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
+          <div className="absolute left-0 right-0 top-full z-50 px-3 sm:px-0">
+            <div className="mx-auto mt-1 w-full max-w-[940px] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+              <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-uva-700">
+                  {openCategoryMenu}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory(openCategoryMenu);
+                    setActiveSubcategory(null);
+                    setSearchQuery('');
+                    setOpenCategoryMenu(null);
+                    router.push('/');
+                  }}
+                  className="text-xs font-semibold text-slate-500 hover:text-uva-700"
+                >
+                  Ver todos
+                </button>
               </div>
+
+              <ul className="grid max-h-[65vh] grid-cols-1 gap-1 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
+                {CATEGORY_SUBCATEGORIES[openCategoryMenu].map((sub) => {
+                  const isSubSelected =
+                    activeCategory === openCategoryMenu && activeSubcategory === sub;
+                  return (
+                    <li key={sub}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveCategory(openCategoryMenu);
+                          setActiveSubcategory(sub);
+                          setOpenCategoryMenu(null);
+                          router.push('/');
+                        }}
+                        className={`flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-medium transition ${
+                          isSubSelected
+                            ? 'bg-uva-50 font-bold text-uva-700'
+                            : 'text-slate-700 hover:bg-slate-50 hover:text-uva-700'
+                        }`}
+                      >
+                        {sub}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           </div>
         )}
       </nav>
       <AuthModal />
-    </header>
+    </>
   );
 }
