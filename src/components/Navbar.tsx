@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -13,22 +13,100 @@ import {
   X,
   Bell,
   MessageSquare,
+  ChevronDown,
 } from 'lucide-react';
 import { DEMO_USERS, useActiveUser } from './ActiveUserProvider';
 import { AuthModal } from './AuthModal';
 
-const PRODUCT_CATEGORIES = [
-  'Carros',
-  'Motos',
-  'Caminhões',
-  'Ônibus/Vans',
-  'Triciclos/Quadriciclos/UTVs',
-  'Náutica',
-  'Tratores/Rebocáveis',
-  'Residências',
-  'Comerciais',
-  'Rurais',
-] as const;
+const CATEGORY_SUBCATEGORIES: Record<string, string[]> = {
+  Carros: [
+    'Sedã',
+    'Hatch',
+    'SUV',
+    'Picape / Camionete',
+    'Conversível',
+    'Jipe',
+    'Perua / Wagon',
+    'Cupê / Esportivo',
+    'Minivan / Monovolume',
+    'Elétrico / Híbrido',
+  ],
+  Motos: [
+    'Street / Urbana',
+    'Esportiva',
+    'Trail / Big Trail',
+    'Custom / Cruiser',
+    'Scooter',
+    'Naked',
+    'Off-Road / Cross',
+  ],
+  Caminhões: [
+    'Leve / VUC',
+    '3/4',
+    'Toco (4x2)',
+    'Truck (6x2 / 6x4)',
+    'Cavalo Mecânico',
+    'Baú / Sider',
+    'Caçamba / Basculante',
+  ],
+  'Ônibus/Vans': [
+    'Van de Passageiros',
+    'Furgão',
+    'Micro-ônibus',
+    'Ônibus Rodoviário',
+    'Ônibus Urbano',
+    'Escolar / Executivo',
+  ],
+  'Triciclos/Quadriciclos/UTVs': [
+    'Triciclo',
+    'Quadriciclo (ATV)',
+    'UTV / Side-by-Side',
+    'Buggy',
+  ],
+  Náutica: [
+    'Barco',
+    'Lancha',
+    'Jet Ski',
+    'Iate',
+    'Veleiro',
+    'Bote / Inflável',
+    'Catamarã / Escuna',
+  ],
+  'Tratores/Rebocáveis': [
+    'Trator Agrícola',
+    'Colheitadeira',
+    'Carreta / Semirreboque',
+    'Reboque / Carretinha',
+    'Trailer / Motorhome',
+    'Implemento Agrícola',
+  ],
+  Residências: [
+    'Casa',
+    'Apartamento',
+    'Cobertura',
+    'Sobrado',
+    'Condomínio Fechado',
+    'Kitnet / Studio',
+    'Terreno Residencial',
+  ],
+  Comerciais: [
+    'Sala Comercial',
+    'Loja / Ponto Comercial',
+    'Galpão / Depósito',
+    'Prédio Comercial',
+    'Hotel / Pousada',
+    'Terreno Comercial',
+  ],
+  Rurais: [
+    'Fazenda',
+    'Sítio',
+    'Chácara',
+    'Haras',
+    'Área Rural / Gleba',
+  ],
+};
+
+const PRODUCT_CATEGORIES = Object.keys(CATEGORY_SUBCATEGORIES);
 
 export function Navbar() {
   const router = useRouter();
@@ -50,6 +128,19 @@ export function Navbar() {
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('Carros');
+  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+  const [openCategoryMenu, setOpenCategoryMenu] = useState<string | null>(null);
+  const categoryNavRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const handleOutside = (e: MouseEvent) => {
+      if (categoryNavRef.current && !categoryNavRef.current.contains(e.target as Node)) {
+        setOpenCategoryMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -291,33 +382,93 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* LINHA INFERIOR DO CABEÇALHO — Categorias com espaçamento horizontal idêntico */}
+      {/* LINHA INFERIOR DO CABEÇALHO — Categorias com menu vertical de subcategorias */}
       <nav
+        ref={categoryNavRef}
         aria-label="Categorias de produtos"
-        className="border-t border-slate-100 bg-white"
+        className="relative border-t border-slate-100 bg-white"
       >
         <div className="mx-auto flex w-full max-w-[1024px] items-center justify-between gap-4 overflow-x-auto px-3 py-2.5 [scrollbar-width:none] sm:px-0 [&::-webkit-scrollbar]:hidden">
           {PRODUCT_CATEGORIES.map((category) => {
             const isActive = activeCategory === category;
+            const isOpen = openCategoryMenu === category;
             return (
               <button
                 key={category}
                 type="button"
                 onClick={() => {
                   setActiveCategory(category);
-                  router.push('/');
+                  setOpenCategoryMenu((prev) => (prev === category ? null : category));
                 }}
-                className={`shrink-0 whitespace-nowrap text-[15px] font-semibold transition ${
-                  isActive
+                className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap text-[15px] font-semibold transition ${
+                  isActive || isOpen
                     ? 'text-uva-700 underline decoration-2 underline-offset-4'
                     : 'text-slate-600 hover:text-uva-700'
                 }`}
               >
-                {category}
+                <span>{category}</span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                />
               </button>
             );
           })}
         </div>
+
+        {/* Menu Vertical de Subcategorias */}
+        {openCategoryMenu && CATEGORY_SUBCATEGORIES[openCategoryMenu] && (
+          <div className="absolute left-0 right-0 top-full z-50 border-t border-slate-100 bg-transparent">
+            <div className="mx-auto w-full max-w-[1024px] px-3 sm:px-0">
+              <div className="mt-1 w-full max-w-xs rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">
+                <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-uva-700">
+                    {openCategoryMenu}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveCategory(openCategoryMenu);
+                      setActiveSubcategory(null);
+                      setSearchQuery('');
+                      setOpenCategoryMenu(null);
+                      router.push('/');
+                    }}
+                    className="text-[11px] font-semibold text-slate-500 hover:text-uva-700"
+                  >
+                    Ver todos
+                  </button>
+                </div>
+
+                <ul className="flex max-h-72 flex-col gap-0.5 overflow-y-auto">
+                  {CATEGORY_SUBCATEGORIES[openCategoryMenu].map((sub) => {
+                    const isSubSelected =
+                      activeCategory === openCategoryMenu && activeSubcategory === sub;
+                    return (
+                      <li key={sub}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveCategory(openCategoryMenu);
+                            setActiveSubcategory(sub);
+                            setOpenCategoryMenu(null);
+                            router.push('/');
+                          }}
+                          className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition ${
+                            isSubSelected
+                              ? 'bg-uva-50 font-bold text-uva-700'
+                              : 'text-slate-700 hover:bg-slate-50 hover:text-uva-700'
+                          }`}
+                        >
+                          <span>{sub}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
       <AuthModal />
     </header>
