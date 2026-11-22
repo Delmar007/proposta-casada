@@ -163,14 +163,14 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
 
   return (
     <article
-      className="mx-auto flex w-full max-w-[400px] aspect-[9/16] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:shadow-md md:max-w-[1024px] md:aspect-auto md:h-[320px] md:flex-row"
+      className="mx-auto flex w-full max-w-[440px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:shadow-md md:h-[320px] md:max-w-[1024px] md:flex-row"
     >
       {/* =====================================================================
           PARTE 1 (ESQUERDA): Foto Horizontal encostada no topo + Logo no canto esquerdo superior + Carrossel de Miniaturas embaixo
          ===================================================================== */}
-      <div className="flex h-[36%] w-full shrink-0 flex-col bg-uva-900 md:h-full md:w-[360px]">
+      <div className="flex w-full shrink-0 flex-col bg-uva-900 md:h-full md:w-[360px]">
         {/* Imagem Principal Horizontal encostada na borda superior da caixa */}
-        <div className="relative flex-1 w-full overflow-hidden">
+        <div className="relative h-56 w-full overflow-hidden md:h-auto md:flex-1">
           <img
             src={galleryImages[activeImageIdx] ?? vehicle.imageUrl}
             alt={`${vehicle.brand} ${specs.model} - Foto ${activeImageIdx + 1}`}
@@ -181,7 +181,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-2">
             <BrandLogo brand={vehicle.brand} size={30} className="shadow-md" />
             {isLocked && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-purple-600 px-2.5 py-0.5 text-[10px] font-bold text-white shadow-xs">
+              <span className="inline-flex items-center gap-1 rounded-full bg-uva-700 px-2.5 py-0.5 text-xs font-bold text-white shadow-xs md:text-[10px]">
                 <Lock className="h-3 w-3" />
                 Acordo Confirmado
               </span>
@@ -192,10 +192,10 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           <button
             type="button"
             onClick={() => toggleFavorite(vehicle.id)}
-            className={`absolute top-2.5 right-2.5 flex h-8 w-8 items-center justify-center rounded-full border backdrop-blur-xs transition ${
+            className={`absolute top-2.5 right-2.5 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-xs transition md:h-8 md:w-8 ${
               fav
-                ? 'border-purple-300 bg-purple-600 text-white'
-                : 'border-white/60 bg-uva-700/55 text-white hover:bg-uva-700/80'
+                ? 'border-uva-200 bg-uva-700 text-white'
+                : 'border-white/60 bg-uva-900/60 text-white hover:bg-uva-800/80'
             }`}
             title={
               fav
@@ -208,22 +208,22 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
 
           {/* Ano e Localização sobre a foto horizontal */}
           <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between gap-2">
-            <span className="rounded-md bg-uva-700/85 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-xs">
+            <span className="rounded-md bg-uva-900/85 px-2.5 py-0.5 text-xs font-bold text-white backdrop-blur-xs md:px-2 md:text-[10px]">
               {vehicle.manufactureYear}/{vehicle.modelYear}
             </span>
-            <span className="inline-flex items-center gap-1 rounded-md bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-slate-800 backdrop-blur-xs">
-              <MapPin className="h-3 w-3 text-slate-600" />
+            <span className="inline-flex items-center gap-1 rounded-md bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-slate-800 backdrop-blur-xs md:px-2 md:text-[10px]">
+              <MapPin className="h-3.5 w-3.5 text-uva-700 md:h-3 md:w-3" />
               {vehicle.city}/{vehicle.state}
             </span>
           </div>
         </div>
 
         {/* Faixa Inferior: Carrossel Horizontal de Miniaturas que movimenta de um lado para o outro */}
-        <div className="relative flex h-[64px] w-full shrink-0 items-center gap-1 border-t border-uva-600 bg-uva-700 px-1.5">
+        <div className="relative flex h-[64px] w-full shrink-0 items-center gap-1 border-t border-uva-700 bg-uva-800 px-1.5">
           <button
             type="button"
             onClick={() => handleCarouselStep(-1)}
-            className="flex h-7 w-6 shrink-0 items-center justify-center rounded-md bg-uva-600 text-slate-200 transition hover:bg-slate-700 hover:text-white"
+            className="flex h-8 w-7 shrink-0 items-center justify-center rounded-md bg-uva-700 text-uva-100 transition hover:bg-uva-600 hover:text-white md:h-7 md:w-6"
             title="Imagem anterior"
             aria-label="Mover carrossel para a esquerda"
           >
@@ -243,7 +243,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
                   onClick={() => handleSelectThumb(idx)}
                   className={`relative h-[46px] w-[72px] shrink-0 overflow-hidden rounded-md border-2 transition ${
                     isSelected
-                      ? 'border-purple-400 ring-1 ring-purple-400/50'
+                      ? 'border-uva-300 ring-1 ring-uva-300/60'
                       : 'border-transparent opacity-65 hover:opacity-100'
                   }`}
                   title={`Ver foto ${idx + 1}`}
@@ -261,7 +261,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           <button
             type="button"
             onClick={() => handleCarouselStep(1)}
-            className="flex h-7 w-6 shrink-0 items-center justify-center rounded-md bg-uva-600 text-slate-200 transition hover:bg-slate-700 hover:text-white"
+            className="flex h-8 w-7 shrink-0 items-center justify-center rounded-md bg-uva-700 text-uva-100 transition hover:bg-uva-600 hover:text-white md:h-7 md:w-6"
             title="Próxima imagem"
             aria-label="Mover carrossel para a direita"
           >
@@ -275,8 +275,8 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           Combustível, Motor, Potência, Tração, KM e Ano) + 1 linha inferior
           (col-span-2) para Informações do veículo (até 200 caracteres)
          ===================================================================== */}
-      <div className="flex h-[32%] w-full flex-col border-y border-slate-100 p-2.5 md:h-full md:w-[332px] md:border-y-0 md:border-x">
-        <div className="grid h-full grid-cols-2 grid-rows-[1fr_1fr_1fr_1fr_1.85fr] gap-1.5">
+      <div className="flex w-full flex-col border-y border-slate-100 p-3 md:h-full md:w-[332px] md:border-y-0 md:border-x md:p-2.5">
+        <div className="grid grid-cols-2 gap-2 md:h-full md:grid-rows-[1fr_1fr_1fr_1fr_1.85fr] md:gap-1.5">
           {[
             { label: 'Modelo', value: specs.model },
             { label: 'Versão', value: specs.version },
@@ -289,22 +289,22 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           ].map((item) => (
             <div
               key={item.label}
-              className="flex min-w-0 flex-col justify-center rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-0.5"
+              className="flex min-w-0 flex-col justify-center rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 md:px-2.5 md:py-0.5"
             >
-              <span className="text-[9px] font-bold uppercase leading-none tracking-wider text-slate-400">
+              <span className="text-[11px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[9px]">
                 {item.label}
               </span>
-              <strong className="mt-0.5 truncate text-xs font-extrabold leading-tight text-slate-900">
+              <strong className="mt-0.5 truncate text-sm font-extrabold leading-tight text-slate-900 md:text-xs">
                 {item.value}
               </strong>
             </div>
           ))}
 
-          <div className="col-span-2 flex min-w-0 flex-col justify-start rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5">
-            <span className="text-[9px] font-bold uppercase leading-none tracking-wider text-slate-400">
+          <div className="col-span-2 flex min-w-0 flex-col justify-start rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 md:px-2.5 md:py-1.5">
+            <span className="text-[11px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[9px]">
               Informações do veículo
             </span>
-            <p className="mt-1 line-clamp-4 break-words text-[11px] font-medium leading-snug text-slate-700">
+            <p className="mt-1 line-clamp-4 break-words text-xs font-medium leading-snug text-slate-700 md:text-[11px]">
               {(vehicle.description || '4 pneus novos, lataria com polimento cristalizado.').slice(0, 200)}
             </p>
           </div>
@@ -315,34 +315,34 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           PARTE 3 (DIREITA): Botão FIPE no topo, Grade 4x3 de Propostas no meio,
           Input à esquerda + Botão duplo (Salvar proposta | Propor permuta) embaixo
          ===================================================================== */}
-      <div className="flex h-[32%] w-full flex-col justify-between gap-2 bg-slate-50/70 p-2.5 md:h-full md:w-[332px]">
+      <div className="flex w-full flex-col justify-between gap-2.5 bg-slate-50/70 p-3 md:h-full md:w-[332px] md:gap-2 md:p-2.5">
         {/* Caixa superior: apenas valor FIPE dentro de um botão */}
         <button
           type="button"
           onClick={() => router.push(`/vehicles/${vehicle.id}`)}
-          className="flex h-9 w-full shrink-0 items-center justify-center rounded-xl bg-uva-700 px-3 text-sm font-extrabold tracking-tight text-white shadow-xs transition hover:bg-uva-600"
+          className="flex h-11 w-full shrink-0 items-center justify-center rounded-xl bg-uva-700 px-3 text-base font-extrabold tracking-tight text-white shadow-xs transition hover:bg-uva-600 md:h-9 md:text-sm"
         >
           {formatBRL(vehicle.fipePrice)} FIPE
         </button>
 
         {isLocked ? (
-          <div className="my-auto rounded-xl border border-purple-200 bg-purple-50 p-3 text-xs text-purple-900">
+          <div className="my-auto rounded-xl border border-uva-200 bg-uva-50 p-3 text-sm text-uva-900 md:text-xs">
             <p className="font-bold">Veículo com Acordo Confirmado</p>
-            <p className="mt-1 text-[11px]">
+            <p className="mt-1 text-xs md:text-[11px]">
               Novas propostas estão bloqueadas enquanto o encontro seguro está em andamento.
             </p>
           </div>
         ) : (
           <>
             {/* Caixa quadrada central: 4 linhas x 3 colunas (inicia vazia; maior proposta sempre em 1ª linha, 1ª coluna) */}
-            <div className="grid flex-1 grid-cols-3 grid-rows-4 gap-1 rounded-xl border border-slate-200 bg-white p-1.5">
+            <div className="grid grid-cols-3 grid-rows-4 gap-1.5 rounded-xl border border-slate-200 bg-white p-2 md:flex-1 md:gap-1 md:p-1.5">
               {Array.from({ length: 12 }, (_, idx) => {
                 const item = proposals[idx];
                 const isWinner = idx === 0 && Boolean(item);
                 return (
                   <div
                     key={idx}
-                    className={`flex items-center justify-center rounded-lg border px-1 text-center text-[11px] font-bold transition ${
+                    className={`flex min-h-[38px] items-center justify-center rounded-lg border px-1 text-center text-xs font-bold transition md:min-h-0 md:text-[11px] ${
                       isWinner
                         ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-2xs'
                         : item
@@ -364,11 +364,11 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
             </div>
 
             {feedback && (
-              <p className="truncate text-[10px] font-semibold text-red-600">{feedback}</p>
+              <p className="truncate text-xs font-semibold text-red-600 md:text-[10px]">{feedback}</p>
             )}
 
             {/* Rodapé: Lado esquerdo valor da proposta | Lado direito botão duplo */}
-            <form onSubmit={handleSaveProposal} className="flex shrink-0 items-center gap-1.5">
+            <form onSubmit={handleSaveProposal} className="flex shrink-0 items-center gap-2 md:gap-1.5">
               <input
                 type="number"
                 required
@@ -377,22 +377,22 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
                 onChange={(e) => setProposalAmount(e.target.value)}
                 placeholder="Valor R$"
                 aria-label="Valor da proposta"
-                className="h-9 w-[112px] shrink-0 rounded-xl border border-slate-300 bg-white px-2.5 text-xs font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none"
+                className="h-11 w-[124px] shrink-0 rounded-xl border border-slate-300 bg-white px-3 text-base font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none md:h-9 md:w-[112px] md:px-2.5 md:text-xs"
               />
 
-              <div className="grid h-9 flex-1 grid-cols-2 overflow-hidden rounded-xl border border-uva-700 shadow-xs">
+              <div className="grid h-11 flex-1 grid-cols-2 overflow-hidden rounded-xl border border-uva-700 shadow-xs md:h-9">
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex items-center justify-center bg-uva-700 px-1.5 text-[11px] font-bold leading-tight text-white transition hover:bg-uva-600 disabled:opacity-50"
+                  className="flex items-center justify-center bg-uva-700 px-2 text-xs font-bold leading-tight text-white transition hover:bg-uva-600 disabled:opacity-50 md:px-1.5 md:text-[11px]"
                 >
                   {submitting ? 'Salvando...' : 'Salvar proposta'}
                 </button>
                 <Link
                   href={`/vehicles/${vehicle.id}?modality=trade_in_plus_cash`}
-                  className="flex items-center justify-center gap-1 border-l border-uva-600 bg-white px-1.5 text-[11px] font-bold leading-tight text-uva-700 transition hover:bg-purple-50"
+                  className="flex items-center justify-center gap-1 border-l border-uva-600 bg-white px-2 text-xs font-bold leading-tight text-uva-700 transition hover:bg-uva-50 md:px-1.5 md:text-[11px]"
                 >
-                  <Repeat className="h-3 w-3 shrink-0" />
+                  <Repeat className="h-3.5 w-3.5 shrink-0 md:h-3 md:w-3" />
                   Propor permuta
                 </Link>
               </div>

@@ -51,22 +51,22 @@ export default function MarketplaceHomePage() {
 
         {/* Topo do Banner */}
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-400/30 bg-purple-500/20 px-3 py-1 text-xs font-bold text-purple-300 backdrop-blur-xs">
-            <ShieldCheck className="h-4 w-4" />
-            Privacidade & Negociação Protegida • 1024 px
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-uva-300/40 bg-uva-900/50 px-3 py-1 text-xs font-bold text-uva-100 backdrop-blur-xs">
+            <ShieldCheck className="h-4 w-4 text-uva-300" />
+            Privacidade & Negociação Protegida
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-slate-200 backdrop-blur-xs">
-            <Sparkles className="h-3.5 w-3.5 text-purple-400" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur-xs">
+            <Sparkles className="h-3.5 w-3.5 text-uva-200" />
             Integrado à Tabela FIPE Oficial
           </span>
         </div>
 
         {/* Centro do Banner */}
-        <div className="relative z-10 my-4 max-w-2xl space-y-3 md:my-0">
-          <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl md:text-4xl">
+        <div className="relative z-10 my-4 max-w-2xl space-y-2.5 md:my-0">
+          <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
             Compre, venda ou negocie com permuta sem expor seus dados pessoais
           </h1>
-          <p className="text-xs leading-relaxed text-slate-300 sm:text-sm">
+          <p className="text-sm leading-relaxed text-slate-100/90">
             Escolha modelo e versão direto pela API FIPE, envie propostas à vista ou com seu
             veículo na troca + complemento em dinheiro e converse pelos Favoritos com moderação e
             anonimato.
@@ -75,21 +75,21 @@ export default function MarketplaceHomePage() {
 
         {/* Rodapé do Banner */}
         <div className="relative z-10 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-          <div className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-3.5 py-2.5 backdrop-blur-xs">
-            <Lock className="h-4 w-4 shrink-0 text-purple-400" />
+          <div className="flex items-center gap-2.5 rounded-xl border border-white/20 bg-white/10 px-3.5 py-2.5 backdrop-blur-xs">
+            <Lock className="h-4 w-4 shrink-0 text-uva-200" />
             <div className="min-w-0">
-              <p className="text-xs font-bold text-white">Identidade Anônima</p>
-              <p className="truncate text-[11px] text-slate-300">
+              <p className="text-sm font-bold text-white sm:text-xs">Identidade Anônima</p>
+              <p className="truncate text-xs text-slate-100/80 sm:text-[11px]">
                 Sem CPF, telefone ou WhatsApp exposto
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-3.5 py-2.5 backdrop-blur-xs">
-            <Repeat className="h-4 w-4 shrink-0 text-purple-400" />
+          <div className="flex items-center gap-2.5 rounded-xl border border-white/20 bg-white/10 px-3.5 py-2.5 backdrop-blur-xs">
+            <Repeat className="h-4 w-4 shrink-0 text-uva-200" />
             <div className="min-w-0">
-              <p className="text-xs font-bold text-white">Permuta + Complemento</p>
-              <p className="truncate text-[11px] text-slate-300">
+              <p className="text-sm font-bold text-white sm:text-xs">Permuta + Complemento</p>
+              <p className="truncate text-xs text-slate-100/80 sm:text-[11px]">
                 Cálculo automático e fotos sem EXIF
               </p>
             </div>
@@ -97,13 +97,13 @@ export default function MarketplaceHomePage() {
 
           <Link
             href="/negociacoes"
-            className="flex items-center justify-between gap-2.5 rounded-xl border border-purple-400/40 bg-purple-600/90 px-3.5 py-2.5 text-white transition hover:bg-purple-600"
+            className="flex items-center justify-between gap-2.5 rounded-xl border border-uva-300/40 bg-uva-500/90 px-3.5 py-2.5 text-white transition hover:bg-uva-500"
           >
-            <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex min-w-0 items-center gap-2.5">
               <Heart className="h-4 w-4 shrink-0 fill-white" />
               <div className="min-w-0">
-                <p className="text-xs font-bold">Favoritos & Comunicação</p>
-                <p className="truncate text-[11px] text-purple-100">
+                <p className="text-sm font-bold sm:text-xs">Favoritos & Comunicação</p>
+                <p className="truncate text-xs text-uva-50 sm:text-[11px]">
                   {favorites.length} favorito(s) • Chat protegido
                 </p>
               </div>

@@ -69,7 +69,7 @@ export function Navbar() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar marca, modelo, versão, motorização ou cidade..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pr-9 pl-10 text-xs text-slate-900 placeholder:text-slate-400 focus:border-uva-700 focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pr-9 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-uva-700 focus:bg-white focus:outline-none sm:py-2 sm:text-xs"
             />
             {searchQuery && (
               <button
@@ -163,11 +163,11 @@ export function Navbar() {
                   setShowProfileMenu((v) => !v);
                   setShowSettingsMenu(false);
                 }}
-                className="relative flex h-10 items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-3 text-xs font-bold text-purple-900 transition hover:bg-purple-100"
+                className="relative flex h-10 items-center gap-2 rounded-xl border border-uva-200 bg-uva-50 px-3 text-xs font-bold text-uva-900 transition hover:bg-uva-100"
                 title={`Logado como ${currentUser.label}`}
                 aria-label="Perfil do Usuário"
               >
-                <User className="h-4 w-4 text-purple-700" />
+                <User className="h-4 w-4 text-uva-700" />
                 <span className="hidden max-w-[110px] truncate md:inline">
                   {currentUser.label.split(' ')[0]}
                 </span>
@@ -225,7 +225,7 @@ export function Navbar() {
           >
             <Bell className="h-4 w-4" />
             {notifications.length > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-purple-600 px-1 text-[10px] font-bold text-white">
+              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-uva-700 px-1 text-[10px] font-bold text-white">
                 {notifications.length}
               </span>
             )}
@@ -234,14 +234,14 @@ export function Navbar() {
           {/* 3. Ícone de Coração — Favoritos & Central de Comunicação entre os Usuários */}
           <Link
             href="/negociacoes"
-            className="relative flex h-10 items-center gap-1.5 rounded-xl border border-purple-200 bg-purple-50 px-3 text-purple-700 transition hover:bg-purple-100"
+            className="relative flex h-10 items-center gap-1.5 rounded-xl border border-uva-200 bg-uva-50 px-3 text-uva-800 transition hover:bg-uva-100"
             title="Favoritos e Sala de Comunicação entre Usuários"
             aria-label="Favoritos e Comunicação"
           >
-            <Heart className="h-4 w-4 fill-purple-600 text-purple-600" />
+            <Heart className="h-4 w-4 fill-uva-700 text-uva-700" />
             <span className="hidden text-xs font-bold md:inline">Favoritos & Chat</span>
             {(favorites.length > 0 || notifications.length > 0) && (
-              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-purple-600 px-1 text-[10px] font-bold text-white">
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-uva-700 px-1 text-[10px] font-bold text-white">
                 {favorites.length + notifications.length}
               </span>
             )}
