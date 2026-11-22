@@ -337,19 +337,20 @@ export function Navbar() {
             )}
           </Link>
 
-          {/* 4. Ícone de Coração — Página dedicada de Favoritos */}
+          {/* 4. Ícone de Coração — Página dedicada de Favoritos (sem círculo, oco ou vermelho vivo) */}
           <Link
             href="/favoritos"
-            className="relative inline-flex items-center py-1 text-slate-700 transition hover:text-uva-700"
+            className="relative inline-flex items-center py-1 text-slate-700 transition hover:text-red-600"
             title="Favoritos"
             aria-label="Favoritos"
           >
-            <Heart className="h-[19px] w-[19px] fill-uva-700 text-uva-700" />
-            {favorites.length > 0 && (
-              <span className="absolute -right-1.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">
-                {favorites.length}
-              </span>
-            )}
+            <Heart
+              className={`h-[19px] w-[19px] transition ${
+                favorites.length > 0
+                  ? 'fill-red-600 text-red-600'
+                  : 'text-slate-700 hover:text-red-600'
+              }`}
+            />
           </Link>
 
           {/* 5. Ícone de Chat — Sala de Comunicação */}

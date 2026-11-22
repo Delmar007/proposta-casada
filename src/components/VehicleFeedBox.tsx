@@ -193,22 +193,22 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
             )}
           </div>
 
-          {/* Botão Favoritar (Coração) no canto direito superior */}
+          {/* Botão Favoritar (apenas coração oco; ao clicar preenche em vermelho vivo) */}
           <button
             type="button"
             onClick={() => toggleFavorite(vehicle.id)}
-            className={`absolute top-2.5 right-2.5 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-xs transition md:h-8 md:w-8 ${
-              fav
-                ? 'border-uva-200 bg-uva-700 text-white'
-                : 'border-white/60 bg-uva-900/60 text-white hover:bg-uva-800/80'
-            }`}
+            className="absolute top-2.5 right-2.5 flex items-center justify-center p-1 drop-shadow-md transition hover:scale-110"
             title={
               fav
-                ? 'Nos seus Favoritos (Central de Comunicação)'
-                : 'Salvar nos Favoritos para negociar'
+                ? 'Nos seus Favoritos'
+                : 'Salvar nos Favoritos'
             }
           >
-            <Heart className={`h-4 w-4 ${fav ? 'fill-white' : ''}`} />
+            <Heart
+              className={`h-6 w-6 transition ${
+                fav ? 'fill-red-600 text-red-600' : 'text-white hover:text-red-500'
+              }`}
+            />
           </button>
 
           {/* Ano e Localização sobre a foto */}
