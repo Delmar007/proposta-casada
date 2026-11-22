@@ -337,9 +337,9 @@ export function Navbar() {
             )}
           </Link>
 
-          {/* 4. Ícone de Coração — Favoritos */}
+          {/* 4. Ícone de Coração — Página dedicada de Favoritos */}
           <Link
-            href="/negociacoes"
+            href="/favoritos"
             className="relative inline-flex items-center py-1 text-slate-700 transition hover:text-uva-700"
             title="Favoritos"
             aria-label="Favoritos"
