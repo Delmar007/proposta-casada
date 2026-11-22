@@ -413,10 +413,10 @@ export function Navbar() {
           })}
         </div>
 
-        {/* Menu Vertical de Subcategorias — 940 px no desktop, vertical no mobile */}
+        {/* Menu Vertical de Subcategorias — 1024 px no desktop, vertical no mobile */}
         {openCategoryMenu && CATEGORY_SUBCATEGORIES[openCategoryMenu] && (
           <div className="absolute left-0 right-0 top-full z-50 px-3 sm:px-0">
-            <div className="mx-auto mt-1 w-full max-w-[940px] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+            <div className="mx-auto mt-1 w-full max-w-[1024px] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
               <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-uva-700">
                   {openCategoryMenu}
