@@ -1,0 +1,254 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import {
+  Search,
+  Settings,
+  User,
+  LogIn,
+  Heart,
+  LogOut,
+  X,
+  Bell,
+} from 'lucide-react';
+import { DEMO_USERS, useActiveUser } from './ActiveUserProvider';
+import { AuthModal } from './AuthModal';
+
+export function Navbar() {
+  const router = useRouter();
+  const {
+    userId,
+    setUserId,
+    currentUser,
+    notifications,
+    isAuthenticated,
+    authProvider,
+    openAuthModal,
+    login,
+    logout,
+    favorites,
+    searchQuery,
+    setSearchQuery,
+  } = useActiveUser();
+
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push('/');
+  };
+
+  return (
+    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
+      <div className="mx-auto flex w-full max-w-[1024px] flex-wrap items-center justify-between gap-3 px-3 py-3 sm:px-0">
+        {/* LOGO — 280 px de largura no desktop */}
+        <Link
+          href="/"
+          className="flex w-full shrink-0 items-center sm:w-[280px]"
+          title="Proposta Casada — Marketplace com Negociação Protegida"
+        >
+          <img
+            src="/logo-proposta-casada.png"
+            alt="Proposta Casada — Negociação Protegida"
+            className="h-[58px] w-auto max-w-[280px] object-contain"
+          />
+        </Link>
+
+        {/* BARRA DE BUSCA CENTRAL */}
+        <form
+          onSubmit={handleSearchSubmit}
+          className="order-3 flex w-full flex-1 items-center sm:order-2 sm:w-auto"
+        >
+          <div className="relative flex w-full items-center">
+            <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Buscar marca, modelo, versão, motorização ou cidade..."
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pr-9 pl-10 text-xs text-slate-900 placeholder:text-slate-400 focus:border-uva-700 focus:bg-white focus:outline-none"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 rounded-full p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700"
+                title="Limpar busca"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        </form>
+
+        {/* LADO DIREITO — ÍCONES: Engrenagem, Perfil/Entrar (após login Entrar vira ícone de Perfil), Coração (Favoritos + Comunicação) */}
+        <div className="order-2 flex shrink-0 items-center gap-2 sm:order-3">
+          {/* 1. Ícone de Engrenagem (Configurações / Central Admin / Seletor de Perfil Demo) */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setShowSettingsMenu((v) => !v);
+                setShowProfileMenu(false);
+              }}
+              className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"
+              title="Configurações e Central de Moderação"
+              aria-label="Configurações"
+            >
+              <Settings className="h-4 w-4" />
+            </button>
+
+            {showSettingsMenu && (
+              <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-xl">
+                <p className="text-xs font-bold text-slate-900">
+                  Configurações & Moderação
+                </p>
+                <p className="mt-0.5 text-[11px] text-slate-500">
+                  Alterne o perfil de simulação ou acesse a Central de Negociações.
+                </p>
+
+                <div className="mt-3 space-y-1.5">
+                  <label className="block text-[11px] font-semibold text-slate-600">
+                    Perfil ativo na sessão:
+                  </label>
+                  <select
+                    value={userId}
+                    onChange={(e) => {
+                      setUserId(e.target.value);
+                      login(e.target.value);
+                    }}
+                    className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-900"
+                  >
+                    {DEMO_USERS.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.label} ({u.roleLabel})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="mt-3 flex flex-col gap-1.5 border-t border-slate-100 pt-2.5 text-xs">
+                  <Link
+                    href="/admin/negociacoes"
+                    onClick={() => setShowSettingsMenu(false)}
+                    className="flex items-center justify-between rounded-lg bg-uva-700 px-3 py-2 font-semibold text-white hover:bg-uva-600"
+                  >
+                    <span>Central de Moderação (Admin)</span>
+                    <Settings className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 2. Entrar / Perfil (após login, Entrar vira ícone de Perfil) */}
+          {!isAuthenticated ? (
+            <button
+              type="button"
+              onClick={openAuthModal}
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-uva-700 bg-uva-700 px-3.5 text-xs font-bold text-white transition hover:bg-uva-600"
+              title="Cadastrar ou Entrar com Google / Facebook"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Entrar</span>
+            </button>
+          ) : (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowProfileMenu((v) => !v);
+                  setShowSettingsMenu(false);
+                }}
+                className="relative flex h-10 items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-3 text-xs font-bold text-purple-900 transition hover:bg-purple-100"
+                title={`Logado como ${currentUser.label}`}
+                aria-label="Perfil do Usuário"
+              >
+                <User className="h-4 w-4 text-purple-700" />
+                <span className="hidden max-w-[110px] truncate md:inline">
+                  {currentUser.label.split(' ')[0]}
+                </span>
+              </button>
+
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-xl">
+                  <div className="border-b border-slate-100 pb-2.5">
+                    <p className="text-xs font-bold text-slate-900">{currentUser.label}</p>
+                    <p className="text-[11px] text-slate-500">
+                      Função: {currentUser.roleLabel}
+                      {authProvider ? ` • Login ${authProvider === 'google' ? 'Google' : 'Facebook'}` : ''}
+                    </p>
+                  </div>
+
+                  <div className="mt-2.5 space-y-1.5">
+                    <label className="block text-[10px] font-semibold uppercase text-slate-400">
+                      Trocar usuário logado
+                    </label>
+                    <select
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs font-semibold text-slate-800"
+                    >
+                      {DEMO_USERS.map((u) => (
+                        <option key={u.id} value={u.id}>
+                          {u.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      setShowProfileMenu(false);
+                    }}
+                    className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    Sair da conta
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 3. Ícone de Sino ao lado do Perfil — abre diretamente a página de Negociações */}
+          <Link
+            href="/negociacoes"
+            className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"
+            title="Abrir página de negociações"
+            aria-label="Abrir página de negociações"
+          >
+            <Bell className="h-4 w-4" />
+            {notifications.length > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-purple-600 px-1 text-[10px] font-bold text-white">
+                {notifications.length}
+              </span>
+            )}
+          </Link>
+
+          {/* 3. Ícone de Coração — Favoritos & Central de Comunicação entre os Usuários */}
+          <Link
+            href="/negociacoes"
+            className="relative flex h-10 items-center gap-1.5 rounded-xl border border-purple-200 bg-purple-50 px-3 text-purple-700 transition hover:bg-purple-100"
+            title="Favoritos e Sala de Comunicação entre Usuários"
+            aria-label="Favoritos e Comunicação"
+          >
+            <Heart className="h-4 w-4 fill-purple-600 text-purple-600" />
+            <span className="hidden text-xs font-bold md:inline">Favoritos & Chat</span>
+            {(favorites.length > 0 || notifications.length > 0) && (
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-purple-600 px-1 text-[10px] font-bold text-white">
+                {favorites.length + notifications.length}
+              </span>
+            )}
+          </Link>
+        </div>
+      </div>
+      <AuthModal />
+    </header>
+  );
+}
