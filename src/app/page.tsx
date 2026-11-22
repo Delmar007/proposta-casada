@@ -36,9 +36,9 @@ export default function MarketplaceHomePage() {
   return (
     <div className="mx-auto w-full max-w-[1024px]">
       {/* =====================================================================
-          BANNER PRINCIPAL — 1024 x 320 px no desktop, responsivo para mobile
+          BANNER PRINCIPAL — 1024 x 250 px no desktop, responsivo para mobile
          ===================================================================== */}
-      <section className="relative flex min-h-[220px] w-full max-w-[1024px] flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-uva-700 via-uva-600 to-uva-700 p-5 text-white shadow-sm md:h-[320px] md:p-6">
+      <section className="relative flex min-h-[220px] w-full max-w-[1024px] flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-uva-700 via-uva-600 to-uva-700 p-4 text-white shadow-sm md:h-[250px] md:p-5">
         {/* Background decorativo automotivo */}
         <div
           className="pointer-events-none absolute inset-0 opacity-20 bg-cover bg-center"
@@ -62,11 +62,11 @@ export default function MarketplaceHomePage() {
         </div>
 
         {/* Centro do Banner */}
-        <div className="relative z-10 my-4 max-w-2xl space-y-2.5 md:my-0">
-          <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl">
+        <div className="relative z-10 my-3 max-w-2xl space-y-1.5 md:my-0">
+          <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl md:text-[28px]">
             Compre, venda ou negocie com permuta sem expor seus dados pessoais
           </h1>
-          <p className="text-sm leading-relaxed text-slate-100/90">
+          <p className="text-sm leading-snug text-slate-100/90 md:text-xs">
             Escolha modelo e versão direto pela API FIPE, envie propostas à vista ou com seu
             veículo na troca + complemento em dinheiro e converse pelos Favoritos com moderação e
             anonimato.
