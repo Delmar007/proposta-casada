@@ -18,15 +18,16 @@ import { DEMO_USERS, useActiveUser } from './ActiveUserProvider';
 import { AuthModal } from './AuthModal';
 
 const PRODUCT_CATEGORIES = [
-  'Carro',
-  'Moto',
-  'Barco',
-  'Caminhão',
-  'Rebocáveis',
-  'UTVs/Triciclos',
-  'Residencial',
-  'Comercial',
-  'Rural',
+  'Carros',
+  'Motos',
+  'Caminhões',
+  'Ônibus/Vans',
+  'Triciclos/Quadriciclos/UTVs',
+  'Náutica',
+  'Tratores/Rebocáveis',
+  'Residências',
+  'Comerciais',
+  'Rurais',
 ] as const;
 
 export function Navbar() {
@@ -48,7 +49,7 @@ export function Navbar() {
 
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>('Carro');
+  const [activeCategory, setActiveCategory] = useState<string>('Carros');
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
