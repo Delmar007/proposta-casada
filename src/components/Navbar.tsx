@@ -12,6 +12,7 @@ import {
   LogOut,
   X,
   Bell,
+  MessageSquare,
 } from 'lucide-react';
 import { DEMO_USERS, useActiveUser } from './ActiveUserProvider';
 import { AuthModal } from './AuthModal';
@@ -244,20 +245,29 @@ export function Navbar() {
             )}
           </Link>
 
-          {/* 4. Ícone de Coração — Favoritos & Central de Comunicação entre os Usuários */}
+          {/* 4. Ícone de Coração — Favoritos */}
           <Link
             href="/negociacoes"
-            className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-slate-800 transition hover:text-uva-700 sm:text-xs"
-            title="Favoritos e Sala de Comunicação entre Usuários"
-            aria-label="Favoritos e Comunicação"
+            className="inline-flex items-center gap-1 py-1 text-slate-700 transition hover:text-uva-700"
+            title="Favoritos"
+            aria-label="Favoritos"
           >
             <Heart className="h-4 w-4 fill-uva-700 text-uva-700" />
-            <span className="hidden md:inline">Favoritos & Chat</span>
-            {(favorites.length > 0 || notifications.length > 0) && (
+            {favorites.length > 0 && (
               <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-uva-700 px-1 text-[10px] font-bold text-white">
-                {favorites.length + notifications.length}
+                {favorites.length}
               </span>
             )}
+          </Link>
+
+          {/* 5. Ícone de Chat — Sala de Comunicação */}
+          <Link
+            href="/negociacoes"
+            className="inline-flex items-center gap-1 py-1 text-slate-700 transition hover:text-uva-700"
+            title="Chat e Negociações"
+            aria-label="Chat e Negociações"
+          >
+            <MessageSquare className="h-4 w-4" />
           </Link>
 
           {/* 5. Sair diretamente no cabeçalho quando autenticado */}
