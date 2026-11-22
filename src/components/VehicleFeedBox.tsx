@@ -297,20 +297,20 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
               key={item.label}
               className="flex min-w-0 flex-col justify-center rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 md:px-2 md:py-0.5"
             >
-              <span className="text-[11px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[8px]">
+              <span className="text-[14px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[11px]">
                 {item.label}
               </span>
-              <strong className="mt-0.5 truncate text-sm font-extrabold leading-none text-slate-900 md:text-[11px]">
+              <strong className="mt-0.5 truncate text-[17px] font-extrabold leading-none text-slate-900 md:text-[14px]">
                 {item.value}
               </strong>
             </div>
           ))}
 
           <div className="col-span-2 flex min-w-0 flex-col justify-start rounded-md border border-slate-200 bg-slate-50 px-3 py-2 md:px-2 md:py-1">
-            <span className="text-[11px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[8px]">
+            <span className="text-[14px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[11px]">
               Informações do veículo
             </span>
-            <p className="mt-0.5 line-clamp-3 break-words text-xs font-medium leading-tight text-slate-700 md:text-[10px]">
+            <p className="mt-0.5 line-clamp-2 break-words text-[15px] font-medium leading-tight text-slate-700 md:text-[13px]">
               {(vehicle.description || '4 pneus novos, lataria com polimento cristalizado.').slice(0, 200)}
             </p>
           </div>
