@@ -246,6 +246,24 @@ export function Navbar() {
               </span>
             )}
           </Link>
+
+          {/* 4. Botão direto de Sair no cabeçalho quando autenticado */}
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={() => {
+                logout();
+                setShowProfileMenu(false);
+                setShowSettingsMenu(false);
+              }}
+              className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3 text-xs font-bold text-red-700 transition hover:bg-red-100"
+              title="Sair da conta"
+              aria-label="Sair"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Sair</span>
+            </button>
+          )}
         </div>
       </div>
       <AuthModal />
