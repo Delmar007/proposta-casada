@@ -113,7 +113,7 @@ export function Navbar() {
               title="Configurações e Central de Moderação"
               aria-label="Configurações"
             >
-              <Settings className="h-4 w-4" />
+              <Settings className="h-[19px] w-[19px]" />
             </button>
 
             {showSettingsMenu && (
@@ -167,7 +167,7 @@ export function Navbar() {
               className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-uva-700 transition hover:text-uva-600 sm:text-xs"
               title="Cadastrar ou Entrar com Google / Facebook"
             >
-              <LogIn className="h-4 w-4" />
+              <LogIn className="h-[19px] w-[19px]" />
               <span>Entrar</span>
             </button>
           ) : (
@@ -182,7 +182,7 @@ export function Navbar() {
                 title={`Logado como ${currentUser.label}`}
                 aria-label="Perfil do Usuário"
               >
-                <User className="h-4 w-4 text-uva-700" />
+                <User className="h-[19px] w-[19px] text-uva-700" />
                 <span className="hidden max-w-[110px] truncate md:inline">
                   {currentUser.label.split(' ')[0]}
                 </span>
@@ -234,13 +234,13 @@ export function Navbar() {
           {/* 3. Ícone de Sino ao lado do Perfil — abre diretamente a página de Negociações */}
           <Link
             href="/negociacoes"
-            className="relative inline-flex items-center gap-1 py-1 text-slate-700 transition hover:text-uva-700"
+            className="relative inline-flex items-center py-1 text-slate-700 transition hover:text-uva-700"
             title="Abrir página de negociações"
             aria-label="Abrir página de negociações"
           >
-            <Bell className="h-4 w-4" />
+            <Bell className="h-[19px] w-[19px]" />
             {notifications.length > 0 && (
-              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-uva-700 px-1 text-[10px] font-bold text-white">
+              <span className="absolute -right-1.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">
                 {notifications.length}
               </span>
             )}
@@ -249,13 +249,13 @@ export function Navbar() {
           {/* 4. Ícone de Coração — Favoritos */}
           <Link
             href="/negociacoes"
-            className="inline-flex items-center gap-1 py-1 text-slate-700 transition hover:text-uva-700"
+            className="relative inline-flex items-center py-1 text-slate-700 transition hover:text-uva-700"
             title="Favoritos"
             aria-label="Favoritos"
           >
-            <Heart className="h-4 w-4 fill-uva-700 text-uva-700" />
+            <Heart className="h-[19px] w-[19px] fill-uva-700 text-uva-700" />
             {favorites.length > 0 && (
-              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-uva-700 px-1 text-[10px] font-bold text-white">
+              <span className="absolute -right-1.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">
                 {favorites.length}
               </span>
             )}
@@ -264,11 +264,11 @@ export function Navbar() {
           {/* 5. Ícone de Chat — Sala de Comunicação */}
           <Link
             href="/negociacoes"
-            className="inline-flex items-center gap-1 py-1 text-slate-700 transition hover:text-uva-700"
+            className="relative inline-flex items-center py-1 text-slate-700 transition hover:text-uva-700"
             title="Chat e Negociações"
             aria-label="Chat e Negociações"
           >
-            <MessageSquare className="h-4 w-4" />
+            <MessageSquare className="h-[19px] w-[19px]" />
           </Link>
 
           {/* 5. Sair diretamente no cabeçalho quando autenticado */}
@@ -284,7 +284,7 @@ export function Navbar() {
               title="Sair da conta"
               aria-label="Sair"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-[19px] w-[19px]" />
               <span className="hidden sm:inline">Sair</span>
             </button>
           )}
