@@ -322,13 +322,18 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           Input à esquerda + Botão duplo (Salvar proposta | Propor permuta) embaixo
          ===================================================================== */}
       <div className="flex w-full flex-col justify-between gap-2.5 bg-slate-50/70 p-3 md:h-full md:w-[332px] md:gap-1.5 md:p-2">
-        {/* Caixa superior: apenas valor FIPE dentro de um botão */}
+        {/* Caixa superior: botão dividido em 2 colunas (PREÇO FIPE | valor) */}
         <button
           type="button"
           onClick={() => router.push(`/vehicles/${vehicle.id}`)}
-          className="flex h-11 w-full shrink-0 items-center justify-center rounded-xl bg-uva-700 px-3 text-base font-extrabold tracking-tight text-white shadow-xs transition hover:bg-uva-600 md:h-8 md:text-xs"
+          className="grid h-11 w-full shrink-0 grid-cols-2 items-center overflow-hidden rounded-xl bg-uva-700 text-white shadow-xs transition hover:bg-uva-600 md:h-8"
         >
-          {formatBRL(vehicle.fipePrice)} FIPE
+          <span className="flex h-full items-center justify-center border-r border-uva-500/60 px-2 text-xs font-bold uppercase tracking-wider text-uva-100 md:text-[11px]">
+            PREÇO FIPE
+          </span>
+          <span className="flex h-full items-center justify-center px-2 text-base font-extrabold tracking-tight md:text-xs">
+            {formatBRL(vehicle.fipePrice)}
+          </span>
         </button>
 
         {isLocked ? (
