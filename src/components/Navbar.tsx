@@ -157,8 +157,14 @@ export function Navbar() {
         {/* LOGO — 280 px de largura no desktop */}
         <Link
           href="/"
+          onClick={() => {
+            setSearchQuery('');
+            setActiveCategory('Carros');
+            setActiveSubcategory(null);
+            setOpenCategoryMenu(null);
+          }}
           className="flex w-full shrink-0 items-center sm:w-[280px]"
-          title="Proposta Casada — Marketplace com Negociação Protegida"
+          title="Proposta Casada — Ver últimos anúncios publicados"
         >
           <img
             src="/logo-proposta-casada.png"

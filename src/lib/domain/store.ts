@@ -368,7 +368,8 @@ export class MarketplaceStore {
 
   public getPublicVehicles(): PublicVehicle[] {
     return Object.values(this.state.vehicles)
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .reverse()
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .map((v) => this.toPublicVehicle(v));
   }
 

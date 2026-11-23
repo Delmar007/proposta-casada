@@ -13,16 +13,19 @@ export default function MarketplaceHomePage() {
   const { searchQuery, favorites } = useActiveUser();
 
   useEffect(() => {
-    fetch('/api/vehicles')
+    fetch('/api/vehicles', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => setVehicles(d.vehicles ?? []))
       .finally(() => setLoading(false));
   }, []);
 
   const filteredVehicles = useMemo(() => {
+    const sorted = [...vehicles].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return vehicles;
-    return vehicles.filter(
+    if (!q) return sorted;
+    return sorted.filter(
       (v) =>
         v.brand.toLowerCase().includes(q) ||
         v.model.toLowerCase().includes(q) ||
