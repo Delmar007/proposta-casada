@@ -143,6 +143,34 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
     }
   };
 
+  const parseProposalReais = (raw: string): number => {
+    const clean = raw.replace(/,00$/, '').replace(/\D/g, '');
+    return clean ? Number(clean) : 0;
+  };
+
+  const handleProposalInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '');
+    if (!digits) {
+      setProposalAmount('');
+      return;
+    }
+    setProposalAmount(`R$ ${Number(digits).toLocaleString('pt-BR')}`);
+  };
+
+  const handleProposalInputBlur = () => {
+    const val = parseProposalReais(proposalAmount);
+    if (val > 0) {
+      setProposalAmount(formatBRL(val));
+    }
+  };
+
+  const handleProposalInputFocus = () => {
+    const val = parseProposalReais(proposalAmount);
+    if (val > 0) {
+      setProposalAmount(`R$ ${val.toLocaleString('pt-BR')}`);
+    }
+  };
+
   const handleSaveProposal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
@@ -150,9 +178,9 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
       openAuthModal();
       return;
     }
-    const numericAmount = Number(proposalAmount);
-    if (!numericAmount || numericAmount <= 0) {
-      setFeedback('Informe um valor válido.');
+    const numericAmount = parseProposalReais(proposalAmount);
+    if (!numericAmount || numericAmount < 1000) {
+      setFeedback('Informe um valor válido (mínimo R$ 1.000).');
       return;
     }
 
@@ -422,11 +450,13 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
             {/* Rodapé dividido em 2 colunas: esquerda Valor da proposta R$ | direita botão duplo em 2 linhas */}
             <form onSubmit={handleSaveProposal} className="grid shrink-0 grid-cols-2 items-center gap-1.5">
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 required
-                min={1000}
                 value={proposalAmount}
-                onChange={(e) => setProposalAmount(e.target.value)}
+                onChange={handleProposalInputChange}
+                onBlur={handleProposalInputBlur}
+                onFocus={handleProposalInputFocus}
                 placeholder="Valor da proposta R$"
                 aria-label="Valor da proposta R$"
                 className="h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-2.5 text-sm font-bold text-slate-900 placeholder:text-[11px] placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none md:h-9 md:px-2 md:text-xs"
