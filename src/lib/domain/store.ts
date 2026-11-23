@@ -349,7 +349,6 @@ export class MarketplaceStore {
       state: v.state,
       fipePrice: v.fipePrice,
       fipeCode: v.fipeCode,
-      askingPrice: v.askingPrice,
       description: v.description,
       imageUrl: v.imageUrl,
       images: v.images,

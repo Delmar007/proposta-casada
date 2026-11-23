@@ -42,7 +42,8 @@ export interface PublicVehicle {
   state: string;
   fipePrice: number;
   fipeCode?: string;
-  askingPrice: number;
+  /** Confidencial: nunca expor ao comprador */
+  askingPrice?: number;
   description: string;
   imageUrl: string;
   images?: string[];

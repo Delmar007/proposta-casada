@@ -134,7 +134,6 @@ export default function AnunciarPage() {
     setFuel(found.fuel);
     setTraction(found.traction);
     setFipePrice(String(found.fipePrice));
-    setAskingPrice(String(found.fipePrice));
 
     setLoadingYears(true);
     try {
@@ -490,6 +489,20 @@ export default function AnunciarPage() {
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                   />
                 </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                    Avaliação de Referência (R$)
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    value={fipePrice}
+                    onChange={(e) => setFipePrice(e.target.value)}
+                    placeholder="Ex: 500000"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold"
+                  />
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
@@ -686,12 +699,26 @@ export default function AnunciarPage() {
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                   />
                 </div>
+                <div>
+                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                    Preço FIPE (R$)
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    value={fipePrice}
+                    onChange={(e) => setFipePrice(e.target.value)}
+                    placeholder="Ex: 100000"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold"
+                  />
+                </div>
               </div>
               </div>
             )}
           </div>
 
-          {/* 4. Localização (Estado UF primeiro, depois Cidade) e Valores */}
+          {/* 4. Localização (Estado UF primeiro, depois Cidade) e Valores Confidenciais */}
           <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-5">
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700">Estado (UF)</label>
@@ -733,33 +760,37 @@ export default function AnunciarPage() {
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700">
-                {isProperty ? 'Avaliação / Pedido (R$)' : 'Valor FIPE (R$)'}
+                Valor da pedida (R$)
               </label>
               <input
                 type="number"
                 required
                 min={1}
-                value={fipePrice}
-                onChange={(e) => {
-                  setFipePrice(e.target.value);
-                  if (!askingPrice) setAskingPrice(e.target.value);
-                }}
-                placeholder="100000"
+                value={askingPrice}
+                onChange={(e) => setAskingPrice(e.target.value)}
+                placeholder="Confidencial (não aparece)"
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold"
               />
+              <span className="mt-0.5 block text-[10px] text-slate-400">
+                Confidencial — não aparece no anúncio
+              </span>
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700">
-                Mínimo Confidencial (R$)
+                Valor mínimo aceito (R$)
               </label>
               <input
                 type="number"
+                required
                 min={1}
                 value={minConfidentialPrice}
                 onChange={(e) => setMinConfidentialPrice(e.target.value)}
-                placeholder="Nunca exibido"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                placeholder="Confidencial (não aparece)"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold"
               />
+              <span className="mt-0.5 block text-[10px] text-slate-400">
+                Confidencial — não aparece no anúncio
+              </span>
             </div>
           </div>
 
