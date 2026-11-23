@@ -13,9 +13,18 @@ export interface UploadedPhotoItem {
 interface TradeInPhotoUploaderProps {
   photos: UploadedPhotoItem[];
   onChange: (photos: UploadedPhotoItem[]) => void;
+  maxPhotos?: number;
+  title?: string;
+  hint?: string;
 }
 
-export function TradeInPhotoUploader({ photos, onChange }: TradeInPhotoUploaderProps) {
+export function TradeInPhotoUploader({
+  photos,
+  onChange,
+  maxPhotos = 6,
+  title = 'Fotografias do Veículo Oferecido',
+  hint = 'Orientações: 1. Frente • 2. Traseira • 3. Lateral direita • 4. Lateral esquerda • 5. Interior • 6. Painel e quilometragem',
+}: TradeInPhotoUploaderProps) {
   const replaceInputRef = useRef<HTMLInputElement | null>(null);
   const replaceIndexRef = useRef<number | null>(null);
 
@@ -30,7 +39,7 @@ export function TradeInPhotoUploader({ photos, onChange }: TradeInPhotoUploaderP
   const handleAddFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
-    const remaining = 6 - photos.length;
+    const remaining = maxPhotos - photos.length;
     const selected = files.slice(0, remaining);
 
     const added: UploadedPhotoItem[] = [];
@@ -93,17 +102,14 @@ export function TradeInPhotoUploader({ photos, onChange }: TradeInPhotoUploaderP
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h4 className="flex items-center gap-2 text-sm font-bold text-slate-900">
-            <Camera className="h-4 w-4 text-slate-700" />
-            Fotografias do Veículo Oferecido ({photos.length}/6)
+            <Camera className="h-4 w-4 text-logo-purple" />
+            {title} ({photos.length}/{maxPhotos})
           </h4>
-          <p className="mt-0.5 text-xs text-slate-500">
-            Orientações: 1. Frente • 2. Traseira • 3. Lateral direita • 4. Lateral esquerda • 5.
-            Interior • 6. Painel e quilometragem
-          </p>
+          <p className="mt-0.5 text-xs text-slate-500">{hint}</p>
         </div>
 
-        {photos.length < 6 && (
-          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-uva-700 px-3 py-2 text-xs font-semibold text-white hover:bg-uva-600">
+        {photos.length < maxPhotos && (
+          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-logo-green px-3 py-2 text-xs font-extrabold text-logo-purple-950 hover:bg-logo-green-hover">
             <Upload className="h-3.5 w-3.5" />
             Adicionar fotos
             <input
@@ -127,7 +133,7 @@ export function TradeInPhotoUploader({ photos, onChange }: TradeInPhotoUploaderP
 
       {photos.length === 0 ? (
         <div className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-xs text-slate-500">
-          Nenhuma fotografia importada ainda. Importe até 6 imagens para avaliação do proprietário.
+          Nenhuma fotografia importada ainda. Importe até {maxPhotos} imagens para o anúncio.
           Metadados EXIF/GPS serão removidos automaticamente antes do envio.
         </div>
       ) : (

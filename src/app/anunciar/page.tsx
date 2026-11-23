@@ -608,7 +608,17 @@ export default function AnunciarPage() {
           </div>
 
           {/* 5. Fotografias & Informações */}
-          <TradeInPhotoUploader photos={photos} onChange={setPhotos} />
+          <TradeInPhotoUploader
+            photos={photos}
+            onChange={setPhotos}
+            maxPhotos={isProperty ? 18 : 12}
+            title={isProperty ? 'Fotografias do Imóvel' : 'Fotografias do Veículo'}
+            hint={
+              isProperty
+                ? 'Importe até 18 fotos (fachada, sala, cozinha, quartos, banheiros, área externa, garagem e detalhes).'
+                : 'Importe até 12 fotos (frente, traseira, laterais, interior, painel, motor, porta-malas, pneus e detalhes).'
+            }
+          />
 
           <div>
             <div className="mb-1 flex items-center justify-between">
