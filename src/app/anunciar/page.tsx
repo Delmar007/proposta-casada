@@ -62,7 +62,7 @@ export default function AnunciarPage() {
 
   const [category, setCategory] = useState<string>('Carros');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
-  const [openSubcategoryMenu, setOpenSubcategoryMenu] = useState<boolean>(false);
+  const [openSubcategoryMenu, setOpenSubcategoryMenu] = useState<boolean>(true);
   const [dealTypes, setDealTypes] = useState<DealTypeOption[]>(['no_dinheiro']);
   const [photos, setPhotos] = useState<UploadedPhotoItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -333,11 +333,15 @@ export default function AnunciarPage() {
               <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700">
                 1. Categoria do Anúncio
               </label>
-              {selectedSubcategory && (
-                <span className="rounded-full bg-logo-purple-50 px-2.5 py-0.5 text-xs font-bold text-logo-purple">
-                  {category} → {selectedSubcategory}
-                </span>
-              )}
+              <button
+                type="button"
+                onClick={() => setOpenSubcategoryMenu((v) => !v)}
+                className="rounded-full bg-logo-purple-50 px-3 py-1 text-xs font-bold text-logo-purple hover:bg-logo-purple-100"
+              >
+                {selectedSubcategory
+                  ? `Subcategoria: ${category} → ${selectedSubcategory}`
+                  : `Subcategoria de ${category}: Selecione`}
+              </button>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
               {ALL_CATEGORIES.map((cat) => {
