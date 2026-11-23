@@ -15,6 +15,8 @@ export default function MarketplaceHomePage() {
     favorites,
     activeCategory,
     activeSubcategory,
+    activeListingType,
+    activeDealType,
     clearAllFilters,
   } = useActiveUser();
 
@@ -38,6 +40,19 @@ export default function MarketplaceHomePage() {
 
     return sorted.filter((v) => {
       const itemCategory = v.category || (v.listingType === 'property' ? 'Residências' : 'Carros');
+      const itemListingType: 'vehicle' | 'property' =
+        v.listingType ??
+        (['Residências', 'Comerciais', 'Rurais'].includes(itemCategory) ? 'property' : 'vehicle');
+
+      if (activeListingType && itemListingType !== activeListingType) {
+        return false;
+      }
+
+      if (activeDealType) {
+        if (!Array.isArray(v.dealTypes) || !v.dealTypes.includes(activeDealType)) {
+          return false;
+        }
+      }
 
       if (activeCategory && normalizeText(itemCategory) !== normalizeText(activeCategory)) {
         return false;
@@ -83,9 +98,11 @@ export default function MarketplaceHomePage() {
 
       return true;
     });
-  }, [vehicles, searchQuery, activeCategory, activeSubcategory]);
+  }, [vehicles, searchQuery, activeCategory, activeSubcategory, activeListingType, activeDealType]);
 
-  const hasActiveFilter = Boolean(activeCategory || activeSubcategory || searchQuery.trim());
+  const hasActiveFilter = Boolean(
+    activeCategory || activeSubcategory || activeListingType || activeDealType || searchQuery.trim()
+  );
 
   return (
     <div className="mx-auto w-full max-w-[1024px]">
@@ -179,6 +196,12 @@ export default function MarketplaceHomePage() {
                 <Filter className="h-3.5 w-3.5" />
                 Filtro ativo:
               </span>
+              {activeListingType && (
+                <span className="rounded-full bg-uva-50 px-2.5 py-0.5 font-bold text-uva-700">
+                  {activeListingType === 'vehicle' ? 'Carro' : 'Imóvel'}
+                  {activeDealType ? ` → ${activeDealType.replace(/_/g, ' ')}` : ''}
+                </span>
+              )}
               {activeCategory && (
                 <span className="rounded-full bg-logo-purple-50 px-2.5 py-0.5 font-bold text-logo-purple">
                   {activeCategory}

@@ -13,10 +13,29 @@ import {
   X,
   Plus,
   MessageSquare,
+  Car,
+  Home,
+  ChevronDown,
 } from 'lucide-react';
 import { DEMO_USERS, useActiveUser } from './ActiveUserProvider';
 import { AuthModal } from './AuthModal';
 import { CATEGORY_SUBCATEGORIES, PRODUCT_CATEGORIES } from '@/lib/domain/categories';
+import { DealTypeOption } from '@/lib/domain/types';
+
+const VEHICLE_DEAL_OPTIONS: { value: DealTypeOption; label: string }[] = [
+  { value: 'no_dinheiro', label: 'No dinheiro' },
+  { value: 'menor_valor', label: 'Aceita menor valor' },
+  { value: 'maior_valor', label: 'Aceita maior valor' },
+  { value: 'troca_na_orelha', label: 'Troca na orelha' },
+];
+
+const PROPERTY_DEAL_OPTIONS: { value: DealTypeOption; label: string }[] = [
+  { value: 'no_dinheiro', label: 'No dinheiro' },
+  { value: 'imovel_menor_valor', label: 'Aceita imóvel de menor valor' },
+  { value: 'imovel_maior_valor', label: 'Aceita imóvel de maior valor' },
+  { value: 'imovel_mesmo_preco', label: 'Aceita imóvel no mesmo preço' },
+  { value: 'carro_mais_dinheiro', label: 'Aceita carro + parte em dinheiro' },
+];
 
 export function Navbar() {
   const router = useRouter();
@@ -38,18 +57,27 @@ export function Navbar() {
     setActiveCategory,
     activeSubcategory,
     setActiveSubcategory,
+    activeListingType,
+    setActiveListingType,
+    activeDealType,
+    setActiveDealType,
     clearAllFilters,
   } = useActiveUser();
 
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [openCategoryMenu, setOpenCategoryMenu] = useState<string | null>(null);
+  const [openDealMenu, setOpenDealMenu] = useState<'vehicle' | 'property' | null>(null);
   const categoryNavRef = useRef<HTMLElement | null>(null);
+  const dealMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleOutside = (e: MouseEvent) => {
       if (categoryNavRef.current && !categoryNavRef.current.contains(e.target as Node)) {
         setOpenCategoryMenu(null);
+      }
+      if (dealMenuRef.current && !dealMenuRef.current.contains(e.target as Node)) {
+        setOpenDealMenu(null);
       }
     };
     document.addEventListener('mousedown', handleOutside);
@@ -64,13 +92,14 @@ export function Navbar() {
   return (
     <>
       <header className="border-b border-slate-100 bg-white">
-        <div className="mx-auto flex w-full max-w-[1024px] flex-wrap items-center justify-between gap-3 px-3 py-3 sm:px-0">
+        <div className="mx-auto flex w-full max-w-[1024px] flex-wrap items-center justify-between gap-3 px-3 py-3 sm:gap-0 sm:px-0">
         {/* LOGO — 280 px de largura no desktop */}
         <Link
           href="/"
           onClick={() => {
             clearAllFilters();
             setOpenCategoryMenu(null);
+            setOpenDealMenu(null);
           }}
           className="flex w-full shrink-0 items-center justify-center sm:w-[280px] sm:justify-start"
           title="Proposta Casada — Ver últimos anúncios publicados"
@@ -82,10 +111,10 @@ export function Navbar() {
           />
         </Link>
 
-        {/* BARRA DE BUSCA CENTRAL */}
+        {/* BARRA DE BUSCA CENTRAL — 20 px de distância da logo */}
         <form
           onSubmit={handleSearchSubmit}
-          className="order-3 flex w-full flex-1 items-center sm:order-2 sm:w-auto"
+          className="order-3 flex w-full flex-1 items-center sm:order-2 sm:ml-[20px] sm:w-auto"
         >
           <div className="relative flex w-full items-center">
             <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-logo-purple" />
@@ -109,8 +138,119 @@ export function Navbar() {
           </div>
         </form>
 
+        {/* BOTÃO DUPLO — TIPO DE NEGÓCIO (CARRO | IMÓVEL) ENTRE A BUSCA E A ENGRENAGEM */}
+        <div
+          ref={dealMenuRef}
+          className="relative order-4 flex w-full justify-center sm:order-3 sm:ml-3 sm:w-auto"
+        >
+          <div className="inline-flex overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => {
+                setShowSettingsMenu(false);
+                setShowProfileMenu(false);
+                setOpenDealMenu((prev) => (prev === 'vehicle' ? null : 'vehicle'));
+              }}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold transition ${
+                openDealMenu === 'vehicle' || activeListingType === 'vehicle'
+                  ? 'bg-logo-purple text-white'
+                  : 'text-logo-purple hover:bg-uva-50'
+              }`}
+              title="Tipo de negócio para Carros"
+            >
+              <Car className="h-3.5 w-3.5" />
+              <span>Carro</span>
+              <ChevronDown
+                className={`h-3 w-3 transition-transform ${
+                  openDealMenu === 'vehicle' ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            <div className="w-px bg-slate-200" />
+            <button
+              type="button"
+              onClick={() => {
+                setShowSettingsMenu(false);
+                setShowProfileMenu(false);
+                setOpenDealMenu((prev) => (prev === 'property' ? null : 'property'));
+              }}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold transition ${
+                openDealMenu === 'property' || activeListingType === 'property'
+                  ? 'bg-logo-purple text-white'
+                  : 'text-logo-purple hover:bg-uva-50'
+              }`}
+              title="Tipo de negócio para Imóveis"
+            >
+              <Home className="h-3.5 w-3.5" />
+              <span>Imóvel</span>
+              <ChevronDown
+                className={`h-3 w-3 transition-transform ${
+                  openDealMenu === 'property' ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          {openDealMenu && (
+            <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl sm:left-0 sm:translate-x-0">
+              <div className="mb-1.5 flex items-center justify-between border-b border-slate-100 px-2.5 pb-1.5">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-uva-700">
+                  Tipo de negócio — {openDealMenu === 'vehicle' ? 'Carro' : 'Imóvel'}
+                </span>
+              </div>
+              <ul className="flex flex-col gap-0.5">
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveListingType(openDealMenu);
+                      setActiveDealType(null);
+                      setOpenDealMenu(null);
+                      router.push('/');
+                    }}
+                    className={`flex w-full items-center rounded-lg px-2.5 py-2 text-left text-xs font-semibold transition ${
+                      activeListingType === openDealMenu && activeDealType === null
+                        ? 'bg-uva-50 font-bold text-uva-700'
+                        : 'text-slate-700 hover:bg-slate-50 hover:text-uva-700'
+                    }`}
+                  >
+                    {openDealMenu === 'vehicle' ? 'Todos os carros' : 'Todos os imóveis'}
+                  </button>
+                </li>
+                {(openDealMenu === 'vehicle'
+                  ? VEHICLE_DEAL_OPTIONS
+                  : PROPERTY_DEAL_OPTIONS
+                ).map((opt) => {
+                  const isSelected =
+                    activeListingType === openDealMenu && activeDealType === opt.value;
+                  return (
+                    <li key={opt.value}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveListingType(openDealMenu);
+                          setActiveDealType(opt.value);
+                          setOpenDealMenu(null);
+                          router.push('/');
+                        }}
+                        className={`flex w-full items-center rounded-lg px-2.5 py-2 text-left text-xs font-medium transition ${
+                          isSelected
+                            ? 'bg-uva-50 font-bold text-uva-700'
+                            : 'text-slate-700 hover:bg-slate-50 hover:text-uva-700'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+        </div>
+
         {/* LADO DIREITO — Apenas palavras e ícones (sem caixas/bordas de botão) */}
-        <div className="order-2 flex shrink-0 items-center gap-4 sm:order-3">
+        <div className="order-2 flex shrink-0 items-center gap-4 sm:order-4 sm:ml-4">
           {/* 1. Engrenagem (Configurações / Central Admin) */}
           <div className="relative">
             <button

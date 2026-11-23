@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { NegotiationNotification } from '@/lib/domain/types';
+import { DealTypeOption, NegotiationNotification } from '@/lib/domain/types';
 import { getSupabaseClient, isSupabaseConfigured } from '@/lib/supabase/client';
 
 export type SocialAuthProvider = 'google' | 'facebook';
@@ -45,6 +45,10 @@ interface ActiveUserContextValue {
   setActiveCategory: (cat: string | null) => void;
   activeSubcategory: string | null;
   setActiveSubcategory: (sub: string | null) => void;
+  activeListingType: 'vehicle' | 'property' | null;
+  setActiveListingType: (t: 'vehicle' | 'property' | null) => void;
+  activeDealType: DealTypeOption | null;
+  setActiveDealType: (d: DealTypeOption | null) => void;
   clearAllFilters: () => void;
 }
 
@@ -61,12 +65,16 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+  const [activeListingType, setActiveListingType] = useState<'vehicle' | 'property' | null>(null);
+  const [activeDealType, setActiveDealType] = useState<DealTypeOption | null>(null);
   const [notifications, setNotifications] = useState<NegotiationNotification[]>([]);
 
   const clearAllFilters = () => {
     setSearchQuery('');
     setActiveCategory(null);
     setActiveSubcategory(null);
+    setActiveListingType(null);
+    setActiveDealType(null);
   };
 
   useEffect(() => {
@@ -252,6 +260,10 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
         setActiveCategory,
         activeSubcategory,
         setActiveSubcategory,
+        activeListingType,
+        setActiveListingType,
+        activeDealType,
+        setActiveDealType,
         clearAllFilters,
       }}
     >
