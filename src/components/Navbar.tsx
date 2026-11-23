@@ -104,9 +104,9 @@ export function Navbar() {
   return (
     <>
       {/* BARRA SUPERIOR VERDE — Largura total, mesma altura da barra de categorias */}
-      <div ref={locationMenuRef} className="relative z-50 w-full bg-logo-green text-black">
+      <div ref={locationMenuRef} className="relative z-50 w-full bg-logo-green text-logo-purple">
         <div className="mx-auto flex w-full max-w-[1024px] items-center justify-between px-3 py-2.5 text-[15px] font-semibold sm:px-0">
-          <span className="truncate text-black">
+          <span className="truncate text-logo-purple">
             {activeUf && activeCity
               ? `${activeUf}, ${activeCity}`
               : activeUf
@@ -126,7 +126,7 @@ export function Navbar() {
               setDraftCity(activeCity ?? '');
               setShowLocationMenu((v) => !v);
             }}
-            className="shrink-0 text-black transition hover:underline"
+            className="shrink-0 text-logo-purple transition hover:underline"
           >
             escolher outra cidade
           </button>
