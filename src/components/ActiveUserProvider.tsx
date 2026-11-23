@@ -71,9 +71,27 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const [activeListingType, setActiveListingType] = useState<'vehicle' | 'property' | null>(null);
   const [activeDealType, setActiveDealType] = useState<DealTypeOption | null>(null);
-  const [activeUf, setActiveUf] = useState<string | null>(null);
-  const [activeCity, setActiveCity] = useState<string | null>(null);
+  const [activeUf, setActiveUfState] = useState<string | null>(null);
+  const [activeCity, setActiveCityState] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<NegotiationNotification[]>([]);
+
+  const setActiveUf = (uf: string | null) => {
+    setActiveUfState(uf);
+    if (uf) {
+      window.localStorage.setItem('mp_active_uf', uf);
+    } else {
+      window.localStorage.removeItem('mp_active_uf');
+    }
+  };
+
+  const setActiveCity = (city: string | null) => {
+    setActiveCityState(city);
+    if (city) {
+      window.localStorage.setItem('mp_active_city', city);
+    } else {
+      window.localStorage.removeItem('mp_active_city');
+    }
+  };
 
   const clearAllFilters = () => {
     setSearchQuery('');
@@ -81,14 +99,20 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
     setActiveSubcategory(null);
     setActiveListingType(null);
     setActiveDealType(null);
-    setActiveUf(null);
-    setActiveCity(null);
   };
 
   useEffect(() => {
     const saved = window.localStorage.getItem('mp_active_user_id');
     if (saved && DEMO_USERS.some((u) => u.id === saved)) {
       setUserIdState(saved);
+    }
+    const savedUf = window.localStorage.getItem('mp_active_uf');
+    if (savedUf) {
+      setActiveUfState(savedUf);
+    }
+    const savedCity = window.localStorage.getItem('mp_active_city');
+    if (savedCity) {
+      setActiveCityState(savedCity);
     }
     const savedAuth = window.localStorage.getItem('mp_is_authenticated');
     if (savedAuth === 'true') {
