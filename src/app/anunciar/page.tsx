@@ -7,6 +7,7 @@ import { ArrowLeft, PlusCircle, Car, Building2, ShieldCheck, Check } from 'lucid
 import { DealTypeOption } from '@/lib/domain/types';
 import { useActiveUser } from '@/components/ActiveUserProvider';
 import { TradeInPhotoUploader, UploadedPhotoItem } from '@/components/TradeInPhotoUploader';
+import { BRAZIL_STATES, getCitiesByUF } from '@/lib/geo/brazil-locations';
 
 const VEHICLE_CATEGORIES = [
   'Carros',
@@ -217,10 +218,6 @@ export default function AnunciarPage() {
               <h1 className="text-lg font-extrabold text-slate-900 sm:text-xl">
                 Cadastrar Anúncio para Venda ou Permuta
               </h1>
-              <p className="mt-0.5 text-xs text-slate-500">
-                Selecione a categoria (veículos móveis ou imóveis), preencha todos os dados e
-                defina os tipos de negócio aceitos.
-              </p>
             </div>
           </div>
 
@@ -552,28 +549,45 @@ export default function AnunciarPage() {
             )}
           </div>
 
-          {/* 4. Localização e Valores */}
+          {/* 4. Localização (Estado UF primeiro, depois Cidade) e Valores */}
           <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-5">
-            <div className="sm:col-span-2">
-              <label className="mb-1 block text-xs font-semibold text-slate-700">Cidade</label>
-              <input
-                required
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Ex: São Paulo"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-              />
-            </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700">Estado (UF)</label>
-              <input
+              <select
                 required
-                maxLength={2}
                 value={stateUF}
-                onChange={(e) => setStateUF(e.target.value.toUpperCase())}
-                placeholder="SP"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-              />
+                onChange={(e) => {
+                  setStateUF(e.target.value);
+                  setCity('');
+                }}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
+              >
+                <option value="">Selecione o estado...</option>
+                {BRAZIL_STATES.map((st) => (
+                  <option key={st.uf} value={st.uf}>
+                    {st.uf} — {st.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs font-semibold text-slate-700">Cidade</label>
+              <select
+                required
+                value={city}
+                disabled={!stateUF}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold disabled:bg-slate-50 disabled:text-slate-400"
+              >
+                <option value="">
+                  {stateUF ? 'Selecione a cidade...' : 'Escolha o Estado (UF) primeiro'}
+                </option>
+                {getCitiesByUF(stateUF).map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700">
