@@ -9,6 +9,7 @@ import type { FipeBrandOption, FipeModelOption } from '@/lib/fipe/fipe-service';
 import { useActiveUser } from '@/components/ActiveUserProvider';
 import { TradeInPhotoUploader, UploadedPhotoItem } from '@/components/TradeInPhotoUploader';
 import { BRAZIL_STATES, getCitiesByUF } from '@/lib/geo/brazil-locations';
+import { CATEGORY_SUBCATEGORIES } from '@/lib/domain/categories';
 
 const VEHICLE_CATEGORIES = [
   'Carros',
@@ -60,6 +61,8 @@ export default function AnunciarPage() {
   const { userId } = useActiveUser();
 
   const [category, setCategory] = useState<string>('Carros');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
+  const [openSubcategoryMenu, setOpenSubcategoryMenu] = useState<boolean>(false);
   const [dealTypes, setDealTypes] = useState<DealTypeOption[]>(['no_dinheiro']);
   const [photos, setPhotos] = useState<UploadedPhotoItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -194,6 +197,8 @@ export default function AnunciarPage() {
 
   const handleCategoryChange = (nextCat: string) => {
     setCategory(nextCat);
+    setSelectedSubcategory('');
+    setOpenSubcategoryMenu((prev) => (category === nextCat ? !prev : true));
     if ((PROPERTY_CATEGORIES as readonly string[]).includes(nextCat)) {
       const firstSub = PROPERTY_SUBTYPES[nextCat]?.[0] ?? 'Imóvel';
       setPropertyType(firstSub);
@@ -322,11 +327,18 @@ export default function AnunciarPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-          {/* 1. Categorias */}
+          {/* 1. Categorias + Menu vertical de subcategorias abaixo */}
           <div className="space-y-2">
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700">
-              1. Categoria do Anúncio
-            </label>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700">
+                1. Categoria do Anúncio
+              </label>
+              {selectedSubcategory && (
+                <span className="rounded-full bg-logo-purple-50 px-2.5 py-0.5 text-xs font-bold text-logo-purple">
+                  {category} → {selectedSubcategory}
+                </span>
+              )}
+            </div>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
               {ALL_CATEGORIES.map((cat) => {
                 const selected = category === cat;
@@ -351,6 +363,51 @@ export default function AnunciarPage() {
                 );
               })}
             </div>
+
+            {/* Menu Vertical de Subcategorias embaixo de Categorias */}
+            {openSubcategoryMenu && CATEGORY_SUBCATEGORIES[category] && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-md">
+                <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-logo-purple">
+                    Subcategorias de {category}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setOpenSubcategoryMenu(false)}
+                    className="text-xs font-semibold text-slate-500 hover:text-logo-purple"
+                  >
+                    Fechar
+                  </button>
+                </div>
+                <ul className="flex max-h-64 flex-col gap-1 overflow-y-auto">
+                  {CATEGORY_SUBCATEGORIES[category].map((sub) => {
+                    const isSubSelected = selectedSubcategory === sub;
+                    return (
+                      <li key={sub}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedSubcategory(sub);
+                            if (isProperty) {
+                              setPropertyType(sub);
+                            }
+                            setOpenSubcategoryMenu(false);
+                          }}
+                          className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-semibold transition ${
+                            isSubSelected
+                              ? 'bg-logo-purple-50 text-logo-purple'
+                              : 'text-slate-700 hover:bg-slate-50 hover:text-logo-purple'
+                          }`}
+                        >
+                          <span>{sub}</span>
+                          {isSubSelected && <Check className="h-4 w-4 text-logo-purple" />}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
           </div>
 
           {/* 2. Tipo de Negócio */}
