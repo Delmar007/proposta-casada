@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -12,6 +12,8 @@ import {
   ChevronRight,
   ChevronUp,
   ChevronDown,
+  ZoomIn,
+  ArrowLeft,
 } from 'lucide-react';
 import { PublicVehicle } from '@/lib/domain/types';
 import { BrandLogo } from './BrandLogo';
@@ -84,7 +86,17 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
       : [vehicle.imageUrl, ...DEFAULT_EXTRA_GALLERY];
 
   const [activeImageIdx, setActiveImageIdx] = useState<number>(0);
+  const [showGalleryModal, setShowGalleryModal] = useState<boolean>(false);
   const thumbsContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!showGalleryModal) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowGalleryModal(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showGalleryModal]);
 
   // Estado da área de propostas (Parte 3): grade 4x3 inicia vazia, maior proposta sempre na 1ª linha, 1ª coluna
   const [proposals, setProposals] = useState<Array<{ id: string; amount: number }>>([]);
@@ -180,6 +192,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
   };
 
   return (
+    <>
     <article
       className="mx-auto flex w-full max-w-[440px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:shadow-md md:h-[250px] md:max-w-[1024px] md:flex-row"
     >
@@ -193,7 +206,8 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           <img
             src={galleryImages[activeImageIdx] ?? vehicle.imageUrl}
             alt={`${vehicle.brand} ${specs.model} - Foto ${activeImageIdx + 1}`}
-            className="h-full w-full object-cover object-center transition-all duration-300"
+            onClick={() => setShowGalleryModal(true)}
+            className="h-full w-full cursor-zoom-in object-cover object-center transition-all duration-300"
           />
 
           {/* LOGO DA MARCA (30x30) DENTRO DA IMAGEM NO CANTO ESQUERDO SUPERIOR */}
@@ -225,11 +239,22 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
             />
           </button>
 
-          {/* Tipo de negociação e Localização sobre a foto */}
-          <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between gap-2">
-            <span className="max-w-[62%] truncate rounded-md bg-uva-900/90 px-2.5 py-0.5 text-xs font-bold text-white backdrop-blur-xs md:px-2 md:text-[10px]">
+          {/* Tipo de negociação, Lupa (+) e Localização sobre a foto */}
+          <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between gap-1.5">
+            <span className="max-w-[48%] truncate rounded-md bg-uva-900/90 px-2.5 py-0.5 text-xs font-bold text-white backdrop-blur-xs md:px-2 md:text-[10px]">
               {formatDealTypesLabel(vehicle.dealTypes)}
             </span>
+
+            <button
+              type="button"
+              onClick={() => setShowGalleryModal(true)}
+              className="flex shrink-0 items-center justify-center p-0.5 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)] transition hover:scale-110"
+              title="Ampliar imagens"
+              aria-label="Ampliar imagens"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </button>
+
             <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)] md:text-[11px]">
               <MapPin className="h-3.5 w-3.5 text-white md:h-3 md:w-3" />
               {vehicle.city}/{vehicle.state}
@@ -426,5 +451,97 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
         )}
       </div>
     </article>
+
+    {/* MODAL AMPLIADO DE IMAGENS — 1024 px, carrossel grande à direita, sem texto sobre as fotos, com botão Voltar */}
+    {showGalleryModal && (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 backdrop-blur-xs"
+        onClick={() => setShowGalleryModal(false)}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Visualizador de imagens do veículo"
+      >
+        <div
+          className="flex h-[85vh] w-full max-w-[1024px] flex-col overflow-hidden rounded-2xl bg-slate-950 shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Barra superior apenas com botão Voltar */}
+          <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-slate-900 px-4 py-2.5">
+            <button
+              type="button"
+              onClick={() => setShowGalleryModal(false)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-logo-green px-4 py-1.5 text-xs font-extrabold text-logo-purple-950 transition hover:bg-logo-green-hover"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Voltar
+            </button>
+          </div>
+
+          {/* Conteúdo: Imagem grande à esquerda + Carrossel vertical grande à direita (sem texto) */}
+          <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+            <div className="relative flex min-h-0 flex-1 items-center justify-center bg-black p-2">
+              <img
+                src={galleryImages[activeImageIdx] ?? vehicle.imageUrl}
+                alt={`Foto ${activeImageIdx + 1}`}
+                className="max-h-full max-w-full rounded-lg object-contain"
+              />
+            </div>
+
+            <div className="flex h-[108px] w-full shrink-0 flex-row items-center gap-2 border-t border-white/10 bg-slate-900 p-2 md:h-full md:w-[152px] md:flex-col md:border-t-0 md:border-l">
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveImageIdx(
+                    (activeImageIdx - 1 + galleryImages.length) % galleryImages.length
+                  )
+                }
+                className="flex h-full w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 md:h-8 md:w-full"
+                aria-label="Foto anterior"
+              >
+                <ChevronLeft className="h-5 w-5 md:hidden" />
+                <ChevronUp className="hidden h-5 w-5 md:block" />
+              </button>
+
+              <div className="flex flex-1 flex-row gap-2 overflow-x-auto [scrollbar-width:none] md:w-full md:flex-col md:overflow-x-hidden md:overflow-y-auto [&::-webkit-scrollbar]:hidden">
+                {galleryImages.map((imgUrl, idx) => {
+                  const isSelected = idx === activeImageIdx;
+                  return (
+                    <button
+                      key={`modal-thumb-${vehicle.id}-${idx}`}
+                      type="button"
+                      onClick={() => setActiveImageIdx(idx)}
+                      className={`h-20 w-28 shrink-0 overflow-hidden rounded-lg border-2 transition md:h-24 md:w-full ${
+                        isSelected
+                          ? 'border-logo-green ring-2 ring-logo-green/50'
+                          : 'border-transparent opacity-65 hover:opacity-100'
+                      }`}
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`Miniatura ampliada ${idx + 1}`}
+                        className="h-full w-full object-cover"
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setActiveImageIdx((activeImageIdx + 1) % galleryImages.length)
+                }
+                className="flex h-full w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 md:h-8 md:w-full"
+                aria-label="Próxima foto"
+              >
+                <ChevronRight className="h-5 w-5 md:hidden" />
+                <ChevronDown className="hidden h-5 w-5 md:block" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
