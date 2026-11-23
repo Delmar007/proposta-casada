@@ -94,6 +94,33 @@ export default function AnunciarPage() {
   const [traction, setTraction] = useState('4x2');
   const [color, setColor] = useState('');
 
+  const formatBRL = (v: number) =>
+    v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  const parseReaisValue = (raw: string): number => {
+    const clean = raw.replace(/,00$/, '').replace(/\D/g, '');
+    return clean ? Number(clean) : 0;
+  };
+
+  const handleReaisChange = (raw: string, setter: (v: string) => void) => {
+    const digits = raw.replace(/\D/g, '');
+    if (!digits) {
+      setter('');
+      return;
+    }
+    setter(`R$ ${Number(digits).toLocaleString('pt-BR')}`);
+  };
+
+  const handleReaisBlur = (raw: string, setter: (v: string) => void) => {
+    const val = parseReaisValue(raw);
+    if (val > 0) setter(formatBRL(val));
+  };
+
+  const handleReaisFocus = (raw: string, setter: (v: string) => void) => {
+    const val = parseReaisValue(raw);
+    if (val > 0) setter(`R$ ${val.toLocaleString('pt-BR')}`);
+  };
+
   useEffect(() => {
     fetch('/api/fipe')
       .then((r) => r.json())
@@ -133,7 +160,7 @@ export default function AnunciarPage() {
     setEngine(found.engine);
     setFuel(found.fuel);
     setTraction(found.traction);
-    setFipePrice(String(found.fipePrice));
+    setFipePrice(formatBRL(found.fipePrice));
 
     setLoadingYears(true);
     try {
@@ -205,9 +232,9 @@ export default function AnunciarPage() {
             color: `${parkingSpaces || 0} vagas`,
             city,
             state: stateUF,
-            fipePrice: Number(fipePrice) || Number(askingPrice),
-            askingPrice: Number(askingPrice) || Number(fipePrice),
-            minConfidentialPrice: minConfidentialPrice ? Number(minConfidentialPrice) : undefined,
+            fipePrice: parseReaisValue(fipePrice) || parseReaisValue(askingPrice),
+            askingPrice: parseReaisValue(askingPrice) || parseReaisValue(fipePrice),
+            minConfidentialPrice: parseReaisValue(minConfidentialPrice) || undefined,
             description,
             images: photos.map((p) => p.dataUrl),
             propertyType,
@@ -236,9 +263,9 @@ export default function AnunciarPage() {
             color,
             city,
             state: stateUF,
-            fipePrice: Number(fipePrice) || Number(askingPrice),
-            askingPrice: Number(askingPrice) || Number(fipePrice),
-            minConfidentialPrice: minConfidentialPrice ? Number(minConfidentialPrice) : undefined,
+            fipePrice: parseReaisValue(fipePrice) || parseReaisValue(askingPrice),
+            askingPrice: parseReaisValue(askingPrice) || parseReaisValue(fipePrice),
+            minConfidentialPrice: parseReaisValue(minConfidentialPrice) || undefined,
             description,
             images: photos.map((p) => p.dataUrl),
           };
@@ -494,12 +521,14 @@ export default function AnunciarPage() {
                     Avaliação de Referência (R$)
                   </label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     required
-                    min={1}
                     value={fipePrice}
-                    onChange={(e) => setFipePrice(e.target.value)}
-                    placeholder="Ex: 500000"
+                    onChange={(e) => handleReaisChange(e.target.value, setFipePrice)}
+                    onBlur={() => handleReaisBlur(fipePrice, setFipePrice)}
+                    onFocus={() => handleReaisFocus(fipePrice, setFipePrice)}
+                    placeholder="R$ 500.000,00"
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold"
                   />
                 </div>
@@ -704,12 +733,14 @@ export default function AnunciarPage() {
                     Preço FIPE (R$)
                   </label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     required
-                    min={1}
                     value={fipePrice}
-                    onChange={(e) => setFipePrice(e.target.value)}
-                    placeholder="Ex: 100000"
+                    onChange={(e) => handleReaisChange(e.target.value, setFipePrice)}
+                    onBlur={() => handleReaisBlur(fipePrice, setFipePrice)}
+                    onFocus={() => handleReaisFocus(fipePrice, setFipePrice)}
+                    placeholder="R$ 278.000,00"
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold"
                   />
                 </div>
@@ -731,10 +762,10 @@ export default function AnunciarPage() {
                 }}
                 className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
               >
-                <option value="">Selecione o estado...</option>
+                <option value="">UF</option>
                 {BRAZIL_STATES.map((st) => (
                   <option key={st.uf} value={st.uf}>
-                    {st.uf} — {st.name}
+                    {st.uf}
                   </option>
                 ))}
               </select>
@@ -763,12 +794,14 @@ export default function AnunciarPage() {
                 Valor da pedida (R$)
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 required
-                min={1}
                 value={askingPrice}
-                onChange={(e) => setAskingPrice(e.target.value)}
-                placeholder="Confidencial (não aparece)"
+                onChange={(e) => handleReaisChange(e.target.value, setAskingPrice)}
+                onBlur={() => handleReaisBlur(askingPrice, setAskingPrice)}
+                onFocus={() => handleReaisFocus(askingPrice, setAskingPrice)}
+                placeholder="R$ 0,00 (confidencial)"
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold"
               />
               <span className="mt-0.5 block text-[10px] text-slate-400">
@@ -780,12 +813,14 @@ export default function AnunciarPage() {
                 Valor mínimo aceito (R$)
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 required
-                min={1}
                 value={minConfidentialPrice}
-                onChange={(e) => setMinConfidentialPrice(e.target.value)}
-                placeholder="Confidencial (não aparece)"
+                onChange={(e) => handleReaisChange(e.target.value, setMinConfidentialPrice)}
+                onBlur={() => handleReaisBlur(minConfidentialPrice, setMinConfidentialPrice)}
+                onFocus={() => handleReaisFocus(minConfidentialPrice, setMinConfidentialPrice)}
+                placeholder="R$ 0,00 (confidencial)"
                 className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold"
               />
               <span className="mt-0.5 block text-[10px] text-slate-400">
