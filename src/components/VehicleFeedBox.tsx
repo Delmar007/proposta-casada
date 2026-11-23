@@ -419,33 +419,40 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
               <p className="truncate text-xs font-semibold text-red-600 md:text-[10px]">{feedback}</p>
             )}
 
-            {/* Rodapé: Lado esquerdo valor da proposta | Lado direito botão duplo */}
-            <form onSubmit={handleSaveProposal} className="flex shrink-0 items-center gap-2 md:gap-1.5">
+            {/* Rodapé dividido em 2 colunas: esquerda Valor da proposta R$ | direita botão duplo em 2 linhas */}
+            <form onSubmit={handleSaveProposal} className="grid shrink-0 grid-cols-2 items-center gap-1.5">
               <input
                 type="number"
                 required
                 min={1000}
                 value={proposalAmount}
                 onChange={(e) => setProposalAmount(e.target.value)}
-                placeholder="Valor R$"
-                aria-label="Valor da proposta"
-                className="h-11 w-[124px] shrink-0 rounded-xl border border-slate-300 bg-white px-3 text-base font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none md:h-8 md:w-[104px] md:px-2 md:text-xs"
+                placeholder="Valor da proposta R$"
+                aria-label="Valor da proposta R$"
+                className="h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-2.5 text-sm font-bold text-slate-900 placeholder:text-[11px] placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none md:h-9 md:px-2 md:text-xs"
               />
 
-              <div className="grid h-11 flex-1 grid-cols-2 overflow-hidden rounded-xl border border-logo-green-hover shadow-xs md:h-8">
+              <div className="grid h-11 w-full grid-cols-2 overflow-hidden rounded-xl border border-logo-green-hover shadow-xs md:h-9">
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex items-center justify-center bg-logo-green px-2 text-xs font-extrabold leading-tight text-logo-purple-950 transition hover:bg-logo-green-hover disabled:opacity-50 md:px-1 md:text-[10px]"
+                  className="flex flex-col items-center justify-center bg-logo-green px-1 text-center text-[11px] font-extrabold leading-[1.1] text-logo-purple-950 transition hover:bg-logo-green-hover disabled:opacity-50 md:text-[10px]"
                 >
-                  {submitting ? 'Salvando...' : 'Salvar proposta'}
+                  {submitting ? (
+                    <span>Salvando...</span>
+                  ) : (
+                    <>
+                      <span>Salvar</span>
+                      <span>proposta</span>
+                    </>
+                  )}
                 </button>
                 <Link
                   href={`/vehicles/${vehicle.id}?modality=trade_in_plus_cash`}
-                  className="flex items-center justify-center gap-1 border-l border-logo-green-hover/40 bg-white px-2 text-xs font-bold leading-tight text-logo-purple transition hover:bg-logo-purple-50 md:px-1 md:text-[10px]"
+                  className="flex flex-col items-center justify-center border-l border-logo-green-hover/40 bg-white px-1 text-center text-[11px] font-bold leading-[1.1] text-logo-purple transition hover:bg-logo-purple-50 md:text-[10px]"
                 >
-                  <Repeat className="h-3.5 w-3.5 shrink-0 text-logo-purple md:h-3 md:w-3" />
-                  Propor permuta
+                  <span>Propor</span>
+                  <span>permuta</span>
                 </Link>
               </div>
             </form>
