@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, PlusCircle, Car, Building2, ShieldCheck, Check, Sparkles } from 'lucide-react';
 import { DealTypeOption } from '@/lib/domain/types';
-import type { FipeBrandOption, FipeModelOption } from '@/lib/fipe/fipe-service';
+import type { FipeBrandOption, FipeModelOption, FipeYearOption } from '@/lib/fipe/fipe-service';
 import { useActiveUser } from '@/components/ActiveUserProvider';
 import { TradeInPhotoUploader, UploadedPhotoItem } from '@/components/TradeInPhotoUploader';
 import { BRAZIL_STATES, getCitiesByUF } from '@/lib/geo/brazil-locations';
@@ -49,11 +49,19 @@ const PROPERTY_SUBTYPES: Record<string, string[]> = {
   Rurais: ['Fazenda', 'Sítio', 'Chácara', 'Haras', 'Área Rural / Gleba'],
 };
 
-const DEAL_TYPE_OPTIONS: Array<{ value: DealTypeOption; label: string }> = [
+const VEHICLE_DEAL_TYPE_OPTIONS: Array<{ value: DealTypeOption; label: string }> = [
   { value: 'no_dinheiro', label: 'No dinheiro' },
   { value: 'menor_valor', label: 'Aceita carro de menor valor' },
   { value: 'maior_valor', label: 'Aceita carro de maior valor' },
   { value: 'troca_na_orelha', label: 'Aceita troca na orelha' },
+];
+
+const PROPERTY_DEAL_TYPE_OPTIONS: Array<{ value: DealTypeOption; label: string }> = [
+  { value: 'no_dinheiro', label: 'No dinheiro' },
+  { value: 'imovel_menor_valor', label: 'Aceita imóvel de menor valor' },
+  { value: 'imovel_maior_valor', label: 'Aceita imóvel de maior valor' },
+  { value: 'imovel_mesmo_preco', label: 'Aceita imóvel no mesmo preço' },
+  { value: 'carro_mais_dinheiro', label: 'Aceita carro + parte em dinheiro' },
 ];
 
 export default function AnunciarPage() {
@@ -79,9 +87,11 @@ export default function AnunciarPage() {
   // Campos de Veículos Móveis + API FIPE
   const [fipeBrands, setFipeBrands] = useState<FipeBrandOption[]>([]);
   const [fipeModels, setFipeModels] = useState<FipeModelOption[]>([]);
-  const [fipeYears, setFipeYears] = useState<number[]>([]);
-  const [selectedFipeBrand, setSelectedFipeBrand] = useState('');
+  const [fipeYearOptions, setFipeYearOptions] = useState<FipeYearOption[]>([]);
+  const [selectedFipeBrandCode, setSelectedFipeBrandCode] = useState('');
+  const [selectedFipeBrandName, setSelectedFipeBrandName] = useState('');
   const [selectedFipeModelCode, setSelectedFipeModelCode] = useState('');
+  const [selectedFipeYearCode, setSelectedFipeYearCode] = useState('');
   const [loadingFipe, setLoadingFipe] = useState(false);
   const [loadingYears, setLoadingYears] = useState(false);
 
@@ -131,19 +141,28 @@ export default function AnunciarPage() {
       .catch(() => {});
   }, []);
 
-  const handleFipeBrandChange = async (brandName: string) => {
-    setSelectedFipeBrand(brandName);
+  const handleFipeBrandChange = async (brandCode: string) => {
+    setSelectedFipeBrandCode(brandCode);
     setSelectedFipeModelCode('');
-    setFipeYears([]);
+    setSelectedFipeYearCode('');
+    setFipeYearOptions([]);
     setManufactureYear('');
-    if (!brandName) {
+    if (!brandCode) {
+      setSelectedFipeBrandName('');
       setFipeModels([]);
       return;
     }
-    setBrand(brandName);
+    const foundBrand = fipeBrands.find((b) => b.code === brandCode);
+    const cleanBrandName = (foundBrand?.name ?? '')
+      .replace(/\s*\(Caminhões\/Ônibus\)/i, '')
+      .trim();
+    setSelectedFipeBrandName(cleanBrandName);
+    setBrand(cleanBrandName);
     setLoadingFipe(true);
     try {
-      const res = await fetch(`/api/fipe?brand=${encodeURIComponent(brandName)}`);
+      const res = await fetch(
+        `/api/fipe?brand=${encodeURIComponent(cleanBrandName)}&brandCode=${encodeURIComponent(brandCode)}`
+      );
       const data = await res.json();
       setFipeModels(data.models ?? []);
     } finally {
@@ -153,9 +172,10 @@ export default function AnunciarPage() {
 
   const handleFipeModelChange = async (modelCode: string) => {
     setSelectedFipeModelCode(modelCode);
+    setSelectedFipeYearCode('');
     const found = fipeModels.find((m) => m.code === modelCode);
     if (!found) {
-      setFipeYears([]);
+      setFipeYearOptions([]);
       return;
     }
     setModel(found.baseModel);
@@ -163,22 +183,52 @@ export default function AnunciarPage() {
     setEngine(found.engine);
     setFuel(found.fuel);
     setTraction(found.traction);
-    setFipePrice(formatBRL(found.fipePrice));
+    if (found.fipePrice > 0) {
+      setFipePrice(formatBRL(found.fipePrice));
+    }
 
     setLoadingYears(true);
     try {
       const res = await fetch(
-        `/api/fipe?brand=${encodeURIComponent(selectedFipeBrand)}&modelCode=${encodeURIComponent(modelCode)}`
+        `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(modelCode)}`
       );
       const data = await res.json();
-      const years: number[] = Array.isArray(data.years) ? data.years : [];
-      setFipeYears(years);
-      if (years.length > 0) {
-        setManufactureYear(String(years[0]));
-        setModelYear(String(years[0]));
+      const opts: FipeYearOption[] = Array.isArray(data.yearOptions) ? data.yearOptions : [];
+      setFipeYearOptions(opts);
+      if (opts.length > 0) {
+        const first = opts[0];
+        setSelectedFipeYearCode(first.code);
+        setManufactureYear(String(first.year));
+        setModelYear(String(first.year));
+        const priceRes = await fetch(
+          `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(modelCode)}&yearCode=${encodeURIComponent(first.code)}`
+        );
+        const priceJson = await priceRes.json();
+        if (priceJson?.priceInfo?.price) {
+          setFipePrice(formatBRL(priceJson.priceInfo.price));
+        }
       }
     } finally {
       setLoadingYears(false);
+    }
+  };
+
+  const handleFipeYearChange = async (yearCode: string) => {
+    setSelectedFipeYearCode(yearCode);
+    const opt = fipeYearOptions.find((y) => y.code === yearCode);
+    if (!opt) return;
+    setManufactureYear(String(opt.year));
+    setModelYear(String(opt.year));
+    try {
+      const priceRes = await fetch(
+        `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(selectedFipeModelCode)}&yearCode=${encodeURIComponent(yearCode)}`
+      );
+      const priceJson = await priceRes.json();
+      if (priceJson?.priceInfo?.price) {
+        setFipePrice(formatBRL(priceJson.priceInfo.price));
+      }
+    } catch {
+      // mantém valor atual
     }
   };
 
@@ -196,10 +246,15 @@ export default function AnunciarPage() {
   const isProperty = (PROPERTY_CATEGORIES as readonly string[]).includes(category);
 
   const handleCategoryChange = (nextCat: string) => {
+    const wasProp = (PROPERTY_CATEGORIES as readonly string[]).includes(category);
+    const nextIsProp = (PROPERTY_CATEGORIES as readonly string[]).includes(nextCat);
     setCategory(nextCat);
     setSelectedSubcategory('');
     setOpenSubcategoryMenu((prev) => (category === nextCat ? !prev : true));
-    if ((PROPERTY_CATEGORIES as readonly string[]).includes(nextCat)) {
+    if (wasProp !== nextIsProp) {
+      setDealTypes(['no_dinheiro']);
+    }
+    if (nextIsProp) {
       const firstSub = PROPERTY_SUBTYPES[nextCat]?.[0] ?? 'Imóvel';
       setPropertyType(firstSub);
     }
@@ -419,8 +474,8 @@ export default function AnunciarPage() {
             <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700">
               2. Tipo de Negócio Aceito
             </label>
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              {DEAL_TYPE_OPTIONS.map((opt) => {
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+              {(isProperty ? PROPERTY_DEAL_TYPE_OPTIONS : VEHICLE_DEAL_TYPE_OPTIONS).map((opt) => {
                 const active = dealTypes.includes(opt.value);
                 return (
                   <button
@@ -608,16 +663,16 @@ export default function AnunciarPage() {
                   <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
                     <div>
                       <label className="mb-1 block text-xs font-semibold text-slate-700">
-                        Marca (Tabela FIPE)
+                        Marca (Tabela FIPE — {fipeBrands.length} marcas)
                       </label>
                       <select
-                        value={selectedFipeBrand}
+                        value={selectedFipeBrandCode}
                         onChange={(e) => handleFipeBrandChange(e.target.value)}
                         className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900"
                       >
                         <option value="">Selecione a marca...</option>
                         {fipeBrands.map((b) => (
-                          <option key={b.code} value={b.name}>
+                          <option key={b.code} value={b.code}>
                             {b.name}
                           </option>
                         ))}
@@ -631,7 +686,7 @@ export default function AnunciarPage() {
                       <select
                         value={selectedFipeModelCode}
                         onChange={(e) => handleFipeModelChange(e.target.value)}
-                        disabled={!selectedFipeBrand || loadingFipe}
+                        disabled={!selectedFipeBrandCode || loadingFipe}
                         className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 disabled:opacity-50"
                       >
                         <option value="">
@@ -684,20 +739,17 @@ export default function AnunciarPage() {
                   <label className="mb-1 block text-xs font-semibold text-slate-700">
                     Ano Fabricação {loadingYears ? '(carregando...)' : ''}
                   </label>
-                  {fipeYears.length > 0 ? (
+                  {fipeYearOptions.length > 0 ? (
                     <select
                       required
-                      value={manufactureYear}
-                      onChange={(e) => {
-                        setManufactureYear(e.target.value);
-                        if (!modelYear) setModelYear(e.target.value);
-                      }}
+                      value={selectedFipeYearCode}
+                      onChange={(e) => handleFipeYearChange(e.target.value)}
                       className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
                     >
                       <option value="">Selecione o ano da versão...</option>
-                      {fipeYears.map((y) => (
-                        <option key={y} value={String(y)}>
-                          {y}
+                      {fipeYearOptions.map((y) => (
+                        <option key={y.code} value={y.code}>
+                          {y.name}
                         </option>
                       ))}
                     </select>

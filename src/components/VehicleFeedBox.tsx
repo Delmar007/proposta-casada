@@ -67,6 +67,10 @@ const DEAL_TYPE_LABELS: Record<string, string> = {
   menor_valor: 'Aceita menor valor',
   maior_valor: 'Aceita maior valor',
   troca_na_orelha: 'Troca na orelha',
+  imovel_menor_valor: 'Imóvel menor valor',
+  imovel_maior_valor: 'Imóvel maior valor',
+  imovel_mesmo_preco: 'Imóvel mesmo preço',
+  carro_mais_dinheiro: 'Carro + dinheiro',
 };
 
 function formatDealTypesLabel(dealTypes?: PublicVehicle['dealTypes']): string {

@@ -1,6 +1,15 @@
+import { FIPE_MARCAS } from './fipe-brands';
+
 export interface FipeBrandOption {
   code: string;
   name: string;
+  isTruck?: boolean;
+}
+
+export interface FipeYearOption {
+  code: string;
+  name: string;
+  year: number;
 }
 
 export interface FipeModelOption {
@@ -291,24 +300,41 @@ export function parseFipeModelName(brandName: string, fullFipeName: string): Fip
   };
 }
 
+function resolveBrandEntry(brandName: string, brandCode?: string) {
+  if (brandCode) {
+    const byCode = FIPE_MARCAS.find((b) => b.codigo === brandCode);
+    if (byCode) return byCode;
+  }
+  const normalized = brandName.trim().toLowerCase();
+  const exact = FIPE_MARCAS.find((b) => b.nome.toLowerCase() === normalized);
+  if (exact) return exact;
+  return FIPE_MARCAS.find((b) => b.nome.toLowerCase().includes(normalized));
+}
+
 /**
  * Busca modelos da marca na API FIPE pública (Parallelum FIPE v2) com fallback instantâneo
  * para o catálogo FIPE integrado.
  */
-export async function fetchFipeModelsForBrand(brandName: string): Promise<FipeModelOption[]> {
+export async function fetchFipeModelsForBrand(
+  brandName: string,
+  brandCode?: string
+): Promise<FipeModelOption[]> {
   const key = brandName.trim().toLowerCase();
   const fallbackEntry = FIPE_CATALOG_FALLBACK[key];
   const fallbackModels = fallbackEntry?.models ?? [];
+  const brandEntry = resolveBrandEntry(brandName, brandCode);
+  const resolvedCode = brandCode || brandEntry?.codigo || fallbackEntry?.code;
+  const fipeVehicleType = brandEntry?.isTruck ? 'trucks' : 'cars';
 
-  if (!fallbackEntry) {
+  if (!resolvedCode) {
     return fallbackModels;
   }
 
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 3500);
+    const timer = setTimeout(() => controller.abort(), 5000);
     const res = await fetch(
-      `https://fipe.parallelum.com.br/api/v2/cars/brands/${fallbackEntry.code}/models`,
+      `https://fipe.parallelum.com.br/api/v2/${fipeVehicleType}/brands/${resolvedCode}/models`,
       { signal: controller.signal }
     );
     clearTimeout(timer);
@@ -317,11 +343,13 @@ export async function fetchFipeModelsForBrand(brandName: string): Promise<FipeMo
     const apiModels: Array<{ code: string; name: string }> = await res.json();
     if (!Array.isArray(apiModels) || apiModels.length === 0) return fallbackModels;
 
-    const parsedFromApi = apiModels.slice(0, 25).map((item) => {
+    const parsedFromApi = apiModels.map((item) => {
       const existing = fallbackModels.find(
         (m) => m.name.toLowerCase() === item.name.toLowerCase()
       );
-      if (existing) return existing;
+      if (existing) {
+        return { ...existing, code: String(item.code) };
+      }
       const parsed = parseFipeModelName(brandName, item.name);
       return {
         ...parsed,
@@ -329,10 +357,10 @@ export async function fetchFipeModelsForBrand(brandName: string): Promise<FipeMo
       };
     });
 
-    // Mantém os modelos curados do catálogo no topo + modelos vindos da API FIPE
+    // Mantém os modelos curados no topo (caso não tenham vindo idênticos) + todos os modelos da API FIPE
     const mergedMap = new Map<string, FipeModelOption>();
-    for (const m of [...fallbackModels, ...parsedFromApi]) {
-      mergedMap.set(m.name, m);
+    for (const m of [...parsedFromApi, ...fallbackModels]) {
+      if (!mergedMap.has(m.name)) mergedMap.set(m.name, m);
     }
     return Array.from(mergedMap.values());
   } catch {
@@ -341,9 +369,10 @@ export async function fetchFipeModelsForBrand(brandName: string): Promise<FipeMo
 }
 
 export function getFipeBrands(): FipeBrandOption[] {
-  return Object.values(FIPE_CATALOG_FALLBACK).map((b) => ({
-    code: b.code,
-    name: b.name,
+  return FIPE_MARCAS.map((b) => ({
+    code: b.codigo,
+    name: b.isTruck ? `${b.nome} (Caminhões/Ônibus)` : b.nome,
+    isTruck: b.isTruck,
   }));
 }
 
@@ -351,21 +380,21 @@ const DEFAULT_MANUFACTURE_YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 201
 
 export async function fetchFipeYearsForModel(
   brandName: string,
-  modelCode: string
-): Promise<number[]> {
+  modelCode: string,
+  brandCode?: string
+): Promise<{ years: number[]; yearOptions: FipeYearOption[] }> {
   const key = brandName.trim().toLowerCase();
-  const brandEntry = FIPE_CATALOG_FALLBACK[key];
-  const curated = brandEntry?.models.find((m) => m.code === modelCode);
-  if (curated?.years && curated.years.length > 0) {
-    return curated.years;
-  }
+  const fallbackEntry = FIPE_CATALOG_FALLBACK[key];
+  const brandEntry = resolveBrandEntry(brandName, brandCode);
+  const resolvedCode = brandCode || brandEntry?.codigo || fallbackEntry?.code;
+  const fipeVehicleType = brandEntry?.isTruck ? 'trucks' : 'cars';
 
-  if (brandEntry && !modelCode.includes('-')) {
+  if (resolvedCode && !modelCode.includes('-')) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 3500);
+      const timer = setTimeout(() => controller.abort(), 5000);
       const res = await fetch(
-        `https://fipe.parallelum.com.br/api/v2/cars/brands/${brandEntry.code}/models/${encodeURIComponent(modelCode)}/years`,
+        `https://fipe.parallelum.com.br/api/v2/${fipeVehicleType}/brands/${resolvedCode}/models/${encodeURIComponent(modelCode)}/years`,
         { signal: controller.signal }
       );
       clearTimeout(timer);
@@ -373,14 +402,17 @@ export async function fetchFipeYearsForModel(
       if (res.ok) {
         const items: Array<{ code: string; name: string }> = await res.json();
         if (Array.isArray(items) && items.length > 0) {
-          const parsedYears = Array.from(
-            new Set(
-              items
-                .map((it) => parseInt(String(it.code).split('-')[0], 10))
-                .filter((y) => !Number.isNaN(y) && y >= 1980 && y <= 2030)
-            )
-          ).sort((a, b) => b - a);
-          if (parsedYears.length > 0) return parsedYears;
+          const yearOptions: FipeYearOption[] = items.map((it) => {
+            const rawYear = parseInt(String(it.code).split('-')[0], 10);
+            const normalizedYear = rawYear === 32000 ? new Date().getFullYear() : rawYear;
+            return {
+              code: String(it.code),
+              name: String(it.name),
+              year: Number.isNaN(normalizedYear) ? new Date().getFullYear() : normalizedYear,
+            };
+          });
+          const years = Array.from(new Set(yearOptions.map((y) => y.year))).sort((a, b) => b - a);
+          return { years, yearOptions };
         }
       }
     } catch {
@@ -388,5 +420,45 @@ export async function fetchFipeYearsForModel(
     }
   }
 
-  return DEFAULT_MANUFACTURE_YEARS;
+  return {
+    years: DEFAULT_MANUFACTURE_YEARS,
+    yearOptions: DEFAULT_MANUFACTURE_YEARS.map((y) => ({
+      code: `${y}-1`,
+      name: `${y}`,
+      year: y,
+    })),
+  };
+}
+
+export async function fetchFipePriceForYear(
+  brandName: string,
+  modelCode: string,
+  yearCode: string,
+  brandCode?: string
+): Promise<{ price: number; fipeCode?: string } | null> {
+  const brandEntry = resolveBrandEntry(brandName, brandCode);
+  const resolvedCode = brandCode || brandEntry?.codigo;
+  const fipeVehicleType = brandEntry?.isTruck ? 'trucks' : 'cars';
+  if (!resolvedCode || modelCode.includes('-')) return null;
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(
+      `https://fipe.parallelum.com.br/api/v2/${fipeVehicleType}/brands/${resolvedCode}/models/${encodeURIComponent(modelCode)}/years/${encodeURIComponent(yearCode)}`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const priceStr = String(data?.price ?? '');
+    const numeric = Number(priceStr.replace(/[^\d,]/g, '').replace(',', '.'));
+    if (!numeric || Number.isNaN(numeric)) return null;
+    return {
+      price: Math.round(numeric),
+      fipeCode: data?.codeFipe ? String(data.codeFipe) : undefined,
+    };
+  } catch {
+    return null;
+  }
 }

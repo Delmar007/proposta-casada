@@ -90,9 +90,9 @@ export default function MarketplaceHomePage() {
   return (
     <div className="mx-auto w-full max-w-[1024px]">
       {/* =====================================================================
-          BANNER PRINCIPAL — 1024 x 250 px no desktop, responsivo para mobile
+          BANNER PRINCIPAL — 1024 x 250 px no desktop, proporcional no mobile
          ===================================================================== */}
-      <section className="relative flex min-h-[220px] w-full max-w-[1024px] flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-uva-700 via-uva-600 to-uva-700 p-4 text-white shadow-sm md:h-[250px] md:p-5">
+      <section className="relative flex min-h-[156px] w-full max-w-[1024px] flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-uva-700 via-uva-600 to-uva-700 p-3 text-white shadow-sm sm:min-h-[195px] sm:p-4 md:h-[250px] md:p-5">
         {/* Background decorativo automotivo */}
         <div
           className="pointer-events-none absolute inset-0 opacity-20 bg-cover bg-center"
@@ -104,23 +104,23 @@ export default function MarketplaceHomePage() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-uva-900/90 via-uva-700/75 to-uva-700/40" />
 
         {/* Topo do Banner */}
-        <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-uva-300/40 bg-uva-900/50 px-3 py-1 text-xs font-bold text-uva-100 backdrop-blur-xs">
-            <ShieldCheck className="h-4 w-4 text-uva-300" />
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-1.5">
+          <span className="inline-flex items-center gap-1 rounded-full border border-uva-300/40 bg-uva-900/50 px-2.5 py-0.5 text-[10px] font-bold text-uva-100 backdrop-blur-xs sm:px-3 sm:py-1 sm:text-xs">
+            <ShieldCheck className="h-3.5 w-3.5 text-uva-300 sm:h-4 sm:w-4" />
             Privacidade & Negociação Protegida
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur-xs">
-            <Sparkles className="h-3.5 w-3.5 text-uva-200" />
+          <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-xs sm:px-3 sm:py-1 sm:text-xs">
+            <Sparkles className="h-3 w-3 text-uva-200 sm:h-3.5 sm:w-3.5" />
             Integrado à Tabela FIPE Oficial
           </span>
         </div>
 
         {/* Centro do Banner */}
-        <div className="relative z-10 my-3 max-w-2xl space-y-1.5 md:my-0">
-          <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl md:text-[28px]">
+        <div className="relative z-10 my-2 max-w-2xl space-y-1 sm:my-3 md:my-0 md:space-y-1.5">
+          <h1 className="text-base font-extrabold leading-tight tracking-tight text-white sm:text-2xl md:text-[28px]">
             Compre, venda ou negocie com permuta sem expor seus dados pessoais
           </h1>
-          <p className="text-sm leading-snug text-slate-100/90 md:text-xs">
+          <p className="text-[11px] leading-snug text-slate-100/90 sm:text-xs">
             Escolha modelo e versão direto pela API FIPE, envie propostas à vista ou com seu
             veículo na troca + complemento em dinheiro e converse pelos Favoritos com moderação e
             anonimato.
@@ -128,22 +128,22 @@ export default function MarketplaceHomePage() {
         </div>
 
         {/* Rodapé do Banner */}
-        <div className="relative z-10 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-          <div className="flex items-center gap-2.5 rounded-xl border border-white/20 bg-white/10 px-3.5 py-2.5 backdrop-blur-xs">
-            <Lock className="h-4 w-4 shrink-0 text-uva-200" />
+        <div className="relative z-10 grid grid-cols-3 gap-1.5 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-2 py-1.5 backdrop-blur-xs sm:gap-2.5 sm:px-3.5 sm:py-2.5">
+            <Lock className="h-3.5 w-3.5 shrink-0 text-uva-200 sm:h-4 sm:w-4" />
             <div className="min-w-0">
-              <p className="text-sm font-bold text-white sm:text-xs">Identidade Anônima</p>
-              <p className="truncate text-xs text-slate-100/80 sm:text-[11px]">
+              <p className="truncate text-[10px] font-bold text-white sm:text-xs">Identidade Anônima</p>
+              <p className="hidden truncate text-[11px] text-slate-100/80 sm:block">
                 Sem CPF, telefone ou WhatsApp exposto
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 rounded-xl border border-white/20 bg-white/10 px-3.5 py-2.5 backdrop-blur-xs">
-            <Repeat className="h-4 w-4 shrink-0 text-uva-200" />
+          <div className="flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-2 py-1.5 backdrop-blur-xs sm:gap-2.5 sm:px-3.5 sm:py-2.5">
+            <Repeat className="h-3.5 w-3.5 shrink-0 text-uva-200 sm:h-4 sm:w-4" />
             <div className="min-w-0">
-              <p className="text-sm font-bold text-white sm:text-xs">Permuta + Complemento</p>
-              <p className="truncate text-xs text-slate-100/80 sm:text-[11px]">
+              <p className="truncate text-[10px] font-bold text-white sm:text-xs">Permuta + Dinheiro</p>
+              <p className="hidden truncate text-[11px] text-slate-100/80 sm:block">
                 Cálculo automático e fotos sem EXIF
               </p>
             </div>
@@ -151,14 +151,14 @@ export default function MarketplaceHomePage() {
 
           <Link
             href="/negociacoes"
-            className="flex items-center justify-between gap-2.5 rounded-xl border border-uva-300/40 bg-uva-500/90 px-3.5 py-2.5 text-white transition hover:bg-uva-500"
+            className="flex items-center justify-between gap-1.5 rounded-xl border border-uva-300/40 bg-uva-500/90 px-2 py-1.5 text-white transition hover:bg-uva-500 sm:gap-2.5 sm:px-3.5 sm:py-2.5"
           >
-            <div className="flex min-w-0 items-center gap-2.5">
-              <Heart className="h-4 w-4 shrink-0 fill-white" />
+            <div className="flex min-w-0 items-center gap-1.5 sm:gap-2.5">
+              <Heart className="h-3.5 w-3.5 shrink-0 fill-white sm:h-4 sm:w-4" />
               <div className="min-w-0">
-                <p className="text-sm font-bold sm:text-xs">Favoritos & Comunicação</p>
-                <p className="truncate text-xs text-uva-50 sm:text-[11px]">
-                  {favorites.length} favorito(s) • Chat protegido
+                <p className="truncate text-[10px] font-bold sm:text-xs">Chat Protegido</p>
+                <p className="hidden truncate text-[11px] text-uva-50 sm:block">
+                  {favorites.length} favorito(s) • Moderação ativa
                 </p>
               </div>
             </div>

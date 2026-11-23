@@ -19,7 +19,11 @@ export type DealTypeOption =
   | 'no_dinheiro'
   | 'menor_valor'
   | 'maior_valor'
-  | 'troca_na_orelha';
+  | 'troca_na_orelha'
+  | 'imovel_menor_valor'
+  | 'imovel_maior_valor'
+  | 'imovel_mesmo_preco'
+  | 'carro_mais_dinheiro';
 
 export interface PublicVehicle {
   id: string;
