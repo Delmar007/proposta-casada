@@ -6,10 +6,17 @@ import { ShieldCheck, Heart, Sparkles, Lock, Repeat, Filter, X } from 'lucide-re
 import { PublicVehicle } from '@/lib/domain/types';
 import { useActiveUser } from '@/components/ActiveUserProvider';
 import { VehicleFeedBox } from '@/components/VehicleFeedBox';
+import {
+  BANNERS_UPDATED_EVENT,
+  BannerItem,
+  loadStoredBanners,
+} from '@/lib/banners/banner-store';
 
 export default function MarketplaceHomePage() {
   const [vehicles, setVehicles] = useState<PublicVehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [customBanners, setCustomBanners] = useState<BannerItem[]>([]);
+  const [bannerIndex, setBannerIndex] = useState(0);
   const {
     searchQuery,
     favorites,
@@ -28,6 +35,31 @@ export default function MarketplaceHomePage() {
       .then((d) => setVehicles(d.vehicles ?? []))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    const syncBanners = () => {
+      const active = loadStoredBanners().filter((b) => b.active && b.imageUrl);
+      setCustomBanners(active);
+      setBannerIndex((prev) => (active.length > 0 ? prev % active.length : 0));
+    };
+    syncBanners();
+    window.addEventListener(BANNERS_UPDATED_EVENT, syncBanners);
+    window.addEventListener('storage', syncBanners);
+    return () => {
+      window.removeEventListener(BANNERS_UPDATED_EVENT, syncBanners);
+      window.removeEventListener('storage', syncBanners);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (customBanners.length <= 1) return;
+    const current = customBanners[bannerIndex] ?? customBanners[0];
+    const ms = Math.max(1, current.durationSeconds || 5) * 1000;
+    const timer = window.setTimeout(() => {
+      setBannerIndex((prev) => (prev + 1) % customBanners.length);
+    }, ms);
+    return () => window.clearTimeout(timer);
+  }, [customBanners, bannerIndex]);
 
   const normalizeText = (s: string) =>
     s
@@ -120,11 +152,58 @@ export default function MarketplaceHomePage() {
       searchQuery.trim()
   );
 
+  const activeBanner = customBanners.length > 0 ? customBanners[bannerIndex % customBanners.length] : null;
+  const activeBannerAnimClass =
+    activeBanner?.transition === 'top-to-bottom'
+      ? 'animate-banner-top-to-bottom'
+      : activeBanner?.transition === 'fade'
+        ? 'animate-banner-fade'
+        : 'animate-banner-side-to-side';
+
   return (
     <div className="mx-auto w-full max-w-[1024px]">
       {/* =====================================================================
           BANNER PRINCIPAL — 1024 x 250 px no desktop, proporcional no mobile
          ===================================================================== */}
+      {activeBanner ? (
+        <section className="relative h-[156px] w-full max-w-[1024px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-sm sm:h-[195px] md:h-[250px]">
+          <div key={activeBanner.id} className={`h-full w-full ${activeBannerAnimClass}`}>
+            {activeBanner.linkUrl ? (
+              <Link href={activeBanner.linkUrl} className="block h-full w-full">
+                <img
+                  src={activeBanner.imageUrl}
+                  alt={activeBanner.title}
+                  className="h-full w-full object-cover"
+                />
+              </Link>
+            ) : (
+              <img
+                src={activeBanner.imageUrl}
+                alt={activeBanner.title}
+                className="h-full w-full object-cover"
+              />
+            )}
+          </div>
+
+          {customBanners.length > 1 && (
+            <div className="absolute bottom-2.5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 backdrop-blur-xs">
+              {customBanners.map((b, i) => (
+                <button
+                  key={b.id}
+                  type="button"
+                  onClick={() => setBannerIndex(i)}
+                  aria-label={`Ver banner ${i + 1}`}
+                  className={`h-2 rounded-full transition-all ${
+                    i === bannerIndex % customBanners.length
+                      ? 'w-5 bg-logo-green'
+                      : 'w-2 bg-white/60 hover:bg-white'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      ) : (
       <section className="relative flex min-h-[156px] w-full max-w-[1024px] flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-uva-700 via-uva-600 to-uva-700 p-3 text-white shadow-sm sm:min-h-[195px] sm:p-4 md:h-[250px] md:p-5">
         {/* Background decorativo automotivo */}
         <div
@@ -198,6 +277,7 @@ export default function MarketplaceHomePage() {
           </Link>
         </div>
       </section>
+      )}
 
       {/* =====================================================================
           FEED DE VEÍCULOS — Desktop: 1024 x 400 px (3 partes horizontais)

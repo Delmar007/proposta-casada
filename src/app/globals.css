@@ -45,3 +45,46 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@keyframes bannerTopToBottom {
+  from {
+    transform: translateY(-100%);
+    opacity: 0.35;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bannerSideToSide {
+  from {
+    transform: translateX(100%);
+    opacity: 0.35;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bannerFade {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-banner-top-to-bottom {
+  animation: bannerTopToBottom 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-banner-side-to-side {
+  animation: bannerSideToSide 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-banner-fade {
+  animation: bannerFade 0.55s ease-out forwards;
+}
