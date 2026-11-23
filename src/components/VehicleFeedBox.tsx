@@ -464,7 +464,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
         aria-label="Visualizador de imagens do veículo"
       >
         <div
-          className="flex h-[90vh] w-full max-w-[1024px] flex-col overflow-hidden rounded-2xl bg-slate-950 shadow-2xl landscape:h-[94vh]"
+          className="flex h-auto max-h-[92vh] w-full max-w-[1024px] flex-col overflow-hidden rounded-2xl bg-slate-950 shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Barra superior apenas com botão Voltar */}
@@ -482,17 +482,17 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
             </button>
           </div>
 
-          {/* Conteúdo: Imagem grande (adapta automaticamente ao virar o celular de lado / landscape) + Carrossel à direita */}
-          <div className="flex min-h-0 flex-1 flex-col landscape:flex-row md:flex-row">
-            <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-black p-2">
+          {/* Conteúdo: Altura natural da foto horizontal (sem espaços em cima/embaixo) + Carrossel à direita */}
+          <div className="flex min-h-0 flex-col landscape:flex-row md:flex-row">
+            <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-black">
               <img
                 src={galleryImages[activeImageIdx] ?? vehicle.imageUrl}
                 alt={`Foto ${activeImageIdx + 1}`}
                 style={{ transform: `rotate(${imageRotation}deg)` }}
-                className={`rounded-lg object-contain transition-transform duration-300 ${
+                className={`block transition-transform duration-300 ${
                   imageRotation % 180 !== 0
-                    ? 'max-h-[65vw] max-w-[65vh] md:max-h-[700px] md:max-w-[520px]'
-                    : 'max-h-full max-w-full'
+                    ? 'max-h-[65vw] max-w-[65vh] object-contain md:max-h-[540px] md:max-w-[540px]'
+                    : 'h-auto max-h-[78vh] w-full object-cover'
                 }`}
               />
 
@@ -508,7 +508,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
               </button>
             </div>
 
-            <div className="flex h-[100px] w-full shrink-0 flex-row items-center gap-2 border-t border-white/10 bg-slate-900 p-2 landscape:h-full landscape:w-[120px] landscape:flex-col landscape:border-t-0 landscape:border-l md:h-full md:w-[152px] md:flex-col md:border-t-0 md:border-l">
+            <div className="flex h-[96px] w-full shrink-0 flex-row items-center gap-2 border-t border-white/10 bg-slate-900 p-2 landscape:h-auto landscape:max-h-[78vh] landscape:w-[120px] landscape:flex-col landscape:border-t-0 landscape:border-l md:h-auto md:max-h-[78vh] md:w-[152px] md:flex-col md:border-t-0 md:border-l">
               <button
                 type="button"
                 onClick={() => {
