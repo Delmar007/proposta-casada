@@ -48,6 +48,7 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
   const [userId, setUserIdState] = useState<string>('buyer-1');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authProvider, setAuthProvider] = useState<SocialAuthProvider | null>(null);
+  const [oauthUserName, setOauthUserName] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [favorites, setFavorites] = useState<string[]>(['veh-1']);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -73,6 +74,46 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
         if (Array.isArray(parsed)) setFavorites(parsed);
       } catch {
         // ignore
+      }
+    }
+
+    if (isSupabaseConfigured()) {
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        supabase.auth.getSession().then(({ data }) => {
+          const session = data.session;
+          if (session?.user) {
+            setIsAuthenticated(true);
+            const provider = session.user.app_metadata?.provider;
+            if (provider === 'google' || provider === 'facebook') {
+              setAuthProvider(provider);
+            }
+            const metaName =
+              session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              session.user.email;
+            if (metaName) setOauthUserName(String(metaName));
+          }
+        });
+
+        const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+          if (session?.user) {
+            setIsAuthenticated(true);
+            const provider = session.user.app_metadata?.provider;
+            if (provider === 'google' || provider === 'facebook') {
+              setAuthProvider(provider);
+            }
+            const metaName =
+              session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              session.user.email;
+            if (metaName) setOauthUserName(String(metaName));
+          }
+        });
+
+        return () => {
+          sub.subscription.unsubscribe();
+        };
       }
     }
   }, []);
@@ -115,8 +156,13 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
   const logout = () => {
     setIsAuthenticated(false);
     setAuthProvider(null);
+    setOauthUserName(null);
     window.localStorage.setItem('mp_is_authenticated', 'false');
     window.localStorage.removeItem('mp_auth_provider');
+    if (isSupabaseConfigured()) {
+      const supabase = getSupabaseClient();
+      supabase?.auth.signOut().catch(() => {});
+    }
   };
 
   const toggleFavorite = (vehicleId: string) => {
@@ -151,7 +197,10 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
     return () => clearInterval(timer);
   }, [userId]);
 
-  const currentUser = DEMO_USERS.find((u) => u.id === userId) ?? DEMO_USERS[0];
+  const baseUser = DEMO_USERS.find((u) => u.id === userId) ?? DEMO_USERS[0];
+  const currentUser: DemoUserOption = oauthUserName
+    ? { ...baseUser, label: oauthUserName }
+    : baseUser;
 
   return (
     <ActiveUserContext.Provider
