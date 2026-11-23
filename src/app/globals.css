@@ -1,18 +1,32 @@
 @import "tailwindcss";
 
-/* Paleta "Verde Uva Premium" — alto contraste e harmonia automotiva */
+/* Paleta oficial extraída do logotipo Proposta Casada */
 @theme {
-  --color-uva-50: #f4f8ee;
-  --color-uva-100: #e6efd9;
-  --color-uva-200: #cde0b4;
-  --color-uva-300: #acc984;
-  --color-uva-400: #8cb258;
-  --color-uva-500: #6b9137;
-  --color-uva-600: #4c6e23;
-  --color-uva-700: #375318;
-  --color-uva-800: #2b4214;
-  --color-uva-900: #1f310e;
-  --color-uva-950: #101b06;
+  /* Verde da logo (#92D40A) */
+  --color-logo-green: #92d40a;
+  --color-logo-green-hover: #7eb807;
+  --color-logo-green-50: #f4fce3;
+  --color-logo-green-100: #e7f8c2;
+
+  /* Roxo da logo (#4D0174 / #7802AB) */
+  --color-logo-purple: #4d0174;
+  --color-logo-purple-light: #7802ab;
+  --color-logo-purple-950: #2a0040;
+  --color-logo-purple-50: #f8f0fc;
+  --color-logo-purple-100: #eedafa;
+
+  /* Tokens legados mapeados para consistência */
+  --color-uva-50: #f8f0fc;
+  --color-uva-100: #eedafa;
+  --color-uva-200: #dcb8f4;
+  --color-uva-300: #c186ea;
+  --color-uva-400: #9f4ad8;
+  --color-uva-500: #7802ab;
+  --color-uva-600: #60018c;
+  --color-uva-700: #4d0174;
+  --color-uva-800: #3d015c;
+  --color-uva-900: #2a0040;
+  --color-uva-950: #1a0029;
 }
 
 :root {

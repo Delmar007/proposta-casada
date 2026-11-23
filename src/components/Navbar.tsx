@@ -172,13 +172,13 @@ export function Navbar() {
           className="order-3 flex w-full flex-1 items-center sm:order-2 sm:w-auto"
         >
           <div className="relative flex w-full items-center">
-            <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-logo-purple" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar marca, modelo, versão, motorização ou cidade..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pr-9 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-uva-700 focus:bg-white focus:outline-none sm:py-2 sm:text-xs"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pr-9 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-logo-purple focus:bg-white focus:outline-none sm:py-2 sm:text-xs"
             />
             {searchQuery && (
               <button
@@ -203,7 +203,7 @@ export function Navbar() {
                 setShowSettingsMenu((v) => !v);
                 setShowProfileMenu(false);
               }}
-              className="inline-flex items-center gap-1.5 py-1 text-sm font-semibold text-slate-700 transition hover:text-uva-700 sm:text-xs"
+              className="inline-flex items-center gap-1.5 py-1 text-sm font-semibold text-logo-purple transition hover:text-logo-purple-light sm:text-xs"
               title="Configurações e Central de Moderação"
               aria-label="Configurações"
             >
@@ -243,10 +243,10 @@ export function Navbar() {
                   <Link
                     href="/admin/negociacoes"
                     onClick={() => setShowSettingsMenu(false)}
-                    className="flex items-center justify-between rounded-lg bg-uva-700 px-3 py-2 font-semibold text-white hover:bg-uva-600"
+                    className="flex items-center justify-between rounded-lg bg-logo-green px-3 py-2 font-bold text-logo-purple-950 hover:bg-logo-green-hover"
                   >
                     <span>Central de Moderação (Admin)</span>
-                    <Settings className="h-3.5 w-3.5" />
+                    <Settings className="h-3.5 w-3.5 text-logo-purple" />
                   </Link>
                 </div>
               </div>
@@ -258,7 +258,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={openAuthModal}
-              className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-uva-700 transition hover:text-uva-600 sm:text-xs"
+              className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-logo-purple transition hover:text-logo-purple-light sm:text-xs"
               title="Cadastrar ou Entrar com Google / Facebook"
             >
               <LogIn className="h-[19px] w-[19px]" />
@@ -272,11 +272,11 @@ export function Navbar() {
                   setShowProfileMenu((v) => !v);
                   setShowSettingsMenu(false);
                 }}
-                className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-slate-800 transition hover:text-uva-700 sm:text-xs"
+                className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-logo-purple transition hover:text-logo-purple-light sm:text-xs"
                 title={`Logado como ${currentUser.label}`}
                 aria-label="Perfil do Usuário"
               >
-                <User className="h-[19px] w-[19px] text-uva-700" />
+                <User className="h-[19px] w-[19px] text-logo-purple" />
                 <span className="hidden max-w-[110px] truncate md:inline">
                   {currentUser.label.split(' ')[0]}
                 </span>
@@ -328,7 +328,7 @@ export function Navbar() {
           {/* 3. Ícone + ao lado do Perfil — abre a página de Cadastro de Anúncio */}
           <Link
             href="/anunciar"
-            className="relative inline-flex items-center py-1 text-slate-700 transition hover:text-uva-700"
+            className="relative inline-flex items-center py-1 text-logo-purple transition hover:text-logo-purple-light"
             title="Anunciar veículo ou imóvel"
             aria-label="Anunciar veículo ou imóvel"
           >
@@ -338,7 +338,7 @@ export function Navbar() {
           {/* 4. Ícone de Coração — Página dedicada de Favoritos (sem círculo, oco ou vermelho vivo) */}
           <Link
             href="/favoritos"
-            className="relative inline-flex items-center py-1 text-slate-700 transition hover:text-red-600"
+            className="relative inline-flex items-center py-1 text-logo-purple transition hover:text-red-600"
             title="Favoritos"
             aria-label="Favoritos"
           >
@@ -346,7 +346,7 @@ export function Navbar() {
               className={`h-[19px] w-[19px] transition ${
                 favorites.length > 0
                   ? 'fill-red-600 text-red-600'
-                  : 'text-slate-700 hover:text-red-600'
+                  : 'text-logo-purple hover:text-red-600'
               }`}
             />
           </Link>
@@ -354,7 +354,7 @@ export function Navbar() {
           {/* 5. Ícone de Chat — Sala de Comunicação */}
           <Link
             href="/negociacoes"
-            className="relative inline-flex items-center py-1 text-slate-700 transition hover:text-uva-700"
+            className="relative inline-flex items-center py-1 text-logo-purple transition hover:text-logo-purple-light"
             title="Chat e Negociações"
             aria-label="Chat e Negociações"
           >
@@ -402,8 +402,8 @@ export function Navbar() {
                 }}
                 className={`shrink-0 whitespace-nowrap text-[15px] font-semibold transition ${
                   isActive || isOpen
-                    ? 'text-uva-700 underline decoration-2 underline-offset-4'
-                    : 'text-slate-600 hover:text-uva-700'
+                    ? 'text-logo-purple-light underline decoration-2 underline-offset-4'
+                    : 'text-logo-purple hover:text-logo-purple-light'
                 }`}
               >
                 {category}

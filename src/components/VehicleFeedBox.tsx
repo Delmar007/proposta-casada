@@ -326,12 +326,12 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
         <button
           type="button"
           onClick={() => router.push(`/vehicles/${vehicle.id}`)}
-          className="grid h-11 w-full shrink-0 grid-cols-2 items-center overflow-hidden rounded-xl bg-uva-700 text-white shadow-xs transition hover:bg-uva-600 md:h-8"
+          className="grid h-11 w-full shrink-0 grid-cols-2 items-center overflow-hidden rounded-xl bg-logo-green text-logo-purple-950 shadow-xs transition hover:bg-logo-green-hover md:h-8"
         >
-          <span className="flex h-full items-center justify-center border-r border-uva-500/60 px-2 text-xs font-bold uppercase tracking-wider text-uva-100 md:text-[11px]">
+          <span className="flex h-full items-center justify-center border-r border-logo-purple-950/20 px-2 text-xs font-extrabold uppercase tracking-wider text-logo-purple-950 md:text-[11px]">
             PREÇO FIPE
           </span>
-          <span className="flex h-full items-center justify-center px-2 text-base font-extrabold tracking-tight md:text-xs">
+          <span className="flex h-full items-center justify-center px-2 text-base font-black tracking-tight md:text-xs">
             {formatBRL(vehicle.fipePrice)}
           </span>
         </button>
@@ -391,19 +391,19 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
                 className="h-11 w-[124px] shrink-0 rounded-xl border border-slate-300 bg-white px-3 text-base font-bold text-slate-900 placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none md:h-8 md:w-[104px] md:px-2 md:text-xs"
               />
 
-              <div className="grid h-11 flex-1 grid-cols-2 overflow-hidden rounded-xl border border-uva-700 shadow-xs md:h-8">
+              <div className="grid h-11 flex-1 grid-cols-2 overflow-hidden rounded-xl border border-logo-green-hover shadow-xs md:h-8">
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex items-center justify-center bg-uva-700 px-2 text-xs font-bold leading-tight text-white transition hover:bg-uva-600 disabled:opacity-50 md:px-1 md:text-[10px]"
+                  className="flex items-center justify-center bg-logo-green px-2 text-xs font-extrabold leading-tight text-logo-purple-950 transition hover:bg-logo-green-hover disabled:opacity-50 md:px-1 md:text-[10px]"
                 >
                   {submitting ? 'Salvando...' : 'Salvar proposta'}
                 </button>
                 <Link
                   href={`/vehicles/${vehicle.id}?modality=trade_in_plus_cash`}
-                  className="flex items-center justify-center gap-1 border-l border-uva-600 bg-white px-2 text-xs font-bold leading-tight text-uva-700 transition hover:bg-uva-50 md:px-1 md:text-[10px]"
+                  className="flex items-center justify-center gap-1 border-l border-logo-green-hover/40 bg-white px-2 text-xs font-bold leading-tight text-logo-purple transition hover:bg-logo-purple-50 md:px-1 md:text-[10px]"
                 >
-                  <Repeat className="h-3.5 w-3.5 shrink-0 md:h-3 md:w-3" />
+                  <Repeat className="h-3.5 w-3.5 shrink-0 text-logo-purple md:h-3 md:w-3" />
                   Propor permuta
                 </Link>
               </div>

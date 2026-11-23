@@ -239,15 +239,20 @@ export default function AnunciarPage() {
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
               {ALL_CATEGORIES.map((cat) => {
                 const selected = category === cat;
+                const isPropCat = (PROPERTY_CATEGORIES as readonly string[]).includes(cat);
                 return (
                   <button
                     key={cat}
                     type="button"
                     onClick={() => handleCategoryChange(cat)}
                     className={`rounded-xl border px-3 py-2 text-xs font-bold transition ${
-                      selected
-                        ? 'border-uva-700 bg-uva-700 text-white shadow-2xs'
-                        : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                      isPropCat
+                        ? selected
+                          ? 'border-logo-purple-950 bg-logo-purple text-white ring-2 ring-logo-green shadow-sm'
+                          : 'border-logo-purple bg-logo-purple/90 text-white hover:bg-logo-purple-light'
+                        : selected
+                        ? 'border-logo-green-hover bg-logo-green text-logo-purple-950 ring-2 ring-logo-purple shadow-sm'
+                        : 'border-logo-green-hover/60 bg-logo-green/85 text-logo-purple-950 hover:bg-logo-green'
                     }`}
                   >
                     {cat}
@@ -638,7 +643,7 @@ export default function AnunciarPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 rounded-xl bg-uva-700 px-6 py-3 text-sm font-bold text-white shadow-xs transition hover:bg-uva-600 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl bg-logo-green px-6 py-3 text-sm font-extrabold text-logo-purple-950 shadow-xs transition hover:bg-logo-green-hover disabled:opacity-50"
             >
               <PlusCircle className="h-4 w-4" />
               {submitting ? 'Publicando anúncio...' : 'Publicar Anúncio'}
