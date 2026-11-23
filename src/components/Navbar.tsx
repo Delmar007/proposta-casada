@@ -81,12 +81,15 @@ const CATEGORY_SUBCATEGORIES: Record<string, string[]> = {
   ],
   Residências: [
     'Casa',
+    'Casa Condomínio',
     'Apartamento',
     'Cobertura',
     'Sobrado',
-    'Condomínio Fechado',
+    'Sobrado Condomínio',
     'Kitnet / Studio',
     'Terreno Residencial',
+    'Terreno Condomínio',
+    'Terreno Comercial',
   ],
   Comerciais: [
     'Sala Comercial',
