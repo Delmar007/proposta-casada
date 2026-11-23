@@ -76,6 +76,9 @@ export function Navbar() {
   const [showLocationMenu, setShowLocationMenu] = useState(false);
   const [draftUf, setDraftUf] = useState<string>('');
   const [draftCity, setDraftCity] = useState<string>('');
+  const [showAdminPasswordModal, setShowAdminPasswordModal] = useState(false);
+  const [adminPasswordInput, setAdminPasswordInput] = useState('');
+  const [adminPasswordError, setAdminPasswordError] = useState('');
   const categoryNavRef = useRef<HTMLElement | null>(null);
   const dealMenuRef = useRef<HTMLDivElement | null>(null);
   const locationMenuRef = useRef<HTMLDivElement | null>(null);
@@ -387,11 +390,16 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => {
-                setShowSettingsMenu((v) => !v);
+                setShowSettingsMenu(false);
                 setShowProfileMenu(false);
+                setOpenDealMenu(null);
+                setShowLocationMenu(false);
+                setAdminPasswordInput('');
+                setAdminPasswordError('');
+                setShowAdminPasswordModal(true);
               }}
               className="inline-flex items-center gap-1.5 py-1 text-sm font-semibold text-logo-purple transition hover:text-logo-purple-light sm:text-xs"
-              title="Configurações e Central de Moderação"
+              title="Acesso Administrativo"
               aria-label="Configurações"
             >
               <Settings className="h-[19px] w-[19px]" />
@@ -664,6 +672,71 @@ export function Navbar() {
           </div>
         )}
       </nav>
+      {showAdminPasswordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-xs rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-extrabold text-logo-purple">Acesso Administrativo</h2>
+              <button
+                type="button"
+                onClick={() => setShowAdminPasswordModal(false)}
+                className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                aria-label="Fechar"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-1 text-xs text-slate-500">
+              Digite a senha para acessar o painel administrativo.
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (adminPasswordInput === 'admin123') {
+                  window.sessionStorage.setItem('mp_admin_unlocked', 'true');
+                  setShowAdminPasswordModal(false);
+                  setAdminPasswordInput('');
+                  setAdminPasswordError('');
+                  router.push('/admin');
+                } else {
+                  setAdminPasswordError('Senha incorreta.');
+                }
+              }}
+              className="mt-3 space-y-3"
+            >
+              <input
+                type="password"
+                autoFocus
+                value={adminPasswordInput}
+                onChange={(e) => {
+                  setAdminPasswordInput(e.target.value);
+                  if (adminPasswordError) setAdminPasswordError('');
+                }}
+                placeholder="Digite a senha"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-logo-purple focus:bg-white focus:outline-none"
+              />
+              {adminPasswordError && (
+                <p className="text-xs font-semibold text-red-600">{adminPasswordError}</p>
+              )}
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAdminPasswordModal(false)}
+                  className="rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-logo-purple px-4 py-2 text-xs font-bold text-white hover:bg-logo-purple-light"
+                >
+                  Entrar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       <AuthModal />
     </>
   );
