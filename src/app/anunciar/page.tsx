@@ -395,7 +395,7 @@ export default function AnunciarPage() {
             </h2>
 
             {isProperty ? (
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-slate-700">
                     Tipo do Imóvel
@@ -544,7 +544,7 @@ export default function AnunciarPage() {
                     </span>
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
                     <div>
                       <label className="mb-1 block text-xs font-semibold text-slate-700">
                         Marca (Tabela FIPE)
@@ -588,7 +588,7 @@ export default function AnunciarPage() {
                   </div>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-slate-700">Marca</label>
                   <input
