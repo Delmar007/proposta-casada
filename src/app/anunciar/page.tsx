@@ -791,7 +791,7 @@ export default function AnunciarPage() {
             </div>
             <div>
               <label className="mb-1 block text-xs font-semibold text-slate-700">
-                Valor da pedida (R$)
+                Valor Pedido R$
               </label>
               <input
                 type="text"
