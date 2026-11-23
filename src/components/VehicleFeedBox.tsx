@@ -369,10 +369,10 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           onClick={() => router.push(`/vehicles/${vehicle.id}`)}
           className="grid h-11 w-full shrink-0 grid-cols-2 items-center overflow-hidden rounded-xl bg-logo-green text-logo-purple shadow-xs transition hover:bg-logo-green-hover md:h-8"
         >
-          <span className="flex h-full items-center justify-center border-r border-logo-purple/25 px-2 text-xs font-extrabold uppercase tracking-wider text-logo-purple md:text-[11px]">
+          <span className="flex h-full items-center justify-center border-r border-logo-purple/25 px-2 text-[13px] font-extrabold uppercase tracking-wider text-logo-purple md:text-[12px]">
             PREÇO FIPE
           </span>
-          <span className="flex h-full items-center justify-center px-2 text-base font-black tracking-tight text-logo-purple md:text-xs">
+          <span className="flex h-full items-center justify-center px-2 text-[18px] font-black tracking-tight text-logo-purple md:text-[13.5px]">
             {formatBRL(vehicle.fipePrice)}
           </span>
         </button>
