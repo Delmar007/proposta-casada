@@ -230,8 +230,8 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
             <span className="max-w-[62%] truncate rounded-md bg-uva-900/90 px-2.5 py-0.5 text-xs font-bold text-white backdrop-blur-xs md:px-2 md:text-[10px]">
               {formatDealTypesLabel(vehicle.dealTypes)}
             </span>
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-slate-800 backdrop-blur-xs md:px-2 md:text-[10px]">
-              <MapPin className="h-3.5 w-3.5 text-logo-purple md:h-3 md:w-3" />
+            <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.95)] md:text-[11px]">
+              <MapPin className="h-3.5 w-3.5 text-white md:h-3 md:w-3" />
               {vehicle.city}/{vehicle.state}
             </span>
           </div>
