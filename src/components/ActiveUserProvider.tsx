@@ -29,6 +29,7 @@ interface ActiveUserContextValue {
   refreshNotifications: () => Promise<void>;
   isAuthenticated: boolean;
   authProvider: SocialAuthProvider | null;
+  userAvatarUrl: string | null;
   showAuthModal: boolean;
   openAuthModal: () => void;
   closeAuthModal: () => void;
@@ -49,6 +50,7 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authProvider, setAuthProvider] = useState<SocialAuthProvider | null>(null);
   const [oauthUserName, setOauthUserName] = useState<string | null>(null);
+  const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [favorites, setFavorites] = useState<string[]>(['veh-1']);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -93,6 +95,10 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
               session.user.user_metadata?.name ||
               session.user.email;
             if (metaName) setOauthUserName(String(metaName));
+            const metaAvatar =
+              session.user.user_metadata?.avatar_url ||
+              session.user.user_metadata?.picture;
+            if (metaAvatar) setUserAvatarUrl(String(metaAvatar));
           }
         });
 
@@ -108,6 +114,10 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
               session.user.user_metadata?.name ||
               session.user.email;
             if (metaName) setOauthUserName(String(metaName));
+            const metaAvatar =
+              session.user.user_metadata?.avatar_url ||
+              session.user.user_metadata?.picture;
+            if (metaAvatar) setUserAvatarUrl(String(metaAvatar));
           }
         });
 
@@ -157,6 +167,7 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
     setIsAuthenticated(false);
     setAuthProvider(null);
     setOauthUserName(null);
+    setUserAvatarUrl(null);
     window.localStorage.setItem('mp_is_authenticated', 'false');
     window.localStorage.removeItem('mp_auth_provider');
     if (isSupabaseConfigured()) {
@@ -212,6 +223,7 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
         refreshNotifications,
         isAuthenticated,
         authProvider,
+        userAvatarUrl,
         showAuthModal,
         openAuthModal,
         closeAuthModal,

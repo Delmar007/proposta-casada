@@ -119,6 +119,7 @@ export function Navbar() {
     notifications,
     isAuthenticated,
     authProvider,
+    userAvatarUrl,
     openAuthModal,
     login,
     logout,
@@ -272,12 +273,22 @@ export function Navbar() {
                   setShowProfileMenu((v) => !v);
                   setShowSettingsMenu(false);
                 }}
-                className="inline-flex items-center gap-1.5 py-1 text-sm font-bold text-logo-purple transition hover:text-logo-purple-light sm:text-xs"
+                className="inline-flex items-center gap-2 py-1 text-sm font-bold text-logo-purple transition hover:text-logo-purple-light sm:text-xs"
                 title={`Logado como ${currentUser.label}`}
                 aria-label="Perfil do Usuário"
               >
-                <User className="h-[19px] w-[19px] text-logo-purple" />
-                <span className="hidden max-w-[110px] truncate md:inline">
+                {userAvatarUrl ? (
+                  <img
+                    src={userAvatarUrl}
+                    alt={currentUser.label.split(' ')[0]}
+                    className="h-7 w-7 shrink-0 rounded-full border border-logo-purple/30 object-cover"
+                  />
+                ) : (
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-logo-purple-50 text-xs font-extrabold text-logo-purple">
+                    {currentUser.label.trim().charAt(0).toUpperCase()}
+                  </span>
+                )}
+                <span className="max-w-[110px] truncate">
                   {currentUser.label.split(' ')[0]}
                 </span>
               </button>
