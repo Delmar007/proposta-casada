@@ -17,6 +17,8 @@ export default function MarketplaceHomePage() {
     activeSubcategory,
     activeListingType,
     activeDealType,
+    activeUf,
+    activeCity,
     clearAllFilters,
   } = useActiveUser();
 
@@ -52,6 +54,14 @@ export default function MarketplaceHomePage() {
         if (!Array.isArray(v.dealTypes) || !v.dealTypes.includes(activeDealType)) {
           return false;
         }
+      }
+
+      if (activeUf && normalizeText(v.state) !== normalizeText(activeUf)) {
+        return false;
+      }
+
+      if (activeCity && normalizeText(v.city) !== normalizeText(activeCity)) {
+        return false;
       }
 
       if (activeCategory && normalizeText(itemCategory) !== normalizeText(activeCategory)) {
@@ -98,10 +108,16 @@ export default function MarketplaceHomePage() {
 
       return true;
     });
-  }, [vehicles, searchQuery, activeCategory, activeSubcategory, activeListingType, activeDealType]);
+  }, [vehicles, searchQuery, activeCategory, activeSubcategory, activeListingType, activeDealType, activeUf, activeCity]);
 
   const hasActiveFilter = Boolean(
-    activeCategory || activeSubcategory || activeListingType || activeDealType || searchQuery.trim()
+    activeCategory ||
+      activeSubcategory ||
+      activeListingType ||
+      activeDealType ||
+      activeUf ||
+      activeCity ||
+      searchQuery.trim()
   );
 
   return (
@@ -196,6 +212,11 @@ export default function MarketplaceHomePage() {
                 <Filter className="h-3.5 w-3.5" />
                 Filtro ativo:
               </span>
+              {(activeUf || activeCity) && (
+                <span className="rounded-full bg-logo-green-50 px-2.5 py-0.5 font-bold text-slate-900">
+                  {[activeUf, activeCity].filter(Boolean).join(', ')}
+                </span>
+              )}
               {activeListingType && (
                 <span className="rounded-full bg-uva-50 px-2.5 py-0.5 font-bold text-uva-700">
                   {activeListingType === 'vehicle' ? 'Carro' : 'Imóvel'}

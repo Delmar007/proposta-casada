@@ -21,6 +21,7 @@ import { DEMO_USERS, useActiveUser } from './ActiveUserProvider';
 import { AuthModal } from './AuthModal';
 import { CATEGORY_SUBCATEGORIES, PRODUCT_CATEGORIES } from '@/lib/domain/categories';
 import { DealTypeOption } from '@/lib/domain/types';
+import { BRAZIL_STATES, getCitiesByUF } from '@/lib/geo/brazil-locations';
 
 const VEHICLE_DEAL_OPTIONS: { value: DealTypeOption; label: string }[] = [
   { value: 'no_dinheiro', label: 'No dinheiro' },
@@ -61,6 +62,10 @@ export function Navbar() {
     setActiveListingType,
     activeDealType,
     setActiveDealType,
+    activeUf,
+    setActiveUf,
+    activeCity,
+    setActiveCity,
     clearAllFilters,
   } = useActiveUser();
 
@@ -68,8 +73,12 @@ export function Navbar() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [openCategoryMenu, setOpenCategoryMenu] = useState<string | null>(null);
   const [openDealMenu, setOpenDealMenu] = useState<'vehicle' | 'property' | null>(null);
+  const [showLocationMenu, setShowLocationMenu] = useState(false);
+  const [draftUf, setDraftUf] = useState<string>('');
+  const [draftCity, setDraftCity] = useState<string>('');
   const categoryNavRef = useRef<HTMLElement | null>(null);
   const dealMenuRef = useRef<HTMLDivElement | null>(null);
+  const locationMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleOutside = (e: MouseEvent) => {
@@ -78,6 +87,9 @@ export function Navbar() {
       }
       if (dealMenuRef.current && !dealMenuRef.current.contains(e.target as Node)) {
         setOpenDealMenu(null);
+      }
+      if (locationMenuRef.current && !locationMenuRef.current.contains(e.target as Node)) {
+        setShowLocationMenu(false);
       }
     };
     document.addEventListener('mousedown', handleOutside);
@@ -91,6 +103,125 @@ export function Navbar() {
 
   return (
     <>
+      {/* BARRA SUPERIOR VERDE — Largura total, mesma altura da barra de categorias */}
+      <div ref={locationMenuRef} className="relative z-50 w-full bg-logo-green text-black">
+        <div className="mx-auto flex w-full max-w-[1024px] items-center justify-between px-3 py-2.5 text-[15px] font-semibold sm:px-0">
+          <span className="truncate text-black">
+            {activeUf && activeCity
+              ? `${activeUf}, ${activeCity}`
+              : activeUf
+                ? `${activeUf}, Cidade`
+                : activeCity
+                  ? `UF, ${activeCity}`
+                  : 'UF, Cidade'}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowSettingsMenu(false);
+              setShowProfileMenu(false);
+              setOpenDealMenu(null);
+              setDraftUf(activeUf ?? '');
+              setDraftCity(activeCity ?? '');
+              setShowLocationMenu((v) => !v);
+            }}
+            className="shrink-0 text-black transition hover:underline"
+          >
+            escolher outra cidade
+          </button>
+        </div>
+
+        {showLocationMenu && (
+          <div className="absolute left-0 right-0 top-full z-50 px-3 sm:px-0">
+            <div className="mx-auto mt-1 flex w-full max-w-[1024px] justify-end">
+              <div className="w-full max-w-xs rounded-2xl border border-slate-200 bg-white p-3.5 text-slate-900 shadow-xl">
+                <p className="text-xs font-bold text-slate-900">Filtrar por localização</p>
+                <div className="mt-2.5 space-y-2">
+                  <div>
+                    <label className="mb-1 block text-[11px] font-semibold text-slate-600">
+                      UF
+                    </label>
+                    <select
+                      value={draftUf}
+                      onChange={(e) => {
+                        setDraftUf(e.target.value);
+                        setDraftCity('');
+                      }}
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-900"
+                    >
+                      <option value="">Todas as UFs</option>
+                      {BRAZIL_STATES.map((st) => (
+                        <option key={st.uf} value={st.uf}>
+                          {st.uf}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-[11px] font-semibold text-slate-600">
+                      Cidade
+                    </label>
+                    {draftUf && getCitiesByUF(draftUf).length > 0 ? (
+                      <select
+                        value={draftCity}
+                        onChange={(e) => setDraftCity(e.target.value)}
+                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-900"
+                      >
+                        <option value="">Todas as cidades</option>
+                        {getCitiesByUF(draftUf).map((c) => (
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        value={draftCity}
+                        onChange={(e) => setDraftCity(e.target.value)}
+                        placeholder="Digite a cidade..."
+                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-900 placeholder:text-slate-400"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveUf(null);
+                      setActiveCity(null);
+                      setDraftUf('');
+                      setDraftCity('');
+                      setShowLocationMenu(false);
+                      router.push('/');
+                    }}
+                    className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+                  >
+                    Limpar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveUf(draftUf || null);
+                      setActiveCity(draftCity.trim() || null);
+                      setShowLocationMenu(false);
+                      router.push('/');
+                    }}
+                    className="rounded-lg bg-logo-purple px-3 py-1.5 text-xs font-bold text-white hover:bg-logo-purple-light"
+                  >
+                    Aplicar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       <header className="border-b border-slate-100 bg-white">
         <div className="mx-auto flex w-full max-w-[1024px] flex-wrap items-center justify-between gap-3 px-3 py-3 sm:gap-0 sm:px-0">
         {/* LOGO — 280 px de largura no desktop */}

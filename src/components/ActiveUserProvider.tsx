@@ -49,6 +49,10 @@ interface ActiveUserContextValue {
   setActiveListingType: (t: 'vehicle' | 'property' | null) => void;
   activeDealType: DealTypeOption | null;
   setActiveDealType: (d: DealTypeOption | null) => void;
+  activeUf: string | null;
+  setActiveUf: (uf: string | null) => void;
+  activeCity: string | null;
+  setActiveCity: (city: string | null) => void;
   clearAllFilters: () => void;
 }
 
@@ -67,6 +71,8 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const [activeListingType, setActiveListingType] = useState<'vehicle' | 'property' | null>(null);
   const [activeDealType, setActiveDealType] = useState<DealTypeOption | null>(null);
+  const [activeUf, setActiveUf] = useState<string | null>(null);
+  const [activeCity, setActiveCity] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<NegotiationNotification[]>([]);
 
   const clearAllFilters = () => {
@@ -75,6 +81,8 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
     setActiveSubcategory(null);
     setActiveListingType(null);
     setActiveDealType(null);
+    setActiveUf(null);
+    setActiveCity(null);
   };
 
   useEffect(() => {
@@ -264,6 +272,10 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
         setActiveListingType,
         activeDealType,
         setActiveDealType,
+        activeUf,
+        setActiveUf,
+        activeCity,
+        setActiveCity,
         clearAllFilters,
       }}
     >
