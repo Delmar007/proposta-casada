@@ -59,6 +59,20 @@ function extractVehicleSpecs(vehicle: PublicVehicle) {
   };
 }
 
+const DEAL_TYPE_LABELS: Record<string, string> = {
+  no_dinheiro: 'No dinheiro',
+  menor_valor: 'Aceita menor valor',
+  maior_valor: 'Aceita maior valor',
+  troca_na_orelha: 'Troca na orelha',
+};
+
+function formatDealTypesLabel(dealTypes?: PublicVehicle['dealTypes']): string {
+  if (!dealTypes || dealTypes.length === 0) {
+    return 'Dinheiro ou Permuta';
+  }
+  return dealTypes.map((d) => DEAL_TYPE_LABELS[d] ?? d).join(' • ');
+}
+
 export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
   const router = useRouter();
   const { userId, isAuthenticated, openAuthModal, isFavorite, toggleFavorite } = useActiveUser();
@@ -211,13 +225,13 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
             />
           </button>
 
-          {/* Ano e Localização sobre a foto */}
+          {/* Tipo de negociação e Localização sobre a foto */}
           <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between gap-2">
-            <span className="rounded-md bg-uva-900/85 px-2.5 py-0.5 text-xs font-bold text-white backdrop-blur-xs md:px-2 md:text-[10px]">
-              {vehicle.manufactureYear}/{vehicle.modelYear}
+            <span className="max-w-[62%] truncate rounded-md bg-uva-900/90 px-2.5 py-0.5 text-xs font-bold text-white backdrop-blur-xs md:px-2 md:text-[10px]">
+              {formatDealTypesLabel(vehicle.dealTypes)}
             </span>
-            <span className="inline-flex items-center gap-1 rounded-md bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-slate-800 backdrop-blur-xs md:px-2 md:text-[10px]">
-              <MapPin className="h-3.5 w-3.5 text-uva-700 md:h-3 md:w-3" />
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-slate-800 backdrop-blur-xs md:px-2 md:text-[10px]">
+              <MapPin className="h-3.5 w-3.5 text-logo-purple md:h-3 md:w-3" />
               {vehicle.city}/{vehicle.state}
             </span>
           </div>
