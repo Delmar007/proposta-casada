@@ -838,7 +838,7 @@ export default function AnunciarPage() {
             hint={
               isProperty
                 ? 'Importe até 18 fotos (fachada, sala, cozinha, quartos, banheiros, área externa, garagem e detalhes).'
-                : 'Importe até 12 fotos (frente, traseira, laterais, interior, painel, motor, porta-malas, pneus e detalhes).'
+                : ''
             }
           />
 

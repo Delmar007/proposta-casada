@@ -105,7 +105,7 @@ export function TradeInPhotoUploader({
             <Camera className="h-4 w-4 text-logo-purple" />
             {title} ({photos.length}/{maxPhotos})
           </h4>
-          <p className="mt-0.5 text-xs text-slate-500">{hint}</p>
+          {hint && <p className="mt-0.5 text-xs text-slate-500">{hint}</p>}
         </div>
 
         {photos.length < maxPhotos && (

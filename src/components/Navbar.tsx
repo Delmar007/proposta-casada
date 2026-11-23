@@ -164,7 +164,7 @@ export function Navbar() {
             clearAllFilters();
             setOpenCategoryMenu(null);
           }}
-          className="flex w-full shrink-0 items-center sm:w-[280px]"
+          className="flex w-full shrink-0 items-center justify-center sm:w-[280px] sm:justify-start"
           title="Proposta Casada — Ver últimos anúncios publicados"
         >
           <img
