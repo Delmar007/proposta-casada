@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ZoomIn,
   ArrowLeft,
+  RotateCw,
 } from 'lucide-react';
 import { PublicVehicle } from '@/lib/domain/types';
 import { BrandLogo } from './BrandLogo';
@@ -87,6 +88,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
 
   const [activeImageIdx, setActiveImageIdx] = useState<number>(0);
   const [showGalleryModal, setShowGalleryModal] = useState<boolean>(false);
+  const [imageRotation, setImageRotation] = useState<number>(0);
   const thumbsContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -462,14 +464,17 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
         aria-label="Visualizador de imagens do veículo"
       >
         <div
-          className="flex h-[85vh] w-full max-w-[1024px] flex-col overflow-hidden rounded-2xl bg-slate-950 shadow-2xl"
+          className="flex h-[90vh] w-full max-w-[1024px] flex-col overflow-hidden rounded-2xl bg-slate-950 shadow-2xl landscape:h-[94vh]"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Barra superior apenas com botão Voltar */}
-          <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-slate-900 px-4 py-2.5">
+          <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-slate-900 px-4 py-2">
             <button
               type="button"
-              onClick={() => setShowGalleryModal(false)}
+              onClick={() => {
+                setShowGalleryModal(false);
+                setImageRotation(0);
+              }}
               className="inline-flex items-center gap-1.5 rounded-xl bg-logo-green px-4 py-1.5 text-xs font-extrabold text-logo-purple-950 transition hover:bg-logo-green-hover"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -477,40 +482,60 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
             </button>
           </div>
 
-          {/* Conteúdo: Imagem grande à esquerda + Carrossel vertical grande à direita (sem texto) */}
-          <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-            <div className="relative flex min-h-0 flex-1 items-center justify-center bg-black p-2">
+          {/* Conteúdo: Imagem grande (adapta automaticamente ao virar o celular de lado / landscape) + Carrossel à direita */}
+          <div className="flex min-h-0 flex-1 flex-col landscape:flex-row md:flex-row">
+            <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-black p-2">
               <img
                 src={galleryImages[activeImageIdx] ?? vehicle.imageUrl}
                 alt={`Foto ${activeImageIdx + 1}`}
-                className="max-h-full max-w-full rounded-lg object-contain"
+                style={{ transform: `rotate(${imageRotation}deg)` }}
+                className={`rounded-lg object-contain transition-transform duration-300 ${
+                  imageRotation % 180 !== 0
+                    ? 'max-h-[65vw] max-w-[65vh] md:max-h-[700px] md:max-w-[520px]'
+                    : 'max-h-full max-w-full'
+                }`}
               />
-            </div>
 
-            <div className="flex h-[108px] w-full shrink-0 flex-row items-center gap-2 border-t border-white/10 bg-slate-900 p-2 md:h-full md:w-[152px] md:flex-col md:border-t-0 md:border-l">
+              {/* Pequeno ícone no canto esquerdo inferior para girar a imagem */}
               <button
                 type="button"
-                onClick={() =>
+                onClick={() => setImageRotation((prev) => (prev + 90) % 360)}
+                className="absolute bottom-3 left-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/65 text-white shadow-md backdrop-blur-xs transition hover:bg-logo-green hover:text-logo-purple-950"
+                title="Girar imagem"
+                aria-label="Girar imagem"
+              >
+                <RotateCw className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="flex h-[100px] w-full shrink-0 flex-row items-center gap-2 border-t border-white/10 bg-slate-900 p-2 landscape:h-full landscape:w-[120px] landscape:flex-col landscape:border-t-0 landscape:border-l md:h-full md:w-[152px] md:flex-col md:border-t-0 md:border-l">
+              <button
+                type="button"
+                onClick={() => {
+                  setImageRotation(0);
                   setActiveImageIdx(
                     (activeImageIdx - 1 + galleryImages.length) % galleryImages.length
-                  )
-                }
-                className="flex h-full w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 md:h-8 md:w-full"
+                  );
+                }}
+                className="flex h-full w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 landscape:h-8 landscape:w-full md:h-8 md:w-full"
                 aria-label="Foto anterior"
               >
-                <ChevronLeft className="h-5 w-5 md:hidden" />
-                <ChevronUp className="hidden h-5 w-5 md:block" />
+                <ChevronLeft className="h-5 w-5 landscape:hidden md:hidden" />
+                <ChevronUp className="hidden h-5 w-5 landscape:block md:block" />
               </button>
 
-              <div className="flex flex-1 flex-row gap-2 overflow-x-auto [scrollbar-width:none] md:w-full md:flex-col md:overflow-x-hidden md:overflow-y-auto [&::-webkit-scrollbar]:hidden">
+              <div className="flex flex-1 flex-row gap-2 overflow-x-auto [scrollbar-width:none] landscape:w-full landscape:flex-col landscape:overflow-x-hidden landscape:overflow-y-auto md:w-full md:flex-col md:overflow-x-hidden md:overflow-y-auto [&::-webkit-scrollbar]:hidden">
                 {galleryImages.map((imgUrl, idx) => {
                   const isSelected = idx === activeImageIdx;
                   return (
                     <button
                       key={`modal-thumb-${vehicle.id}-${idx}`}
                       type="button"
-                      onClick={() => setActiveImageIdx(idx)}
-                      className={`h-20 w-28 shrink-0 overflow-hidden rounded-lg border-2 transition md:h-24 md:w-full ${
+                      onClick={() => {
+                        setImageRotation(0);
+                        setActiveImageIdx(idx);
+                      }}
+                      className={`h-20 w-28 shrink-0 overflow-hidden rounded-lg border-2 transition landscape:h-20 landscape:w-full md:h-24 md:w-full ${
                         isSelected
                           ? 'border-logo-green ring-2 ring-logo-green/50'
                           : 'border-transparent opacity-65 hover:opacity-100'
@@ -528,14 +553,15 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
 
               <button
                 type="button"
-                onClick={() =>
-                  setActiveImageIdx((activeImageIdx + 1) % galleryImages.length)
-                }
-                className="flex h-full w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 md:h-8 md:w-full"
+                onClick={() => {
+                  setImageRotation(0);
+                  setActiveImageIdx((activeImageIdx + 1) % galleryImages.length);
+                }}
+                className="flex h-full w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-white hover:bg-white/20 landscape:h-8 landscape:w-full md:h-8 md:w-full"
                 aria-label="Próxima foto"
               >
-                <ChevronRight className="h-5 w-5 md:hidden" />
-                <ChevronDown className="hidden h-5 w-5 md:block" />
+                <ChevronRight className="h-5 w-5 landscape:hidden md:hidden" />
+                <ChevronDown className="hidden h-5 w-5 landscape:block md:block" />
               </button>
             </div>
           </div>
