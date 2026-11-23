@@ -126,12 +126,15 @@ export function Navbar() {
     favorites,
     searchQuery,
     setSearchQuery,
+    activeCategory,
+    setActiveCategory,
+    activeSubcategory,
+    setActiveSubcategory,
+    clearAllFilters,
   } = useActiveUser();
 
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string>('Carros');
-  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const [openCategoryMenu, setOpenCategoryMenu] = useState<string | null>(null);
   const categoryNavRef = useRef<HTMLElement | null>(null);
 
@@ -158,9 +161,7 @@ export function Navbar() {
         <Link
           href="/"
           onClick={() => {
-            setSearchQuery('');
-            setActiveCategory('Carros');
-            setActiveSubcategory(null);
+            clearAllFilters();
             setOpenCategoryMenu(null);
           }}
           className="flex w-full shrink-0 items-center sm:w-[280px]"
@@ -184,7 +185,7 @@ export function Navbar() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar marca, modelo, versão, motorização ou cidade..."
+              placeholder="Buscar marca, modelo, casa, bar, fazenda, cidade..."
               className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-9 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-logo-purple focus:bg-white focus:outline-none sm:py-2 sm:text-xs"
             />
             {searchQuery && (
@@ -415,7 +416,9 @@ export function Navbar() {
                 type="button"
                 onClick={() => {
                   setActiveCategory(category);
+                  setActiveSubcategory(null);
                   setOpenCategoryMenu((prev) => (prev === category ? null : category));
+                  router.push('/');
                 }}
                 className={`shrink-0 whitespace-nowrap text-[15px] font-semibold transition ${
                   isActive || isOpen

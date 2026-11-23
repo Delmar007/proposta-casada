@@ -41,6 +41,11 @@ interface ActiveUserContextValue {
   isFavorite: (vehicleId: string) => boolean;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
+  activeCategory: string | null;
+  setActiveCategory: (cat: string | null) => void;
+  activeSubcategory: string | null;
+  setActiveSubcategory: (sub: string | null) => void;
+  clearAllFilters: () => void;
 }
 
 const ActiveUserContext = createContext<ActiveUserContextValue | null>(null);
@@ -54,7 +59,15 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [favorites, setFavorites] = useState<string[]>(['veh-1']);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<NegotiationNotification[]>([]);
+
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setActiveCategory(null);
+    setActiveSubcategory(null);
+  };
 
   useEffect(() => {
     const saved = window.localStorage.getItem('mp_active_user_id');
@@ -235,6 +248,11 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
         isFavorite,
         searchQuery,
         setSearchQuery,
+        activeCategory,
+        setActiveCategory,
+        activeSubcategory,
+        setActiveSubcategory,
+        clearAllFilters,
       }}
     >
       {children}
