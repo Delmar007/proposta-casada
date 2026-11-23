@@ -13,6 +13,7 @@ export interface FipeModelOption {
   traction: string;
   fipePrice: number;
   fipeCode: string;
+  years?: number[];
 }
 
 /**
@@ -344,4 +345,48 @@ export function getFipeBrands(): FipeBrandOption[] {
     code: b.code,
     name: b.name,
   }));
+}
+
+const DEFAULT_MANUFACTURE_YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
+
+export async function fetchFipeYearsForModel(
+  brandName: string,
+  modelCode: string
+): Promise<number[]> {
+  const key = brandName.trim().toLowerCase();
+  const brandEntry = FIPE_CATALOG_FALLBACK[key];
+  const curated = brandEntry?.models.find((m) => m.code === modelCode);
+  if (curated?.years && curated.years.length > 0) {
+    return curated.years;
+  }
+
+  if (brandEntry && !modelCode.includes('-')) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 3500);
+      const res = await fetch(
+        `https://fipe.parallelum.com.br/api/v2/cars/brands/${brandEntry.code}/models/${encodeURIComponent(modelCode)}/years`,
+        { signal: controller.signal }
+      );
+      clearTimeout(timer);
+
+      if (res.ok) {
+        const items: Array<{ code: string; name: string }> = await res.json();
+        if (Array.isArray(items) && items.length > 0) {
+          const parsedYears = Array.from(
+            new Set(
+              items
+                .map((it) => parseInt(String(it.code).split('-')[0], 10))
+                .filter((y) => !Number.isNaN(y) && y >= 1980 && y <= 2030)
+            )
+          ).sort((a, b) => b - a);
+          if (parsedYears.length > 0) return parsedYears;
+        }
+      }
+    } catch {
+      // fallback abaixo
+    }
+  }
+
+  return DEFAULT_MANUFACTURE_YEARS;
 }
