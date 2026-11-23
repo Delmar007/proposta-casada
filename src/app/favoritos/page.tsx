@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Heart, Send, Trash2, ArrowRight } from 'lucide-react';
 import { useActiveUser } from '@/components/ActiveUserProvider';
+import { AuthGate } from '@/components/AuthGate';
 import { PublicVehicle } from '@/lib/domain/types';
 import { BrandLogo } from '@/components/BrandLogo';
 
 export default function FavoritosPage() {
-  const { favorites, toggleFavorite } = useActiveUser();
+  const { favorites, toggleFavorite, isAuthenticated } = useActiveUser();
   const [allVehicles, setAllVehicles] = useState<PublicVehicle[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,6 +25,17 @@ export default function FavoritosPage() {
 
   const formatBRL = (v: number) =>
     v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  if (!isAuthenticated) {
+    return (
+      <AuthGate
+        title="Faça login para acessar seus Favoritos"
+        description="Visitantes podem navegar livremente pelo site. Para salvar e visualizar seus favoritos, entre com Google ou Facebook."
+      >
+        <></>
+      </AuthGate>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-[1024px] space-y-6">

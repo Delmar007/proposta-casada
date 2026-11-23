@@ -7,6 +7,7 @@ import { ArrowLeft, PlusCircle, Car, Building2, ShieldCheck, Check, Sparkles } f
 import { DealTypeOption } from '@/lib/domain/types';
 import type { FipeBrandOption, FipeModelOption, FipeYearOption } from '@/lib/fipe/fipe-service';
 import { useActiveUser } from '@/components/ActiveUserProvider';
+import { AuthGate } from '@/components/AuthGate';
 import { TradeInPhotoUploader, UploadedPhotoItem } from '@/components/TradeInPhotoUploader';
 import { BRAZIL_STATES, getCitiesByUF } from '@/lib/geo/brazil-locations';
 import { CATEGORY_SUBCATEGORIES } from '@/lib/domain/categories';
@@ -66,7 +67,7 @@ const PROPERTY_DEAL_TYPE_OPTIONS: Array<{ value: DealTypeOption; label: string }
 
 export default function AnunciarPage() {
   const router = useRouter();
-  const { userId } = useActiveUser();
+  const { userId, isAuthenticated } = useActiveUser();
 
   const [category, setCategory] = useState<string>('Carros');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
@@ -351,6 +352,17 @@ export default function AnunciarPage() {
       setSubmitting(false);
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <AuthGate
+        title="Faça login para cadastrar um anúncio"
+        description="Visitantes podem navegar livremente pelo site. Para publicar veículos ou imóveis, entre com Google ou Facebook."
+      >
+        <></>
+      </AuthGate>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-[1024px] space-y-6">

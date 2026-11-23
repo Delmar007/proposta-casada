@@ -230,6 +230,10 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
   };
 
   const toggleFavorite = (vehicleId: string) => {
+    if (!isAuthenticated) {
+      openAuthModal();
+      return;
+    }
     setFavorites((prev) => {
       const next = prev.includes(vehicleId)
         ? prev.filter((id) => id !== vehicleId)

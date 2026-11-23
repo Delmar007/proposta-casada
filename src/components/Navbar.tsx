@@ -533,6 +533,12 @@ export function Navbar() {
           {/* 3. Ícone + ao lado do Perfil — abre a página de Cadastro de Anúncio */}
           <Link
             href="/anunciar"
+            onClick={(e) => {
+              if (!isAuthenticated) {
+                e.preventDefault();
+                openAuthModal();
+              }
+            }}
             className="relative inline-flex items-center py-1 text-logo-purple transition hover:text-logo-purple-light"
             title="Anunciar veículo ou imóvel"
             aria-label="Anunciar veículo ou imóvel"
@@ -543,13 +549,19 @@ export function Navbar() {
           {/* 4. Ícone de Coração — Página dedicada de Favoritos (sem círculo, oco ou vermelho vivo) */}
           <Link
             href="/favoritos"
+            onClick={(e) => {
+              if (!isAuthenticated) {
+                e.preventDefault();
+                openAuthModal();
+              }
+            }}
             className="relative inline-flex items-center py-1 text-logo-purple transition hover:text-red-600"
             title="Favoritos"
             aria-label="Favoritos"
           >
             <Heart
               className={`h-[19px] w-[19px] transition ${
-                favorites.length > 0
+                isAuthenticated && favorites.length > 0
                   ? 'fill-red-600 text-red-600'
                   : 'text-logo-purple hover:text-red-600'
               }`}
@@ -559,6 +571,12 @@ export function Navbar() {
           {/* 5. Ícone de Chat — Sala de Comunicação */}
           <Link
             href="/negociacoes"
+            onClick={(e) => {
+              if (!isAuthenticated) {
+                e.preventDefault();
+                openAuthModal();
+              }
+            }}
             className="relative inline-flex items-center py-1 text-logo-purple transition hover:text-logo-purple-light"
             title="Chat e Negociações"
             aria-label="Chat e Negociações"

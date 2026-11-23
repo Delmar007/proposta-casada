@@ -14,6 +14,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { useActiveUser } from '@/components/ActiveUserProvider';
+import { AuthGate } from '@/components/AuthGate';
 import {
   NegotiationMessage,
   PublicVehicle,
@@ -50,7 +51,7 @@ interface NegotiationDetailPayload {
 
 export default function NegotiationDetailPage() {
   const params = useParams<{ id: string }>();
-  const { userId, refreshNotifications } = useActiveUser();
+  const { userId, refreshNotifications, isAuthenticated } = useActiveUser();
 
   const [data, setData] = useState<NegotiationDetailPayload | null>(null);
   const [locations, setLocations] = useState<SafeMeetingLocation[]>([]);
@@ -227,6 +228,17 @@ export default function NegotiationDetailPage() {
       setFeedback(json.error ?? 'Erro ao agendar encontro.');
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <AuthGate
+        title="Faça login para acessar esta Negociação"
+        description="Visitantes podem navegar livremente pelo site. Para enviar mensagens, avaliar trocas ou agendar encontros, entre com Google ou Facebook."
+      >
+        <></>
+      </AuthGate>
+    );
+  }
 
   if (loading) {
     return <div className="p-8 text-center text-sm text-slate-500">Carregando sala protegida...</div>;

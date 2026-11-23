@@ -483,6 +483,12 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
                 </button>
                 <Link
                   href={`/vehicles/${vehicle.id}?modality=trade_in_plus_cash`}
+                  onClick={(e) => {
+                    if (!isAuthenticated) {
+                      e.preventDefault();
+                      openAuthModal();
+                    }
+                  }}
                   className="flex flex-col items-center justify-center border-l border-logo-green-hover/40 bg-white px-1 text-center text-[11px] font-bold leading-[1.1] text-logo-purple transition hover:bg-logo-purple-50 md:text-[10px]"
                 >
                   <span>Propor</span>

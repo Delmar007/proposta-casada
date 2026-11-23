@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MessageSquare, ArrowRight, ShieldCheck, Heart } from 'lucide-react';
 import { useActiveUser } from '@/components/ActiveUserProvider';
+import { AuthGate } from '@/components/AuthGate';
 
 interface NegotiationSummary {
   id: string;
@@ -21,7 +22,7 @@ interface NegotiationSummary {
 }
 
 export default function NegotiationsCommunicationPage() {
-  const { userId, notifications, favorites } = useActiveUser();
+  const { userId, notifications, favorites, isAuthenticated } = useActiveUser();
   const [items, setItems] = useState<NegotiationSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,6 +33,17 @@ export default function NegotiationsCommunicationPage() {
       .then((negData) => setItems(negData.negotiations ?? []))
       .finally(() => setLoading(false));
   }, [userId]);
+
+  if (!isAuthenticated) {
+    return (
+      <AuthGate
+        title="Faça login para acessar o Chat e Negociações"
+        description="Visitantes podem navegar livremente pelo site. Para negociar e conversar com segurança, entre com Google ou Facebook."
+      >
+        <></>
+      </AuthGate>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-[1024px] space-y-6">
