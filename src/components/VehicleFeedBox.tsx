@@ -271,7 +271,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
 
           {/* Tipo de negociação, Lupa (+) e Localização sobre a foto */}
           <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between gap-1.5">
-            <span className="max-w-[48%] truncate rounded-md bg-uva-900/90 px-2.5 py-0.5 text-xs font-bold text-white backdrop-blur-xs md:px-2 md:text-[10px]">
+            <span className="max-w-[52%] truncate rounded-md bg-uva-900/90 px-2.5 py-0.5 text-[14px] font-bold text-white backdrop-blur-xs md:px-2 md:text-[12px]">
               {formatDealTypesLabel(vehicle.dealTypes)}
             </span>
 
