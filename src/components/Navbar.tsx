@@ -11,7 +11,7 @@ import {
   Heart,
   LogOut,
   X,
-  Bell,
+  Plus,
   MessageSquare,
 } from 'lucide-react';
 import { DEMO_USERS, useActiveUser } from './ActiveUserProvider';
@@ -325,19 +325,14 @@ export function Navbar() {
             </div>
           )}
 
-          {/* 3. Ícone de Sino ao lado do Perfil — abre diretamente a página de Negociações */}
+          {/* 3. Ícone + ao lado do Perfil — abre a página de Cadastro de Anúncio */}
           <Link
-            href="/negociacoes"
+            href="/anunciar"
             className="relative inline-flex items-center py-1 text-slate-700 transition hover:text-uva-700"
-            title="Abrir página de negociações"
-            aria-label="Abrir página de negociações"
+            title="Anunciar veículo ou imóvel"
+            aria-label="Anunciar veículo ou imóvel"
           >
-            <Bell className="h-[19px] w-[19px]" />
-            {notifications.length > 0 && (
-              <span className="absolute -right-1.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-none text-white">
-                {notifications.length}
-              </span>
-            )}
+            <Plus className="h-[21px] w-[21px]" />
           </Link>
 
           {/* 4. Ícone de Coração — Página dedicada de Favoritos (sem círculo, oco ou vermelho vivo) */}

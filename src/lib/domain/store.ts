@@ -327,9 +327,12 @@ export class MarketplaceStore {
   /**
    * Retorna veículos públicos SEM nunca expor minConfidentialPrice nem PII do vendedor.
    */
-  public getPublicVehicles(): PublicVehicle[] {
-    return Object.values(this.state.vehicles).map((v) => ({
+  private toPublicVehicle(v: VehicleRecord): PublicVehicle {
+    return {
       id: v.id,
+      listingType: v.listingType,
+      category: v.category,
+      dealTypes: v.dealTypes,
       brand: v.brand,
       brandLogoUrl: v.brandLogoUrl,
       model: v.model,
@@ -350,39 +353,111 @@ export class MarketplaceStore {
       description: v.description,
       imageUrl: v.imageUrl,
       images: v.images,
+      propertyType: v.propertyType,
+      totalAreaM2: v.totalAreaM2,
+      builtAreaM2: v.builtAreaM2,
+      bedrooms: v.bedrooms,
+      bathrooms: v.bathrooms,
+      parkingSpaces: v.parkingSpaces,
+      condoFee: v.condoFee,
+      iptu: v.iptu,
       status: v.status,
       createdAt: v.createdAt,
-    }));
+    };
+  }
+
+  public getPublicVehicles(): PublicVehicle[] {
+    return Object.values(this.state.vehicles)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .map((v) => this.toPublicVehicle(v));
   }
 
   public getPublicVehicleById(vehicleId: string): PublicVehicle | null {
     const v = this.state.vehicles[vehicleId];
-    if (!v) return null;
-    return {
-      id: v.id,
-      brand: v.brand,
-      brandLogoUrl: v.brandLogoUrl,
-      model: v.model,
-      version: v.version,
-      engine: v.engine,
-      traction: v.traction,
-      manufactureYear: v.manufactureYear,
-      modelYear: v.modelYear,
-      mileage: v.mileage,
-      fuel: v.fuel,
-      transmission: v.transmission,
-      color: v.color,
-      city: v.city,
-      state: v.state,
-      fipePrice: v.fipePrice,
-      fipeCode: v.fipeCode,
-      askingPrice: v.askingPrice,
-      description: v.description,
-      imageUrl: v.imageUrl,
-      images: v.images,
-      status: v.status,
-      createdAt: v.createdAt,
+    return v ? this.toPublicVehicle(v) : null;
+  }
+
+  public createVehicleListing(input: {
+    sellerId: string;
+    listingType: 'vehicle' | 'property';
+    category: string;
+    dealTypes: PublicVehicle['dealTypes'];
+    brand: string;
+    model: string;
+    version: string;
+    engine?: string;
+    traction?: string;
+    manufactureYear: number;
+    modelYear: number;
+    mileage: number;
+    fuel: string;
+    transmission: string;
+    color: string;
+    city: string;
+    state: string;
+    fipePrice: number;
+    askingPrice: number;
+    minConfidentialPrice?: number;
+    description: string;
+    images?: string[];
+    propertyType?: string;
+    totalAreaM2?: number;
+    builtAreaM2?: number;
+    bedrooms?: number;
+    bathrooms?: number;
+    parkingSpaces?: number;
+    condoFee?: number;
+    iptu?: number;
+  }): PublicVehicle {
+    const id = uid('veh');
+    const now = new Date().toISOString();
+    const fallbackImg =
+      input.listingType === 'property'
+        ? 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80'
+        : 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1000&q=80';
+
+    const images = input.images && input.images.length > 0 ? input.images : [fallbackImg];
+
+    const record: VehicleRecord = {
+      id,
+      sellerId: input.sellerId,
+      listingType: input.listingType,
+      category: input.category,
+      dealTypes: input.dealTypes && input.dealTypes.length > 0 ? input.dealTypes : ['no_dinheiro'],
+      brand: input.brand,
+      model: input.model,
+      version: input.version,
+      engine: input.engine,
+      traction: input.traction,
+      manufactureYear: input.manufactureYear,
+      modelYear: input.modelYear,
+      mileage: input.mileage,
+      fuel: input.fuel,
+      transmission: input.transmission,
+      color: input.color,
+      city: input.city,
+      state: input.state,
+      fipePrice: input.fipePrice,
+      askingPrice: input.askingPrice,
+      minConfidentialPrice: input.minConfidentialPrice ?? Math.round(input.fipePrice * 0.85),
+      description: input.description,
+      imageUrl: images[0],
+      images,
+      propertyType: input.propertyType,
+      totalAreaM2: input.totalAreaM2,
+      builtAreaM2: input.builtAreaM2,
+      bedrooms: input.bedrooms,
+      bathrooms: input.bathrooms,
+      parkingSpaces: input.parkingSpaces,
+      condoFee: input.condoFee,
+      iptu: input.iptu,
+      status: 'active',
+      createdAt: now,
     };
+
+    this.state.vehicles[id] = record;
+    this.saveState();
+    return this.toPublicVehicle(record);
   }
 
   private assertCanPropose(vehicleId: string, buyerId: string): VehicleRecord {

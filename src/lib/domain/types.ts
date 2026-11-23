@@ -15,8 +15,17 @@ export interface UserProfile {
   blockedAt?: string;
 }
 
+export type DealTypeOption =
+  | 'no_dinheiro'
+  | 'menor_valor'
+  | 'maior_valor'
+  | 'troca_na_orelha';
+
 export interface PublicVehicle {
   id: string;
+  listingType?: 'vehicle' | 'property';
+  category?: string;
+  dealTypes?: DealTypeOption[];
   brand: string;
   brandLogoUrl?: string;
   model: string;
@@ -37,6 +46,15 @@ export interface PublicVehicle {
   description: string;
   imageUrl: string;
   images?: string[];
+  // Campos específicos para imóveis
+  propertyType?: string;
+  totalAreaM2?: number;
+  builtAreaM2?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  parkingSpaces?: number;
+  condoFee?: number;
+  iptu?: number;
   status: 'active' | 'negotiation_locked' | 'sold' | 'inactive';
   createdAt: string;
 }
