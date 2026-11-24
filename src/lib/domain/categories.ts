@@ -9,7 +9,8 @@ export const CATEGORY_SUBCATEGORIES: Record<string, string[]> = {
     'Perua / Wagon',
     'Cupê / Esportivo',
     'Minivan / Monovolume',
-    'Elétrico / Híbrido',
+    'Elétrico',
+    'Híbrido',
   ],
   Motos: [
     'Street / Urbana',
