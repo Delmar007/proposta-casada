@@ -245,10 +245,10 @@ export function Navbar() {
           />
         </Link>
 
-        {/* BARRA DE BUSCA CENTRAL — 20 px de distância da logo */}
+        {/* BARRA DE BUSCA CENTRAL — expandida 20 px para o lado esquerdo */}
         <form
           onSubmit={handleSearchSubmit}
-          className="order-3 flex w-full flex-1 items-center sm:order-2 sm:ml-[20px] sm:w-auto"
+          className="order-3 flex w-full flex-1 items-center sm:order-2 sm:ml-0 sm:w-auto"
         >
           <div className="relative flex w-full items-center">
             <Search className="pointer-events-none absolute left-3.5 h-4 w-4 text-logo-purple" />
