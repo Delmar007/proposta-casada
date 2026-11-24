@@ -30,7 +30,7 @@
 }
 
 :root {
-  --background: #f6f7f9;
+  --background: rgba(146, 212, 10, 0.2);
   --foreground: #0f172a;
 }
 
