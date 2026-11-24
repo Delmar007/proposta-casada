@@ -57,14 +57,18 @@ export function parseCnhPdfText(rawText: string): ExtractedCnhData {
   }
   const cpfDigits = cpf ? cpf.replace(/\D/g, '') : '';
 
-  // 2. Nº de Registro da CNH (11 dígitos, distinto do CPF — na CNH nova aparece após "5" ou "Nº REGISTRO")
+  // 2. Nº da CNH = Nº de Registro (sempre 11 dígitos, distinto do CPF; na CNH nova: "5 Nº REGISTRO")
   let cnhNumber: string | undefined;
   const cnhAfterLabel = flat.match(
-    /(?:N[º°o\.]?\s*REGISTRO|REGISTRO|CNH)[^\d]{0,18}(\d{9,11})/i
+    /(?:5\s*)?(?:N[º°o\.]?\s*REGISTRO|REGISTRO)[^\d]{0,25}(\d(?:\s*\d){10})/i
   );
-  if (cnhAfterLabel && cnhAfterLabel[1] !== cpfDigits) {
-    cnhNumber = cnhAfterLabel[1];
-  } else {
+  if (cnhAfterLabel) {
+    const digits = cnhAfterLabel[1].replace(/\D/g, '');
+    if (digits.length === 11 && digits !== cpfDigits) {
+      cnhNumber = digits;
+    }
+  }
+  if (!cnhNumber) {
     const elevenDigitMatches = Array.from(flat.matchAll(/\b(\d{11})\b/g)).map((m) => m[1]);
     cnhNumber = elevenDigitMatches.find((n) => n !== cpfDigits);
   }
