@@ -6,6 +6,8 @@ declare global {
     pdfjsLib?: any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     faceapi?: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Tesseract?: any;
   }
 }
 
@@ -17,6 +19,8 @@ const FACEAPI_SCRIPT_URL =
   'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/dist/face-api.js';
 const FACEAPI_MODEL_URL =
   'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.14/model';
+const TESSERACT_SCRIPT_URL =
+  'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
 
 function loadScriptOnce(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -74,7 +78,11 @@ export interface ParsedCnhPdfResult {
  * 1) Renderiza a página 1 em alta resolução (para exibição, arquivamento e detecção facial);
  * 2) Extrai todo o texto do PDF para identificar RG, CPF, CNH e Data de Nascimento.
  */
-export async function processCnhDigitalPdf(file: File): Promise<ParsedCnhPdfResult> {
+export async function processCnhDigitalPdf(
+  file: File,
+  onStatus?: (msg: string) => void
+): Promise<ParsedCnhPdfResult> {
+  onStatus?.('Carregando leitor de PDF...');
   if (!window.pdfjsLib) {
     await loadScriptOnce(PDFJS_SCRIPT_URL);
   }
@@ -88,8 +96,9 @@ export async function processCnhDigitalPdf(file: File): Promise<ParsedCnhPdfResu
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   const page = await pdf.getPage(1);
 
-  // Renderiza página 1 para imagem
-  const viewport = page.getViewport({ scale: 2.0 });
+  // Renderiza página 1 em alta resolução (para exibição, OCR e detecção facial)
+  onStatus?.('Renderizando imagem da CNH Digital...');
+  const viewport = page.getViewport({ scale: 2.5 });
   const canvas = document.createElement('canvas');
   canvas.width = viewport.width;
   canvas.height = viewport.height;
@@ -97,9 +106,9 @@ export async function processCnhDigitalPdf(file: File): Promise<ParsedCnhPdfResu
   if (!ctx) throw new Error('Contexto 2D indisponível para renderizar o PDF.');
 
   await page.render({ canvasContext: ctx, viewport }).promise;
-  const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+  const imageDataUrl = canvas.toDataURL('image/jpeg', 0.92);
 
-  // Extrai texto de todas as páginas (normalmente 1 ou 2 páginas na CNH Digital)
+  // 1) Extrai camada de texto nativa do PDF (se existir)
   let fullText = '';
   const totalPages = Math.min(pdf.numPages, 2);
   for (let i = 1; i <= totalPages; i++) {
@@ -112,7 +121,49 @@ export async function processCnhDigitalPdf(file: File): Promise<ParsedCnhPdfResu
     fullText += `${pageText}\n`;
   }
 
-  const extracted = parseCnhPdfText(fullText);
+  let extracted = parseCnhPdfText(fullText);
+
+  // 2) PDFs exportados pela CNH Digital (CDT) geralmente são baseados em imagem;
+  // se faltou CPF, RG, CNH ou Data de Nascimento, executa OCR gratuito (Tesseract.js) na imagem!
+  const missingCoreField =
+    !extracted.cpf || !extracted.rg || !extracted.cnhNumber || !extracted.birthDate;
+
+  if (missingCoreField) {
+    try {
+      onStatus?.('Reconhecendo RG, CPF, CNH e data de nascimento via OCR...');
+      if (!window.Tesseract) {
+        await loadScriptOnce(TESSERACT_SCRIPT_URL);
+      }
+      if (window.Tesseract) {
+        const ocrResult = await window.Tesseract.recognize(imageDataUrl, 'por', {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          logger: (m: any) => {
+            if (m?.status === 'recognizing text' && typeof m.progress === 'number') {
+              onStatus?.(
+                `Extraindo documentos da CNH (OCR ${Math.round(m.progress * 100)}%)...`
+              );
+            }
+          },
+        });
+        const ocrText = String(ocrResult?.data?.text ?? '');
+        if (ocrText.trim()) {
+          const combined = `${fullText}\n${ocrText}`;
+          const fromOcr = parseCnhPdfText(combined);
+          extracted = {
+            fullName: extracted.fullName || fromOcr.fullName,
+            cpf: extracted.cpf || fromOcr.cpf,
+            rg: extracted.rg || fromOcr.rg,
+            cnhNumber: extracted.cnhNumber || fromOcr.cnhNumber,
+            birthDate: extracted.birthDate || fromOcr.birthDate,
+            rawText: combined,
+          };
+        }
+      }
+    } catch {
+      // mantém os campos que já foram extraídos
+    }
+  }
+
   return { imageDataUrl, extracted };
 }
 

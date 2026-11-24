@@ -125,7 +125,9 @@ export default function PerfilPage() {
     setPdfFeedback('Lendo PDF da CNH Digital e extraindo documentos...');
     setFaceResult(null);
     try {
-      const { imageDataUrl, extracted } = await processCnhDigitalPdf(file);
+      const { imageDataUrl, extracted } = await processCnhDigitalPdf(file, (statusMsg) => {
+        setPdfFeedback(statusMsg);
+      });
       setCnhFileName(file.name);
       setCnhImageDataUrl(imageDataUrl);
       if (extracted.cpf) setCpf(extracted.cpf);
