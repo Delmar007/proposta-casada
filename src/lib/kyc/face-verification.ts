@@ -158,6 +158,45 @@ export async function processCnhDigitalPdf(
             rawText: combined,
           };
         }
+
+        // 3) Se o Nº de Registro (impresso em vermelho logo abaixo da foto) não veio no OCR normal,
+        // isola a tinta vermelha em alto contraste (preto no branco) para ler os 11 dígitos!
+        if (!extracted.cnhNumber) {
+          onStatus?.('Lendo Nº de Registro (CNH) abaixo da foto...');
+          const redCanvas = document.createElement('canvas');
+          redCanvas.width = canvas.width;
+          redCanvas.height = canvas.height;
+          const rCtx = redCanvas.getContext('2d');
+          if (rCtx) {
+            rCtx.drawImage(canvas, 0, 0);
+            const imgData = rCtx.getImageData(0, 0, redCanvas.width, redCanvas.height);
+            const d = imgData.data;
+            for (let p = 0; p < d.length; p += 4) {
+              const r = d[p];
+              const g = d[p + 1];
+              const b = d[p + 2];
+              const isRedInk = r > 110 && r - g > 30 && r - b > 25;
+              const v = isRedInk ? 0 : 255;
+              d[p] = v;
+              d[p + 1] = v;
+              d[p + 2] = v;
+            }
+            rCtx.putImageData(imgData, 0, 0);
+            const redOcr = await window.Tesseract.recognize(
+              redCanvas.toDataURL('image/png'),
+              'por'
+            );
+            const redText = String(redOcr?.data?.text ?? '');
+            const cpfDigits = (extracted.cpf ?? '').replace(/\D/g, '');
+            const candidates = Array.from(
+              redText.replace(/[Oo]/g, '0').replace(/[Il|]/g, '1').matchAll(/\b(\d{11})\b/g)
+            ).map((m) => m[1]);
+            const foundReg = candidates.find((n) => n !== cpfDigits);
+            if (foundReg) {
+              extracted = { ...extracted, cnhNumber: foundReg };
+            }
+          }
+        }
       }
     } catch {
       // mantém os campos que já foram extraídos
