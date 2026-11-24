@@ -83,12 +83,16 @@ export function Navbar() {
   const [profileCompleted, setProfileCompleted] = useState(false);
   const [cnhImported, setCnhImported] = useState(false);
   const [faceValidated, setFaceValidated] = useState(false);
+  const [justApproved, setJustApproved] = useState(false);
+  const [firstListingDone, setFirstListingDone] = useState(false);
 
   useEffect(() => {
     const syncProfileStatus = () => {
       setProfileCompleted(window.localStorage.getItem('mp_profile_completed') === 'true');
       setCnhImported(window.sessionStorage.getItem('mp_cnh_imported') === 'true');
       setFaceValidated(window.sessionStorage.getItem('mp_face_validated') === 'true');
+      setJustApproved(window.sessionStorage.getItem('mp_just_approved') === 'true');
+      setFirstListingDone(window.localStorage.getItem('mp_first_listing_done') === 'true');
     };
     syncProfileStatus();
     window.addEventListener('mp-profile-updated', syncProfileStatus);
@@ -98,6 +102,14 @@ export function Navbar() {
       window.removeEventListener('storage', syncProfileStatus);
     };
   }, []);
+
+  // Limpa o aviso único "Cadastro Aprovado" assim que o usuário sai da página inicial
+  useEffect(() => {
+    if (pathname !== '/' && justApproved) {
+      window.sessionStorage.removeItem('mp_just_approved');
+      setJustApproved(false);
+    }
+  }, [pathname, justApproved]);
   const categoryNavRef = useRef<HTMLElement | null>(null);
   const dealMenuRef = useRef<HTMLDivElement | null>(null);
   const locationMenuRef = useRef<HTMLDivElement | null>(null);
@@ -138,9 +150,9 @@ export function Navbar() {
                   : 'MS, Campo Grande'}
           </span>
 
-          {/* Tutorial passo a passo centralizado na faixa superior com reflexo de luz */}
+          {/* Tutorial passo a passo centralizado na faixa superior (apenas na primeira vez) */}
           <div className="order-3 flex w-full items-center justify-center text-center text-[13px] font-extrabold text-logo-purple md:order-2 md:w-auto md:flex-1 md:text-[14px]">
-            {!isAuthenticated ? (
+            {!isAuthenticated && !profileCompleted ? (
               <button
                 type="button"
                 onClick={openAuthModal}
@@ -153,7 +165,7 @@ export function Navbar() {
                 </span>
                 <span className="tutorial-text-shine">e faça o login.</span>
               </button>
-            ) : pathname?.startsWith('/perfil') ? (
+            ) : isAuthenticated && !profileCompleted && pathname?.startsWith('/perfil') ? (
               <span className="tutorial-text-shine">
                 {faceValidated
                   ? 'Clique em Salvar Perfil e Documentos.'
@@ -161,7 +173,7 @@ export function Navbar() {
                     ? 'Clique em Iniciar Câmera, tire uma foto do seu rosto, Fotografar e validar rosto.'
                     : 'Adicione nº de celular, importe o PDF da sua CNH.'}
               </span>
-            ) : !profileCompleted ? (
+            ) : isAuthenticated && !profileCompleted ? (
               <Link
                 href="/perfil"
                 className="inline-flex flex-wrap items-center justify-center gap-1.5 text-logo-purple transition hover:underline"
@@ -183,25 +195,13 @@ export function Navbar() {
                 </span>
                 <span className="tutorial-text-shine">para concluir cadastro.</span>
               </Link>
-            ) : pathname?.startsWith('/anunciar') ? (
-              <span className="tutorial-text-shine">
-                Preencha a categoria, os dados e publique seu anúncio.
-              </span>
-            ) : pathname?.startsWith('/vehicles/') ? (
-              <span className="tutorial-text-shine">
-                Escolha dinheiro ou permuta e envie sua proposta protegida.
-              </span>
-            ) : pathname?.startsWith('/negociacoes') ? (
-              <span className="tutorial-text-shine">
-                Acompanhe suas propostas e negocie com segurança.
-              </span>
-            ) : pathname?.startsWith('/favoritos') ? (
-              <span className="tutorial-text-shine">
-                Seus anúncios favoritos salvos para comparar e negociar.
-              </span>
-            ) : (
+            ) : isAuthenticated && profileCompleted && pathname === '/' && justApproved ? (
               <Link
                 href="/anunciar"
+                onClick={() => {
+                  window.sessionStorage.removeItem('mp_just_approved');
+                  setJustApproved(false);
+                }}
                 className="inline-flex flex-wrap items-center justify-center gap-1 transition hover:underline"
               >
                 <span className="tutorial-text-shine">
@@ -212,7 +212,12 @@ export function Navbar() {
                   ou envie proposta nos bens anunciados.
                 </span>
               </Link>
-            )}
+            ) : isAuthenticated && pathname?.startsWith('/anunciar') && !firstListingDone ? (
+              <span className="tutorial-text-shine">
+                Escolha: Categoria (carro), Subcategoria (sedã), Tipo de Negócio (aceito carro de
+                menor valor). Selecione: Marca e Versão.
+              </span>
+            ) : null}
           </div>
 
           <button

@@ -272,6 +272,7 @@ export default function PerfilPage() {
         setSaveError(json.error ?? 'Erro ao salvar perfil.');
       } else {
         window.localStorage.setItem('mp_profile_completed', 'true');
+        window.sessionStorage.setItem('mp_just_approved', 'true');
         window.dispatchEvent(new Event('mp-profile-updated'));
         setSaveMessage(
           'Cadastro do perfil e documentos da CNH arquivados com sucesso no banco de dados!'

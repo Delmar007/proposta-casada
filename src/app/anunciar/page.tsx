@@ -472,6 +472,8 @@ export default function AnunciarPage() {
         return;
       }
 
+      window.localStorage.setItem('mp_first_listing_done', 'true');
+      window.dispatchEvent(new Event('mp-profile-updated'));
       router.push(`/vehicles/${json.vehicle.id}`);
     } catch {
       setError('Erro de conexão ao salvar anúncio.');
