@@ -1,3 +1,5 @@
+import { BRAZIL_STATES } from '@/lib/geo/brazil-locations';
+
 export interface ExtractedCnhData {
   fullName?: string;
   cpf?: string;
@@ -114,27 +116,85 @@ export function parseCnhPdfText(rawText: string): ExtractedCnhData {
     }
   }
 
-  // 5. Local (Cidade e UF — ex.: "CAMPO GRANDE, MS" ou "SÃO PAULO - SP")
+  // 5. Local (Cidade e UF — ex.: "CAMPO GRANDE, MS", "CAMPO GRANDE MS", "SÃO PAULO - SP")
   let local: string | undefined;
   const UF_PATTERN =
     'AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO';
-  const localAfterLabel = flat.match(
-    new RegExp(
-      `LOCAL\\s*[:\\-]?\\s*([A-ZÀ-Ú][A-ZÀ-Ú\\s'.-]{2,38}[,\\-\\/\\s]+(?:${UF_PATTERN}))\\b`,
-      'i'
-    )
-  );
-  if (localAfterLabel) {
-    local = localAfterLabel[1].replace(/\s+/g, ' ').trim();
+  const ORG_EMISSOR_RE = /\b(?:SSP|DETRAN|SESP|PC|IFP|IGP|SDS|SEJUSP|DIC|II|DGPC|POLITEC)\b/i;
+
+  const normalizeNoAccent = (s: string) =>
+    s
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase();
+
+  // 5a. Busca por linha contendo "LOCAL" ou linha imediatamente abaixo de "LOCAL"
+  const lines = normalized
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+  for (let i = 0; i < lines.length; i++) {
+    if (/\bLOCAL\b/i.test(lines[i]) && !/NASCIMENTO/i.test(lines[i])) {
+      const windowText = [lines[i], lines[i + 1] ?? '', lines[i + 2] ?? ''].join(' ');
+      const m = windowText.match(
+        new RegExp(
+          `([A-ZÀ-Ú][A-ZÀ-Ú\\s'.]{2,32})\\s*[,\\-\\/\\s]\\s*(${UF_PATTERN})\\b`
+        )
+      );
+      if (m && !ORG_EMISSOR_RE.test(m[1]) && !/\bLOCAL\b/i.test(m[1])) {
+        const cleanCity = m[1]
+          .replace(/^.*\b(?:LOCAL|EMISS[AÃ]O|DATA)\b\s*/i, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        if (cleanCity.length >= 3) {
+          local = `${cleanCity}, ${m[2].toUpperCase()}`;
+          break;
+        }
+      }
+    }
   }
+
+  // 5b. Busca por "CIDADE, UF" ou "CIDADE - UF" em qualquer ponto (ignorando órgão emissor)
   if (!local) {
-    const cityUfMatch = flat.match(
-      new RegExp(
-        `\\b([A-ZÀ-Ú][A-ZÀ-Ú\\s'.]{2,32},\\s*(?:${UF_PATTERN}))\\b`
+    const matches = Array.from(
+      flat.matchAll(
+        new RegExp(
+          `\\b([A-ZÀ-Ú][A-ZÀ-Ú\\s'.]{2,30})\\s*[,\\-\\/]\\s*(${UF_PATTERN})\\b`,
+          'g'
+        )
       )
     );
-    if (cityUfMatch) {
-      local = cityUfMatch[1].replace(/\s+/g, ' ').trim();
+    for (const m of matches) {
+      const cityCandidate = m[1]
+        .replace(/^.*\b(?:LOCAL|EMISS[AÃ]O|NASCIMENTO|DATA|DETRAN)\b\s*/i, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (cityCandidate.length >= 3 && !ORG_EMISSOR_RE.test(cityCandidate)) {
+        local = `${cityCandidate}, ${m[2].toUpperCase()}`;
+        break;
+      }
+    }
+  }
+
+  // 5c. Fallback infalível: procura qualquer cidade oficial de BRAZIL_STATES + sua UF no texto OCR
+  if (!local) {
+    const flatUpper = normalizeNoAccent(flat);
+    for (const st of BRAZIL_STATES) {
+      for (const city of st.cities) {
+        const cityUpper = normalizeNoAccent(city);
+        const cityRegex = new RegExp(
+          `\\b${cityUpper.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b(?:\\s*[,\\-\\/\\s]\\s*${st.uf}\\b)?`
+        );
+        const match = flatUpper.match(cityRegex);
+        if (match && flatUpper.includes(st.uf)) {
+          // Prefere quando a UF aparece logo depois da cidade
+          if (match[0].endsWith(st.uf)) {
+            local = `${city}, ${st.uf}`;
+            break;
+          }
+        }
+      }
+      if (local) break;
     }
   }
 
