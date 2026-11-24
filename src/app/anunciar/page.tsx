@@ -473,7 +473,7 @@ export default function AnunciarPage() {
     <div className="mx-auto w-full max-w-[1024px] space-y-6">
       <Link
         href="/"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-uva-700"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-uva-700 sm:text-[15px]"
       >
         <ArrowLeft className="h-4 w-4" />
         Voltar ao feed
@@ -486,13 +486,13 @@ export default function AnunciarPage() {
               {isProperty ? <Building2 className="h-5 w-5" /> : <Car className="h-5 w-5" />}
             </div>
             <div>
-              <h1 className="text-lg font-extrabold text-slate-900 sm:text-xl">
+              <h1 className="text-xl font-extrabold text-slate-900 sm:text-2xl">
                 Cadastrar Anúncio para Venda ou Permuta
               </h1>
             </div>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-uva-50 px-3 py-1 text-xs font-semibold text-uva-800">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-uva-50 px-3 py-1 text-sm font-semibold text-uva-800">
             <ShieldCheck className="h-4 w-4 text-uva-700" />
             Dados Pessoais Protegidos
           </span>
@@ -502,7 +502,7 @@ export default function AnunciarPage() {
           {/* 1. Categorias + Menu vertical de subcategorias abaixo */}
           <div className="space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700">
+              <label className="block text-sm font-extrabold uppercase tracking-wider sm:text-[15px] text-slate-700">
                 1. Categoria do Anúncio
               </label>
               <button
@@ -524,7 +524,7 @@ export default function AnunciarPage() {
                     key={cat}
                     type="button"
                     onClick={() => handleCategoryChange(cat)}
-                    className={`rounded-xl border px-3 py-2 text-xs font-bold transition ${
+                    className={`rounded-xl border px-3 py-2.5 text-sm font-bold sm:text-[15px] transition ${
                       isPropCat
                         ? selected
                           ? 'border-logo-purple-950 bg-logo-purple text-white ring-2 ring-logo-green shadow-sm'
@@ -544,7 +544,7 @@ export default function AnunciarPage() {
             {openSubcategoryMenu && CATEGORY_SUBCATEGORIES[category] && (
               <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-md">
                 <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-logo-purple">
+                  <span className="text-sm font-extrabold uppercase tracking-wider sm:text-[15px] text-logo-purple">
                     Subcategorias de {category}
                   </span>
                   <button
@@ -588,7 +588,7 @@ export default function AnunciarPage() {
 
           {/* 2. Tipo de Negócio */}
           <div className="space-y-2">
-            <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700">
+            <label className="block text-sm font-extrabold uppercase tracking-wider sm:text-[15px] text-slate-700">
               2. Tipo de Negócio Aceito
             </label>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
@@ -599,7 +599,7 @@ export default function AnunciarPage() {
                     key={opt.value}
                     type="button"
                     onClick={() => toggleDealType(opt.value)}
-                    className={`flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-left text-xs font-bold transition ${
+                    className={`flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-left text-sm font-bold sm:text-[15px] transition ${
                       active
                         ? 'border-uva-700 bg-uva-50 text-uva-900'
                         : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
@@ -623,20 +623,20 @@ export default function AnunciarPage() {
 
           {/* 3. Dados Específicos (Veículo Móvel vs Imóvel) */}
           <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
-            <h2 className="text-xs font-extrabold uppercase tracking-wider text-uva-800">
+            <h2 className="text-sm font-extrabold uppercase tracking-wider sm:text-[15px] text-uva-800">
               3. {isProperty ? `Dados do Imóvel (${category})` : `Dados do Veículo (${category})`}
             </h2>
 
             {isProperty ? (
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Tipo do Imóvel
                   </label>
                   <select
                     value={propertyType}
                     onChange={(e) => setPropertyType(e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px] font-semibold"
                   >
                     {(PROPERTY_SUBTYPES[category] ?? ['Imóvel']).map((sub) => (
                       <option key={sub} value={sub}>
@@ -646,7 +646,7 @@ export default function AnunciarPage() {
                   </select>
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Título / Referência do Imóvel
                   </label>
                   <input
@@ -654,11 +654,11 @@ export default function AnunciarPage() {
                     value={propertyTitle}
                     onChange={(e) => setPropertyTitle(e.target.value)}
                     placeholder="Ex: Casa Condomínio Alphaville 3 suítes"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Área Total (m²)
                   </label>
                   <input
@@ -668,11 +668,11 @@ export default function AnunciarPage() {
                     value={totalAreaM2}
                     onChange={(e) => setTotalAreaM2(e.target.value)}
                     placeholder="Ex: 250"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Área Construída (m²)
                   </label>
                   <input
@@ -681,11 +681,11 @@ export default function AnunciarPage() {
                     value={builtAreaM2}
                     onChange={(e) => setBuiltAreaM2(e.target.value)}
                     placeholder="Ex: 180"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Quartos / Salas
                   </label>
                   <input
@@ -694,11 +694,11 @@ export default function AnunciarPage() {
                     value={bedrooms}
                     onChange={(e) => setBedrooms(e.target.value)}
                     placeholder="Ex: 3"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Banheiros
                   </label>
                   <input
@@ -707,11 +707,11 @@ export default function AnunciarPage() {
                     value={bathrooms}
                     onChange={(e) => setBathrooms(e.target.value)}
                     placeholder="Ex: 2"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Vagas de Garagem
                   </label>
                   <input
@@ -720,11 +720,11 @@ export default function AnunciarPage() {
                     value={parkingSpaces}
                     onChange={(e) => setParkingSpaces(e.target.value)}
                     placeholder="Ex: 2"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Condomínio (R$/mês)
                   </label>
                   <input
@@ -733,11 +733,11 @@ export default function AnunciarPage() {
                     value={condoFee}
                     onChange={(e) => setCondoFee(e.target.value)}
                     placeholder="Opcional"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     IPTU (R$/ano)
                   </label>
                   <input
@@ -746,11 +746,11 @@ export default function AnunciarPage() {
                     value={iptu}
                     onChange={(e) => setIptu(e.target.value)}
                     placeholder="Opcional"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Avaliação de Referência (R$)
                   </label>
                   <input
@@ -762,7 +762,7 @@ export default function AnunciarPage() {
                     onBlur={() => handleReaisBlur(fipePrice, setFipePrice)}
                     onFocus={() => handleReaisFocus(fipePrice, setFipePrice)}
                     placeholder="R$ 500.000,00"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px] font-bold"
                   />
                 </div>
               </div>
@@ -773,7 +773,7 @@ export default function AnunciarPage() {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-logo-purple" />
-                      <span className="text-xs font-extrabold uppercase tracking-wider text-logo-purple">
+                      <span className="text-sm font-extrabold uppercase tracking-wider sm:text-[15px] text-logo-purple">
                         API Tabela FIPE — Marca, Modelo, Versão, Motor, Combustível e Anos
                       </span>
                     </div>
@@ -787,13 +787,13 @@ export default function AnunciarPage() {
 
                   <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
                     <div>
-                      <label className="mb-1 block text-xs font-semibold text-slate-700">
+                      <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                         Marca (Tabela FIPE — {fipeBrands.length} marcas)
                       </label>
                       <select
                         value={selectedFipeBrandCode}
                         onChange={(e) => handleFipeBrandChange(e.target.value)}
-                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900"
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base font-semibold text-slate-900 sm:text-[15px]"
                       >
                         <option value="">Selecione a marca...</option>
                         {fipeBrands.map((b) => (
@@ -805,14 +805,14 @@ export default function AnunciarPage() {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="mb-1 block text-xs font-semibold text-slate-700">
+                      <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                         Modelo, Versão, Motor e Combustível (FIPE)
                       </label>
                       <select
                         value={selectedFipeModelCode}
                         onChange={(e) => handleFipeModelChange(e.target.value)}
                         disabled={!selectedFipeBrandCode || loadingFipe}
-                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 disabled:opacity-50"
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base font-semibold text-slate-900 sm:text-[15px] disabled:opacity-50"
                       >
                         <option value="">
                           {loadingFipe
@@ -831,37 +831,37 @@ export default function AnunciarPage() {
 
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">Marca</label>
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">Marca</label>
                   <input
                     required
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
                     placeholder="Ex: Toyota"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">Modelo</label>
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">Modelo</label>
                   <input
                     required
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
                     placeholder="Ex: Corolla"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">Versão</label>
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">Versão</label>
                   <input
                     required
                     value={version}
                     onChange={(e) => setVersion(e.target.value)}
                     placeholder="Ex: XEi 2.0 Flex"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Ano Fabricação {loadingYears ? '(carregando...)' : ''}
                   </label>
                   {fipeYearOptions.length > 0 ? (
@@ -869,7 +869,7 @@ export default function AnunciarPage() {
                       required
                       value={selectedFipeYearCode}
                       onChange={(e) => handleFipeYearChange(e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px] font-semibold"
                     >
                       <option value="">Selecione o ano da versão...</option>
                       {fipeYearOptions.map((y) => (
@@ -885,12 +885,12 @@ export default function AnunciarPage() {
                       value={manufactureYear}
                       onChange={(e) => setManufactureYear(e.target.value)}
                       placeholder="Ex: 2022"
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                     />
                   )}
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Quilometragem / Horas
                   </label>
                   <input
@@ -900,27 +900,27 @@ export default function AnunciarPage() {
                     value={mileage}
                     onChange={(e) => setMileage(e.target.value)}
                     placeholder="Ex: 35000"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Combustível
                   </label>
                   <input
                     required
                     value={fuel}
                     onChange={(e) => setFuel(e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">Câmbio</label>
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">Câmbio</label>
                   <select
                     required
                     value={transmission}
                     onChange={(e) => setTransmission(e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px] font-medium text-slate-900"
                   >
                     {[
                       'Automático',
@@ -938,22 +938,22 @@ export default function AnunciarPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Motor / Potência
                   </label>
                   <input
                     value={engine}
                     onChange={(e) => setEngine(e.target.value)}
                     placeholder="Ex: 2.0 177 cv"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">Tração</label>
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">Tração</label>
                   <select
                     value={traction}
                     onChange={(e) => setTraction(e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px] font-medium text-slate-900"
                   >
                     {[
                       '4x2',
@@ -991,7 +991,7 @@ export default function AnunciarPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Preço FIPE (R$) {loadingFipePrice ? '(consultando...)' : ''}
                   </label>
                   <input
@@ -1003,10 +1003,10 @@ export default function AnunciarPage() {
                     onBlur={() => handleReaisBlur(fipePrice, setFipePrice)}
                     onFocus={() => handleReaisFocus(fipePrice, setFipePrice)}
                     placeholder="R$ 278.000,00"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px] font-bold"
                   />
                   {fipeOfficialMeta?.fipeCode && (
-                    <p className="mt-1 text-[10px] font-semibold text-logo-purple">
+                    <p className="mt-1 text-xs font-semibold text-logo-purple">
                       FIPE Oficial • Cód. {fipeOfficialMeta.fipeCode}
                       {fipeOfficialMeta.referenceMonth
                         ? ` • ${fipeOfficialMeta.referenceMonth}`
@@ -1022,7 +1022,7 @@ export default function AnunciarPage() {
           {/* 4. Localização (Estado UF primeiro, depois Cidade) e Valores Confidenciais */}
           <div className="grid grid-cols-1 gap-2.5 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-12 md:items-start">
             <div className="md:col-span-1">
-              <label className="mb-1 block text-xs font-semibold text-slate-700">Estado (UF)</label>
+              <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">Estado (UF)</label>
               <select
                 required
                 value={stateUF}
@@ -1030,7 +1030,7 @@ export default function AnunciarPage() {
                   setStateUF(e.target.value);
                   setCity('');
                 }}
-                className="w-full rounded-lg border border-slate-200 bg-white px-2 py-2 text-sm font-semibold"
+                className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2.5 text-base sm:text-[15px] font-semibold"
               >
                 <option value="">UF</option>
                 {BRAZIL_STATES.map((st) => (
@@ -1041,13 +1041,13 @@ export default function AnunciarPage() {
               </select>
             </div>
             <div className="md:col-span-2">
-              <label className="mb-1 block text-xs font-semibold text-slate-700">Cidade</label>
+              <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">Cidade</label>
               <select
                 required
                 value={city}
                 disabled={!stateUF}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-sm font-semibold disabled:bg-slate-50 disabled:text-slate-400"
+                className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2.5 text-base sm:text-[15px] font-semibold disabled:bg-slate-50 disabled:text-slate-400"
               >
                 <option value="">
                   {stateUF ? 'Cidade...' : 'UF primeiro'}
@@ -1060,7 +1060,7 @@ export default function AnunciarPage() {
               </select>
             </div>
             <div className="md:col-span-2">
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                 Valor Pedido R$
               </label>
               <input
@@ -1072,14 +1072,14 @@ export default function AnunciarPage() {
                 onBlur={() => handleReaisBlur(askingPrice, setAskingPrice)}
                 onFocus={() => handleReaisFocus(askingPrice, setAskingPrice)}
                 placeholder="R$ 0,00"
-                className="w-full rounded-lg border border-slate-200 px-2.5 py-2 text-sm font-bold"
+                className="w-full rounded-lg border border-slate-200 px-2.5 py-2.5 text-base sm:text-[15px] font-bold"
               />
-              <span className="mt-0.5 block text-[10px] text-slate-400">
+              <span className="mt-0.5 block text-xs text-slate-500">
                 Confidencial — não aparece no anúncio
               </span>
             </div>
             <div className="md:col-span-3">
-              <label className="mb-1 block text-xs font-semibold text-slate-700">
+              <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                 Valor mínimo aceito (R$)
               </label>
               <input
@@ -1091,9 +1091,9 @@ export default function AnunciarPage() {
                 onBlur={() => handleReaisBlur(minConfidentialPrice, setMinConfidentialPrice)}
                 onFocus={() => handleReaisFocus(minConfidentialPrice, setMinConfidentialPrice)}
                 placeholder="R$ 0,00 (confidencial)"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base sm:text-[15px] font-bold"
               />
-              <span className="mt-0.5 block text-[10px] text-slate-400">
+              <span className="mt-0.5 block text-xs text-slate-500">
                 Confidencial — não aparece no anúncio
               </span>
             </div>
@@ -1119,11 +1119,11 @@ export default function AnunciarPage() {
 
           {isProperty ? (
             <div>
-              <div className="mb-1 flex items-center justify-between">
-                <label className="block text-xs font-semibold text-slate-700">
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="block text-[15px] font-semibold text-slate-800">
                   Informações do imóvel (até 200 caracteres no card)
                 </label>
-                <span className="text-[11px] text-slate-400">{description.length}/200</span>
+                <span className="text-xs text-slate-500">{description.length}/200</span>
               </div>
               <textarea
                 required
@@ -1132,13 +1132,13 @@ export default function AnunciarPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ex: Documentação 100% regularizada, piscina, área gourmet..."
-                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-uva-700 focus:outline-none"
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-base sm:text-[15px] focus:border-uva-700 focus:outline-none"
               />
             </div>
           ) : (
             <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs font-bold text-slate-800">
+                <span className="text-[15px] font-bold text-slate-800">
                   Acessórios do Veículo ({selectedAccessories.length}/60 selecionados)
                 </span>
                 {selectedAccessories.length > 0 && (
@@ -1157,7 +1157,7 @@ export default function AnunciarPage() {
                   return (
                     <label
                       key={acc}
-                      className={`flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs transition ${
+                      className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2.5 text-base sm:text-[15px] transition sm:text-[15px] ${
                         checked
                           ? 'border-logo-purple bg-uva-50 font-bold text-logo-purple'
                           : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -1187,7 +1187,7 @@ export default function AnunciarPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center gap-2 rounded-xl bg-logo-green px-6 py-3 text-sm font-extrabold text-logo-purple-950 shadow-xs transition hover:bg-logo-green-hover disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl bg-logo-green px-6 py-3.5 text-[15px] font-extrabold sm:text-base text-logo-purple-950 shadow-xs transition hover:bg-logo-green-hover disabled:opacity-50"
             >
               <PlusCircle className="h-4 w-4" />
               {submitting ? 'Publicando anúncio...' : 'Publicar Anúncio'}
