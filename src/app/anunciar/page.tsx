@@ -1027,7 +1027,7 @@ export default function AnunciarPage() {
           {/* 4. Localização (Estado UF primeiro, depois Cidade) e Valores Confidenciais */}
           <div className="grid grid-cols-1 gap-2.5 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-12 md:items-start">
             <div className="md:col-span-1">
-              <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">Estado (UF)</label>
+              <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">UF</label>
               <select
                 required
                 value={stateUF}
