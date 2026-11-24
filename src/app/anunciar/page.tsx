@@ -1096,7 +1096,7 @@ export default function AnunciarPage() {
                 onBlur={() => handleReaisBlur(minConfidentialPrice, setMinConfidentialPrice)}
                 onFocus={() => handleReaisFocus(minConfidentialPrice, setMinConfidentialPrice)}
                 placeholder="R$ 0,00 (confidencial)"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base sm:text-[15px] font-bold"
+                className="w-full rounded-lg border border-logo-green/60 bg-logo-green/20 px-3 py-2.5 text-base sm:text-[15px] font-bold text-slate-900"
               />
               <span className="mt-0.5 block text-xs text-slate-500">
                 Confidencial — não aparece no anúncio
