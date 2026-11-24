@@ -350,7 +350,7 @@ export default function AnunciarPage() {
             mileage: Number(mileage),
             fuel,
             transmission,
-            color,
+            color: 'Não informada',
             city,
             state: stateUF,
             fipePrice: parseReaisValue(fipePrice) || parseReaisValue(askingPrice),
@@ -913,16 +913,6 @@ export default function AnunciarPage() {
                       </option>
                     ))}
                   </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">Cor</label>
-                  <input
-                    required
-                    value={color}
-                    onChange={(e) => setColor(e.target.value)}
-                    placeholder="Ex: Prata"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
-                  />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-slate-700">
