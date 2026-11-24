@@ -430,8 +430,8 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
                       isWinner
                         ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-2xs'
                         : item
-                        ? 'border-slate-200 bg-slate-50 text-slate-800'
-                        : 'border-dashed border-slate-200 bg-slate-50/40 text-slate-300'
+                        ? 'border-logo-green/60 bg-logo-green/20 text-slate-900'
+                        : 'border-dashed border-logo-green/50 bg-logo-green/20 text-logo-purple/40'
                     }`}
                     title={
                       isWinner
