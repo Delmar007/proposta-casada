@@ -1098,7 +1098,7 @@ export default function AnunciarPage() {
               </span>
             </div>
             <div className="md:col-span-4 md:pt-5">
-              <div className="flex min-h-[40px] items-center rounded-xl border border-logo-green/60 bg-logo-green-50 px-3 py-2 text-xs font-semibold leading-snug text-logo-purple-950">
+              <div className="flex min-h-[40px] items-center rounded-xl border border-logo-green/60 bg-logo-green-50 px-3 py-2 text-[15px] font-semibold leading-snug text-logo-purple-950">
                 Proposta igual ou maior que esse valor será enviada no seu WhatsApp.
               </div>
             </div>
