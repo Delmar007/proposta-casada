@@ -1020,8 +1020,8 @@ export default function AnunciarPage() {
           </div>
 
           {/* 4. Localização (Estado UF primeiro, depois Cidade) e Valores Confidenciais */}
-          <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:grid-cols-5">
-            <div>
+          <div className="grid grid-cols-1 gap-2.5 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-12 md:items-start">
+            <div className="md:col-span-1">
               <label className="mb-1 block text-xs font-semibold text-slate-700">Estado (UF)</label>
               <select
                 required
@@ -1030,7 +1030,7 @@ export default function AnunciarPage() {
                   setStateUF(e.target.value);
                   setCity('');
                 }}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
+                className="w-full rounded-lg border border-slate-200 bg-white px-2 py-2 text-sm font-semibold"
               >
                 <option value="">UF</option>
                 {BRAZIL_STATES.map((st) => (
@@ -1040,17 +1040,17 @@ export default function AnunciarPage() {
                 ))}
               </select>
             </div>
-            <div className="sm:col-span-2">
+            <div className="md:col-span-2">
               <label className="mb-1 block text-xs font-semibold text-slate-700">Cidade</label>
               <select
                 required
                 value={city}
                 disabled={!stateUF}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold disabled:bg-slate-50 disabled:text-slate-400"
+                className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-sm font-semibold disabled:bg-slate-50 disabled:text-slate-400"
               >
                 <option value="">
-                  {stateUF ? 'Selecione a cidade...' : 'Escolha o Estado (UF) primeiro'}
+                  {stateUF ? 'Cidade...' : 'UF primeiro'}
                 </option>
                 {getCitiesByUF(stateUF).map((c) => (
                   <option key={c} value={c}>
@@ -1059,7 +1059,7 @@ export default function AnunciarPage() {
                 ))}
               </select>
             </div>
-            <div>
+            <div className="md:col-span-2">
               <label className="mb-1 block text-xs font-semibold text-slate-700">
                 Valor Pedido R$
               </label>
@@ -1071,14 +1071,14 @@ export default function AnunciarPage() {
                 onChange={(e) => handleReaisChange(e.target.value, setAskingPrice)}
                 onBlur={() => handleReaisBlur(askingPrice, setAskingPrice)}
                 onFocus={() => handleReaisFocus(askingPrice, setAskingPrice)}
-                placeholder="R$ 0,00 (confidencial)"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-bold"
+                placeholder="R$ 0,00"
+                className="w-full rounded-lg border border-slate-200 px-2.5 py-2 text-sm font-bold"
               />
               <span className="mt-0.5 block text-[10px] text-slate-400">
                 Confidencial — não aparece no anúncio
               </span>
             </div>
-            <div>
+            <div className="md:col-span-3">
               <label className="mb-1 block text-xs font-semibold text-slate-700">
                 Valor mínimo aceito (R$)
               </label>
@@ -1096,6 +1096,11 @@ export default function AnunciarPage() {
               <span className="mt-0.5 block text-[10px] text-slate-400">
                 Confidencial — não aparece no anúncio
               </span>
+            </div>
+            <div className="md:col-span-4 md:pt-5">
+              <div className="flex min-h-[40px] items-center rounded-xl border border-logo-green/60 bg-logo-green-50 px-3 py-2 text-xs font-semibold leading-snug text-logo-purple-950">
+                Proposta igual ou maior que esse valor será enviada no seu WhatsApp.
+              </div>
             </div>
           </div>
 
