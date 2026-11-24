@@ -21,7 +21,7 @@ interface TradeInPhotoUploaderProps {
 export function TradeInPhotoUploader({
   photos,
   onChange,
-  maxPhotos = 6,
+  maxPhotos = 12,
   title = 'Fotografias do Veículo Oferecido',
   hint = 'Orientações: 1. Frente • 2. Traseira • 3. Lateral direita • 4. Lateral esquerda • 5. Interior • 6. Painel e quilometragem',
 }: TradeInPhotoUploaderProps) {
@@ -136,9 +136,8 @@ export function TradeInPhotoUploader({
       />
 
       {photos.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-xs text-slate-500">
-          Nenhuma fotografia importada ainda. Importe até {maxPhotos} imagens para o anúncio.
-          Metadados EXIF/GPS serão removidos automaticamente antes do envio.
+        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-xs font-semibold text-slate-500">
+          {maxPhotos} imagens
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
