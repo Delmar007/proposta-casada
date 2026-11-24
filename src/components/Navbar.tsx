@@ -493,74 +493,31 @@ export function Navbar() {
               <span>Entrar</span>
             </button>
           ) : (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowProfileMenu((v) => !v);
-                  setShowSettingsMenu(false);
-                }}
-                className="inline-flex items-center gap-2 py-1 text-sm font-bold text-logo-purple transition hover:text-logo-purple-light sm:text-xs"
-                title={`Logado como ${currentUser.label}`}
-                aria-label="Perfil do Usuário"
-              >
-                {userAvatarUrl ? (
-                  <img
-                    src={userAvatarUrl}
-                    alt={currentUser.label.split(' ')[0]}
-                    className="h-7 w-7 shrink-0 rounded-full border border-logo-purple/30 object-cover"
-                  />
-                ) : (
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-logo-purple-50 text-xs font-extrabold text-logo-purple">
-                    {currentUser.label.trim().charAt(0).toUpperCase()}
-                  </span>
-                )}
-                <span className="max-w-[110px] truncate">
-                  {currentUser.label.split(' ')[0]}
+            <Link
+              href="/perfil"
+              onClick={() => {
+                setShowProfileMenu(false);
+                setShowSettingsMenu(false);
+              }}
+              className="inline-flex items-center gap-2 py-1 text-sm font-bold text-logo-purple transition hover:text-logo-purple-light sm:text-xs"
+              title={`Meu Perfil — ${currentUser.label}`}
+              aria-label="Meu Perfil"
+            >
+              {userAvatarUrl ? (
+                <img
+                  src={userAvatarUrl}
+                  alt={currentUser.label.split(' ')[0]}
+                  className="h-7 w-7 shrink-0 rounded-full border border-logo-purple/30 object-cover"
+                />
+              ) : (
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-logo-purple-50 text-xs font-extrabold text-logo-purple">
+                  {currentUser.label.trim().charAt(0).toUpperCase()}
                 </span>
-              </button>
-
-              {showProfileMenu && (
-                <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-xl">
-                  <div className="border-b border-slate-100 pb-2.5">
-                    <p className="text-xs font-bold text-slate-900">{currentUser.label}</p>
-                    <p className="text-[11px] text-slate-500">
-                      Função: {currentUser.roleLabel}
-                      {authProvider ? ` • Login ${authProvider === 'google' ? 'Google' : 'Facebook'}` : ''}
-                    </p>
-                  </div>
-
-                  <div className="mt-2.5 space-y-1.5">
-                    <label className="block text-[10px] font-semibold uppercase text-slate-400">
-                      Trocar usuário logado
-                    </label>
-                    <select
-                      value={userId}
-                      onChange={(e) => setUserId(e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs font-semibold text-slate-800"
-                    >
-                      {DEMO_USERS.map((u) => (
-                        <option key={u.id} value={u.id}>
-                          {u.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      logout();
-                      setShowProfileMenu(false);
-                    }}
-                    className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100"
-                  >
-                    <LogOut className="h-3.5 w-3.5" />
-                    Sair da conta
-                  </button>
-                </div>
               )}
-            </div>
+              <span className="max-w-[110px] truncate">
+                {currentUser.label.split(' ')[0]}
+              </span>
+            </Link>
           )}
 
           {/* 3. Ícone + ao lado do Perfil — abre a página de Cadastro de Anúncio */}

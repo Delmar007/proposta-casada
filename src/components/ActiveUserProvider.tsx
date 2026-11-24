@@ -30,6 +30,7 @@ interface ActiveUserContextValue {
   isAuthenticated: boolean;
   authProvider: SocialAuthProvider | null;
   userAvatarUrl: string | null;
+  userEmail: string;
   showAuthModal: boolean;
   openAuthModal: () => void;
   closeAuthModal: () => void;
@@ -63,6 +64,7 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authProvider, setAuthProvider] = useState<SocialAuthProvider | null>(null);
   const [oauthUserName, setOauthUserName] = useState<string | null>(null);
+  const [oauthUserEmail, setOauthUserEmail] = useState<string | null>(null);
   const [userAvatarUrl, setUserAvatarUrl] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [favorites, setFavorites] = useState<string[]>(['veh-1']);
@@ -148,6 +150,7 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
               session.user.user_metadata?.name ||
               session.user.email;
             if (metaName) setOauthUserName(String(metaName));
+            if (session.user.email) setOauthUserEmail(String(session.user.email));
             const metaAvatar =
               session.user.user_metadata?.avatar_url ||
               session.user.user_metadata?.picture;
@@ -167,6 +170,7 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
               session.user.user_metadata?.name ||
               session.user.email;
             if (metaName) setOauthUserName(String(metaName));
+            if (session.user.email) setOauthUserEmail(String(session.user.email));
             const metaAvatar =
               session.user.user_metadata?.avatar_url ||
               session.user.user_metadata?.picture;
@@ -281,6 +285,7 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
         isAuthenticated,
         authProvider,
         userAvatarUrl,
+        userEmail: oauthUserEmail ?? `${userId}@propostacasada.com.br`,
         showAuthModal,
         openAuthModal,
         closeAuthModal,
