@@ -43,6 +43,72 @@ export function saveStoredBanners(banners: BannerItem[]): void {
 }
 
 /**
+ * Lê um arquivo de imagem como Data URL original (sem cortar) para permitir
+ * posicionamento e zoom livres dentro da grade 1024x250.
+ */
+export function readBannerFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Falha ao ler arquivo de imagem.'));
+    reader.onload = () => resolve(String(reader.result));
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Renderiza a imagem posicionada (panX/panY em [-1, 1] e zoom >= 1)
+ * exatamente dentro da grade final de 1024 x 250 px.
+ */
+export function renderPositionedBannerToDataUrl(
+  imageUrl: string,
+  panX: number,
+  panY: number,
+  zoom: number
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onerror = () => reject(new Error('Não foi possível processar a imagem do banner.'));
+    img.onload = () => {
+      const targetWidth = 1024;
+      const targetHeight = 250;
+      const canvas = document.createElement('canvas');
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(imageUrl);
+        return;
+      }
+
+      const baseScale = Math.max(targetWidth / img.width, targetHeight / img.height);
+      const scale = baseScale * Math.max(1, zoom);
+      const drawW = img.width * scale;
+      const drawH = img.height * scale;
+
+      const maxOffsetX = Math.max(0, (drawW - targetWidth) / 2);
+      const maxOffsetY = Math.max(0, (drawH - targetHeight) / 2);
+      const clampedPanX = Math.max(-1, Math.min(1, panX));
+      const clampedPanY = Math.max(-1, Math.min(1, panY));
+
+      const x = (targetWidth - drawW) / 2 + clampedPanX * maxOffsetX;
+      const y = (targetHeight - drawH) / 2 + clampedPanY * maxOffsetY;
+
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, targetWidth, targetHeight);
+      ctx.drawImage(img, x, y, drawW, drawH);
+
+      try {
+        resolve(canvas.toDataURL('image/jpeg', 0.88));
+      } catch {
+        resolve(imageUrl);
+      }
+    };
+    img.src = imageUrl;
+  });
+}
+
+/**
  * Converte um arquivo de imagem importado em Data URL otimizado para 1024x250.
  */
 export function processBannerImageFile(file: File): Promise<string> {

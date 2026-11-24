@@ -15,13 +15,16 @@ import {
   Move,
   Eye,
   EyeOff,
+  RotateCcw,
+  ZoomIn,
 } from 'lucide-react';
 import {
   BANNER_TRANSITION_LABELS,
   BannerItem,
   BannerTransitionType,
   loadStoredBanners,
-  processBannerImageFile,
+  readBannerFileAsDataUrl,
+  renderPositionedBannerToDataUrl,
   saveStoredBanners,
 } from '@/lib/banners/banner-store';
 
@@ -55,8 +58,20 @@ export default function AdminDashboardPage() {
   const [newTransition, setNewTransition] = useState<BannerTransitionType>('side-to-side');
   const [newDuration, setNewDuration] = useState<number>(5);
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [imgNaturalSize, setImgNaturalSize] = useState<{ w: number; h: number } | null>(null);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  const [savingBanner, setSavingBanner] = useState(false);
   const [bannerMsg, setBannerMsg] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const previewFrameRef = useRef<HTMLDivElement | null>(null);
+  const dragStartRef = useRef<{
+    clientX: number;
+    clientY: number;
+    startPanX: number;
+    startPanY: number;
+  } | null>(null);
 
   useEffect(() => {
     if (window.sessionStorage.getItem('mp_admin_unlocked') === 'true') {
@@ -74,8 +89,12 @@ export default function AdminDashboardPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const dataUrl = await processBannerImageFile(file);
+      const dataUrl = await readBannerFileAsDataUrl(file);
       setNewImageUrl(dataUrl);
+      setImgNaturalSize(null);
+      setPanX(0);
+      setPanY(0);
+      setZoom(1);
       if (!newTitle.trim()) {
         setNewTitle(file.name.replace(/\.[^.]+$/, ''));
       }
@@ -87,29 +106,86 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleAddBanner = (e: React.FormEvent) => {
+  const handleAddBanner = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newImageUrl.trim()) {
       setBannerMsg('Importe uma imagem ou informe a URL do banner.');
       return;
     }
-    const item: BannerItem = {
-      id: `banner-${Date.now()}`,
-      title: newTitle.trim() || `Banner ${banners.length + 1}`,
-      imageUrl: newImageUrl.trim(),
-      linkUrl: newLinkUrl.trim() || undefined,
-      transition: newTransition,
-      durationSeconds: Math.max(1, Math.min(120, Number(newDuration) || 5)),
-      active: true,
-      createdAt: new Date().toISOString(),
+    setSavingBanner(true);
+    try {
+      const finalImageUrl = await renderPositionedBannerToDataUrl(
+        newImageUrl.trim(),
+        panX,
+        panY,
+        zoom
+      );
+      const item: BannerItem = {
+        id: `banner-${Date.now()}`,
+        title: newTitle.trim() || `Banner ${banners.length + 1}`,
+        imageUrl: finalImageUrl,
+        linkUrl: newLinkUrl.trim() || undefined,
+        transition: newTransition,
+        durationSeconds: Math.max(1, Math.min(120, Number(newDuration) || 5)),
+        active: true,
+        createdAt: new Date().toISOString(),
+      };
+      persistBanners([...banners, item]);
+      setNewTitle('');
+      setNewLinkUrl('');
+      setNewImageUrl('');
+      setImgNaturalSize(null);
+      setPanX(0);
+      setPanY(0);
+      setZoom(1);
+      setNewDuration(5);
+      setNewTransition('side-to-side');
+      setBannerMsg('Banner posicionado (1024 × 250) e salvo com sucesso!');
+    } catch {
+      setBannerMsg('Não foi possível salvar o banner.');
+    } finally {
+      setSavingBanner(false);
+    }
+  };
+
+  const handleFramePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!newImageUrl) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    dragStartRef.current = {
+      clientX: e.clientX,
+      clientY: e.clientY,
+      startPanX: panX,
+      startPanY: panY,
     };
-    persistBanners([...banners, item]);
-    setNewTitle('');
-    setNewLinkUrl('');
-    setNewImageUrl('');
-    setNewDuration(5);
-    setNewTransition('side-to-side');
-    setBannerMsg('Banner importado e salvo com sucesso!');
+  };
+
+  const handleFramePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragStartRef.current;
+    const frame = previewFrameRef.current;
+    if (!drag || !frame || !imgNaturalSize) return;
+
+    const rect = frame.getBoundingClientRect();
+    const baseScale = Math.max(rect.width / imgNaturalSize.w, rect.height / imgNaturalSize.h);
+    const scale = baseScale * zoom;
+    const drawW = imgNaturalSize.w * scale;
+    const drawH = imgNaturalSize.h * scale;
+    const maxOffsetX = Math.max(0, (drawW - rect.width) / 2);
+    const maxOffsetY = Math.max(0, (drawH - rect.height) / 2);
+
+    const dx = e.clientX - drag.clientX;
+    const dy = e.clientY - drag.clientY;
+
+    const nextPanX =
+      maxOffsetX > 1 ? Math.max(-1, Math.min(1, drag.startPanX + dx / maxOffsetX)) : 0;
+    const nextPanY =
+      maxOffsetY > 1 ? Math.max(-1, Math.min(1, drag.startPanY + dy / maxOffsetY)) : 0;
+
+    setPanX(nextPanX);
+    setPanY(nextPanY);
+  };
+
+  const handleFramePointerUp = () => {
+    dragStartRef.current = null;
   };
 
   const updateBannerField = <K extends keyof BannerItem>(
@@ -331,12 +407,102 @@ export default function AdminDashboardPage() {
               </div>
 
               {newImageUrl && (
-                <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                  <img
-                    src={newImageUrl}
-                    alt="Pré-visualização do banner"
-                    className="h-[150px] w-full object-cover md:h-[200px]"
-                  />
+                <div className="space-y-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <span className="font-bold text-logo-purple">
+                      Grade 1024 × 250 — Arraste a imagem para posicionar
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <label className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600">
+                        <ZoomIn className="h-3.5 w-3.5 text-logo-purple" />
+                        <span>Zoom ({Math.round(zoom * 100)}%)</span>
+                        <input
+                          type="range"
+                          min={1}
+                          max={2.5}
+                          step={0.05}
+                          value={zoom}
+                          onChange={(e) => setZoom(Number(e.target.value))}
+                          className="w-24 accent-logo-purple"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPanX(0);
+                          setPanY(0);
+                          setZoom(1);
+                        }}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                        Centralizar
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Grade interativa proporcional 1024 x 250 */}
+                  <div
+                    ref={previewFrameRef}
+                    onPointerDown={handleFramePointerDown}
+                    onPointerMove={handleFramePointerMove}
+                    onPointerUp={handleFramePointerUp}
+                    onPointerCancel={handleFramePointerUp}
+                    className="relative aspect-[1024/250] w-full cursor-grab touch-none select-none overflow-hidden rounded-2xl border-2 border-dashed border-logo-purple/60 bg-slate-900 active:cursor-grabbing"
+                  >
+                    {(() => {
+                      const frameW = previewFrameRef.current?.clientWidth || 1024;
+                      const frameH = previewFrameRef.current?.clientHeight || 250;
+                      const natW = imgNaturalSize?.w || 1024;
+                      const natH = imgNaturalSize?.h || 250;
+                      const baseScale = Math.max(frameW / natW, frameH / natH);
+                      const scale = baseScale * zoom;
+                      const drawW = natW * scale;
+                      const drawH = natH * scale;
+                      const maxOffsetX = Math.max(0, (drawW - frameW) / 2);
+                      const maxOffsetY = Math.max(0, (drawH - frameH) / 2);
+                      const tx = panX * maxOffsetX;
+                      const ty = panY * maxOffsetY;
+
+                      return (
+                        <img
+                          src={newImageUrl}
+                          alt="Pré-visualização do banner na grade 1024 x 250"
+                          draggable={false}
+                          onLoad={(e) => {
+                            setImgNaturalSize({
+                              w: e.currentTarget.naturalWidth || 1024,
+                              h: e.currentTarget.naturalHeight || 250,
+                            });
+                          }}
+                          style={{
+                            width: `${drawW}px`,
+                            height: `${drawH}px`,
+                            maxWidth: 'none',
+                            transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px))`,
+                          }}
+                          className="pointer-events-none absolute left-1/2 top-1/2 object-cover"
+                        />
+                      );
+                    })()}
+
+                    {/* Linhas de grade 1024 x 250 */}
+                    <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
+                      <div className="border-r border-b border-white/25" />
+                      <div className="border-r border-b border-white/25" />
+                      <div className="border-b border-white/25" />
+                      <div className="border-r border-b border-white/25" />
+                      <div className="border-r border-b border-white/25" />
+                      <div className="border-b border-white/25" />
+                      <div className="border-r border-white/25" />
+                      <div className="border-r border-white/25" />
+                      <div />
+                    </div>
+
+                    <span className="pointer-events-none absolute bottom-2 right-2 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
+                      1024 × 250 px
+                    </span>
+                  </div>
                 </div>
               )}
 
@@ -347,9 +513,10 @@ export default function AdminDashboardPage() {
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 rounded-xl bg-logo-purple px-5 py-2.5 text-xs font-bold text-white transition hover:bg-logo-purple-light"
+                  disabled={savingBanner}
+                  className="inline-flex items-center gap-2 rounded-xl bg-logo-purple px-5 py-2.5 text-xs font-bold text-white transition hover:bg-logo-purple-light disabled:opacity-50"
                 >
-                  Salvar Banner
+                  {savingBanner ? 'Salvando...' : 'Salvar Banner'}
                 </button>
               </div>
             </form>
