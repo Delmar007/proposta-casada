@@ -472,7 +472,7 @@ export default function PerfilPage() {
                 <img
                   src={cnhImageDataUrl}
                   alt="CNH Digital importada"
-                  className="max-h-72 w-auto rounded-lg border border-slate-100 object-contain"
+                  className="h-auto w-full rounded-lg border border-slate-100 object-contain"
                 />
               </div>
             )}
