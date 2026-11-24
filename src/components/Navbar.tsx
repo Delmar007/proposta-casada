@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Search,
   Settings,
@@ -40,6 +40,7 @@ const PROPERTY_DEAL_OPTIONS: { value: DealTypeOption; label: string }[] = [
 
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const {
     userId,
     setUserId,
@@ -108,7 +109,7 @@ export function Navbar() {
     <>
       {/* BARRA SUPERIOR VERDE — Largura total, mesma altura da barra de categorias */}
       <div ref={locationMenuRef} className="relative z-50 w-full bg-logo-green text-logo-purple">
-        <div className="mx-auto flex w-full max-w-[1024px] items-center justify-between px-3 py-2.5 text-[15px] font-semibold sm:px-0">
+        <div className="mx-auto flex w-full max-w-[1024px] flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2.5 text-[15px] font-semibold sm:px-0">
           <span className="truncate text-logo-purple">
             {activeUf && activeCity
               ? `${activeUf}, ${activeCity}`
@@ -118,6 +119,38 @@ export function Navbar() {
                   ? `MS, ${activeCity}`
                   : 'MS, Campo Grande'}
           </span>
+
+          {/* Tutorial passo a passo centralizado na faixa superior */}
+          <div className="order-3 flex w-full items-center justify-center text-center text-[13px] font-bold text-logo-purple md:order-2 md:w-auto md:flex-1 md:text-[14px]">
+            {!isAuthenticated ? (
+              <button
+                type="button"
+                onClick={openAuthModal}
+                className="inline-flex flex-wrap items-center justify-center gap-1 text-logo-purple transition hover:underline"
+              >
+                <span>Para entrar clique em</span>
+                <span className="inline-flex items-center gap-0.5 rounded-md bg-logo-purple/10 px-1.5 py-0.5 font-extrabold">
+                  <LogIn className="h-4 w-4" />
+                  <span>Entrar</span>
+                </span>
+                <span>e faça o login.</span>
+              </button>
+            ) : pathname?.startsWith('/anunciar') ? (
+              <span>Preencha a categoria, os dados e publique seu anúncio.</span>
+            ) : pathname?.startsWith('/vehicles/') ? (
+              <span>Escolha dinheiro ou permuta e envie sua proposta protegida.</span>
+            ) : pathname?.startsWith('/negociacoes') ? (
+              <span>Acompanhe suas propostas e negocie com segurança.</span>
+            ) : pathname?.startsWith('/favoritos') ? (
+              <span>Seus anúncios favoritos salvos para comparar e negociar.</span>
+            ) : (
+              <span className="inline-flex flex-wrap items-center justify-center gap-1">
+                <span>Clique em</span>
+                <Plus className="inline h-4 w-4" strokeWidth={2.5} />
+                <span>para anunciar ou envie sua proposta nos anúncios.</span>
+              </span>
+            )}
+          </div>
 
           <button
             type="button"
@@ -129,7 +162,7 @@ export function Navbar() {
               setDraftCity(activeCity ?? '');
               setShowLocationMenu((v) => !v);
             }}
-            className="shrink-0 text-logo-purple transition hover:underline"
+            className="order-2 shrink-0 text-logo-purple transition hover:underline md:order-3"
           >
             escolher outra cidade
           </button>
