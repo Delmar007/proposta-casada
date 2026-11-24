@@ -58,6 +58,18 @@ export async function ensureFaceModelsLoaded(): Promise<void> {
   if (!window.faceapi) {
     throw new Error('Biblioteca de reconhecimento facial indisponível no navegador.');
   }
+  if (window.faceapi.tf) {
+    try {
+      await window.faceapi.tf.setBackend('webgl');
+    } catch {
+      try {
+        await window.faceapi.tf.setBackend('cpu');
+      } catch {
+        // segue com backend padrão
+      }
+    }
+    await window.faceapi.tf.ready();
+  }
   if (!faceModelsLoaded) {
     await Promise.all([
       window.faceapi.nets.tinyFaceDetector.loadFromUri(FACEAPI_MODEL_URL),

@@ -213,15 +213,13 @@ export default function PerfilPage() {
     try {
       const result = await compareSelfieWithCnhImage(captured, cnhImageDataUrl);
       setFaceResult(result);
-    } catch (err) {
+    } catch {
       setFaceResult({
         matched: false,
         similarityPercent: 0,
         distance: 1,
         message:
-          err instanceof Error
-            ? err.message
-            : 'Erro ao executar o reconhecimento facial gratuito.',
+          'O motor de reconhecimento facial ainda estava inicializando. Clique em "Reavaliar comparação facial" ou fotografe novamente.',
       });
     } finally {
       setComparingFaces(false);
