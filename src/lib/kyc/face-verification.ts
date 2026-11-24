@@ -73,6 +73,53 @@ export interface ParsedCnhPdfResult {
   extracted: ExtractedCnhData;
 }
 
+function trimCanvasWhiteSpace(source: HTMLCanvasElement): HTMLCanvasElement {
+  const ctx = source.getContext('2d');
+  if (!ctx) return source;
+  const { width, height } = source;
+  const { data } = ctx.getImageData(0, 0, width, height);
+
+  let top = height;
+  let bottom = 0;
+  let left = width;
+  let right = 0;
+
+  // Passo de 2px para ser instantâneo mesmo em canvas A4 2.5x
+  for (let y = 0; y < height; y += 2) {
+    for (let x = 0; x < width; x += 2) {
+      const idx = (y * width + x) * 4;
+      const r = data[idx];
+      const g = data[idx + 1];
+      const b = data[idx + 2];
+      const a = data[idx + 3];
+      if (a > 20 && (r < 244 || g < 244 || b < 244)) {
+        if (y < top) top = y;
+        if (y > bottom) bottom = y;
+        if (x < left) left = x;
+        if (x > right) right = x;
+      }
+    }
+  }
+
+  if (bottom <= top || right <= left) return source;
+
+  const pad = 12;
+  const cropX = Math.max(0, left - pad);
+  const cropY = Math.max(0, top - pad);
+  const cropW = Math.min(width - cropX, right - left + pad * 2);
+  const cropH = Math.min(height - cropY, bottom - top + pad * 2);
+
+  const trimmed = document.createElement('canvas');
+  trimmed.width = cropW;
+  trimmed.height = cropH;
+  const tCtx = trimmed.getContext('2d');
+  if (!tCtx) return source;
+  tCtx.fillStyle = '#ffffff';
+  tCtx.fillRect(0, 0, cropW, cropH);
+  tCtx.drawImage(source, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+  return trimmed;
+}
+
 /**
  * Lê o PDF exportado pela CNH Digital no navegador:
  * 1) Renderiza a página 1 em alta resolução (para exibição, arquivamento e detecção facial);
@@ -106,7 +153,8 @@ export async function processCnhDigitalPdf(
   if (!ctx) throw new Error('Contexto 2D indisponível para renderizar o PDF.');
 
   await page.render({ canvasContext: ctx, viewport }).promise;
-  const imageDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+  const croppedCanvas = trimCanvasWhiteSpace(canvas);
+  const imageDataUrl = croppedCanvas.toDataURL('image/jpeg', 0.92);
 
   // 1) Extrai camada de texto nativa do PDF (se existir)
   let fullText = '';
