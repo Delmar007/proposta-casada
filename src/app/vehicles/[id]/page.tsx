@@ -127,7 +127,6 @@ export default function VehicleDetailPage() {
     if (found.fipePrice > 0) {
       setFipeReferencePrice(found.fipePrice);
       setFipeReferenceCode(found.fipeCode);
-      setDeclaredValue(String(found.fipePrice));
     }
 
     setLoadingYears(true);
@@ -154,7 +153,6 @@ export default function VehicleDetailPage() {
           if (priceJson.priceInfo.fuel) {
             setFuel(priceJson.priceInfo.fuel);
           }
-          setDeclaredValue(String(priceJson.priceInfo.price));
         }
       }
     } finally {
@@ -180,7 +178,6 @@ export default function VehicleDetailPage() {
         if (priceJson.priceInfo.fuel) {
           setFuel(priceJson.priceInfo.fuel);
         }
-        setDeclaredValue(String(priceJson.priceInfo.price));
       }
     } catch {
       // mantém valor atual
@@ -647,8 +644,8 @@ export default function VehicleDetailPage() {
                       </div>
                     </div>
 
-                    {/* Valores & Cálculo Automático */}
-                    <div className="grid gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
+                    {/* Valores — Alinhados horizontalmente */}
+                    <div className="grid grid-cols-1 items-end gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
                           Preço para negócio (R$)
@@ -659,14 +656,27 @@ export default function VehicleDetailPage() {
                           min={1}
                           value={declaredValue}
                           onChange={(e) => setDeclaredValue(e.target.value)}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
+                          placeholder="Digite o valor pedido"
+                          className="h-[42px] w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold"
                         />
-                        {fipeReferencePrice !== null && (
-                          <p className="mt-1 text-[10px] font-medium text-purple-700">
-                            Referência FIPE: {formatBRL(fipeReferencePrice)}
-                          </p>
-                        )}
                       </div>
+
+                      <div>
+                        <span className="mb-1 block text-xs font-semibold text-slate-700">
+                          Preço FIPE
+                        </span>
+                        <div className="flex h-[42px] w-full items-center justify-between rounded-lg bg-logo-purple px-3 text-white shadow-xs">
+                          <span className="text-sm font-bold">
+                            {fipeReferencePrice !== null ? formatBRL(fipeReferencePrice) : '—'}
+                          </span>
+                          {fipeReferenceCode && (
+                            <span className="text-[10px] font-medium text-uva-100">
+                              {fipeReferenceCode}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
                           Complemento em dinheiro (R$)
@@ -677,16 +687,9 @@ export default function VehicleDetailPage() {
                           min={0}
                           value={cashComplement}
                           onChange={(e) => setCashComplement(e.target.value)}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
+                          placeholder="0"
+                          className="h-[42px] w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold"
                         />
-                      </div>
-                      <div className="rounded-lg bg-uva-700 p-3 text-white">
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-slate-300">
-                          Preço para Negócio (Total)
-                        </p>
-                        <p className="mt-0.5 text-lg font-bold">
-                          {formatBRL(totalTradeInOffer)}
-                        </p>
                       </div>
                     </div>
 
