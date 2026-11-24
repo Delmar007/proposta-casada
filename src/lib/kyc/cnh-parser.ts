@@ -3,6 +3,7 @@ export interface ExtractedCnhData {
   cpf?: string;
   rg?: string;
   cnhNumber?: string;
+  local?: string;
   birthDate?: string;
   rawText: string;
 }
@@ -113,7 +114,31 @@ export function parseCnhPdfText(rawText: string): ExtractedCnhData {
     }
   }
 
-  // 5. Nome Completo (linha após "NOME" ou "NOME E SOBRENOME")
+  // 5. Local (Cidade e UF — ex.: "CAMPO GRANDE, MS" ou "SÃO PAULO - SP")
+  let local: string | undefined;
+  const UF_PATTERN =
+    'AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO';
+  const localAfterLabel = flat.match(
+    new RegExp(
+      `LOCAL\\s*[:\\-]?\\s*([A-ZÀ-Ú][A-ZÀ-Ú\\s'.-]{2,38}[,\\-\\/\\s]+(?:${UF_PATTERN}))\\b`,
+      'i'
+    )
+  );
+  if (localAfterLabel) {
+    local = localAfterLabel[1].replace(/\s+/g, ' ').trim();
+  }
+  if (!local) {
+    const cityUfMatch = flat.match(
+      new RegExp(
+        `\\b([A-ZÀ-Ú][A-ZÀ-Ú\\s'.]{2,32},\\s*(?:${UF_PATTERN}))\\b`
+      )
+    );
+    if (cityUfMatch) {
+      local = cityUfMatch[1].replace(/\s+/g, ' ').trim();
+    }
+  }
+
+  // 6. Nome Completo (linha após "NOME" ou "NOME E SOBRENOME")
   let fullName: string | undefined;
   const nameAfterLabel = normalized.match(
     /(?:NOME\s*E\s*SOBRENOME|2\s*E\s*1\s*NOME|NOME)\s*[:\n]+\s*([A-ZÀ-Ú][A-ZÀ-Ú\s]{4,70})/
@@ -133,6 +158,7 @@ export function parseCnhPdfText(rawText: string): ExtractedCnhData {
     cpf,
     rg,
     cnhNumber,
+    local,
     birthDate,
     rawText,
   };

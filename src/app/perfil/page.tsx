@@ -41,7 +41,7 @@ export default function PerfilPage() {
   // Dados extraídos da CNH Digital
   const [cpf, setCpf] = useState('');
   const [rg, setRg] = useState('');
-  const [cnhNumber, setCnhNumber] = useState('');
+  const [localCityUf, setLocalCityUf] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [cnhFileName, setCnhFileName] = useState('');
   const [cnhImageDataUrl, setCnhImageDataUrl] = useState('');
@@ -83,7 +83,7 @@ export default function PerfilPage() {
         if (p.whatsapp) setWhatsapp(p.whatsapp);
         if (p.cpf) setCpf(p.cpf);
         if (p.rg) setRg(p.rg);
-        if (p.cnhNumber) setCnhNumber(p.cnhNumber);
+        if (p.cnhNumber) setLocalCityUf(p.cnhNumber);
         if (p.birthDate) setBirthDate(p.birthDate);
         if (p.cnhFileName) setCnhFileName(p.cnhFileName);
         if (p.cnhImageDataUrl) setCnhImageDataUrl(p.cnhImageDataUrl);
@@ -132,13 +132,13 @@ export default function PerfilPage() {
       setCnhImageDataUrl(imageDataUrl);
       if (extracted.cpf) setCpf(extracted.cpf);
       if (extracted.rg) setRg(extracted.rg);
-      if (extracted.cnhNumber) setCnhNumber(extracted.cnhNumber);
+      if (extracted.local) setLocalCityUf(extracted.local);
       if (extracted.birthDate) setBirthDate(extracted.birthDate);
       if (extracted.fullName && (!fullName || fullName === currentUser.label)) {
         setFullName(extracted.fullName);
       }
 
-      const foundCount = [extracted.cpf, extracted.rg, extracted.cnhNumber, extracted.birthDate].filter(
+      const foundCount = [extracted.cpf, extracted.rg, extracted.local, extracted.birthDate].filter(
         Boolean
       ).length;
       setPdfFeedback(
@@ -247,7 +247,7 @@ export default function PerfilPage() {
           whatsapp,
           cpf,
           rg,
-          cnhNumber,
+          cnhNumber: localCityUf,
           birthDate,
           cnhFileName,
           cnhImageDataUrl,
@@ -439,13 +439,13 @@ export default function PerfilPage() {
 
               <div>
                 <label className="mb-1 block text-xs font-bold text-slate-700">
-                  Nº CNH (Registro)
+                  Local (Cidade - UF)
                 </label>
                 <input
                   type="text"
-                  value={cnhNumber}
-                  onChange={(e) => setCnhNumber(e.target.value)}
-                  placeholder="11 dígitos do Nº Registro"
+                  value={localCityUf}
+                  onChange={(e) => setLocalCityUf(e.target.value)}
+                  placeholder="Ex: Campo Grande, MS"
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-[15px] font-semibold text-slate-900"
                 />
               </div>
