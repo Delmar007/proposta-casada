@@ -463,14 +463,14 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
                 onFocus={handleProposalInputFocus}
                 placeholder="Valor da proposta R$"
                 aria-label="Valor da proposta R$"
-                className="h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-2.5 text-sm font-bold text-slate-900 placeholder:text-[11px] placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none md:h-9 md:px-2 md:text-xs"
+                className="h-11 w-full min-w-0 rounded-xl border border-slate-300 bg-white px-2.5 text-[16px] font-bold text-slate-900 placeholder:text-[13px] placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none md:h-9 md:px-2 md:text-[14px]"
               />
 
               <div className="grid h-11 w-full grid-cols-2 overflow-hidden rounded-xl border border-logo-green-hover shadow-xs md:h-9">
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex flex-col items-center justify-center bg-logo-green px-1 text-center text-[11px] font-extrabold leading-[1.1] text-logo-purple-950 transition hover:bg-logo-green-hover disabled:opacity-50 md:text-[10px]"
+                  className="flex flex-col items-center justify-center bg-logo-green px-1 text-center text-[13px] font-extrabold leading-[1.1] text-logo-purple-950 transition hover:bg-logo-green-hover disabled:opacity-50 md:text-[12px]"
                 >
                   {submitting ? (
                     <span>Salvando...</span>
@@ -489,7 +489,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
                       openAuthModal();
                     }
                   }}
-                  className="flex flex-col items-center justify-center border-l border-logo-green-hover/40 bg-white px-1 text-center text-[11px] font-bold leading-[1.1] text-logo-purple transition hover:bg-logo-purple-50 md:text-[10px]"
+                  className="flex flex-col items-center justify-center border-l border-logo-green-hover/40 bg-white px-1 text-center text-[13px] font-bold leading-[1.1] text-logo-purple transition hover:bg-logo-purple-50 md:text-[12px]"
                 >
                   <span>Propor</span>
                   <span>permuta</span>
