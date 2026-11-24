@@ -88,3 +88,15 @@ body {
 .animate-banner-fade {
   animation: bannerFade 0.55s ease-out forwards;
 }
+
+/* Remove setas (spinners) de todos os campos numéricos */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
