@@ -208,6 +208,9 @@ export function Navbar() {
                   Cadastro Aprovado, agora se quiser anunciar clique no
                 </span>
                 <Plus className="inline h-4 w-4 text-logo-purple" strokeWidth={2.5} />
+                <span className="tutorial-text-shine">
+                  ou envie proposta nos bens anunciados.
+                </span>
               </Link>
             )}
           </div>
