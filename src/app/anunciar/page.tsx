@@ -779,7 +779,8 @@ export default function AnunciarPage() {
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-logo-purple" />
                       <span className="text-sm font-extrabold uppercase tracking-wider sm:text-[15px] text-logo-purple">
-                        API Tabela FIPE — Marca, Modelo, Versão, Motor, Combustível e Anos
+                        API Tabela FIPE
+                        <span className="hidden sm:inline"> — Marca, Modelo, Versão, Motor, Combustível e Anos</span>
                       </span>
                     </div>
                     {fipePrice && (
@@ -790,10 +791,10 @@ export default function AnunciarPage() {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
+                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-3">
                     <div>
                       <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
-                        Marca (Tabela FIPE — {fipeBrands.length} marcas)
+                        Marca<span className="hidden sm:inline"> (Tabela FIPE — {fipeBrands.length} marcas)</span>
                       </label>
                       <select
                         value={selectedFipeBrandCode}
