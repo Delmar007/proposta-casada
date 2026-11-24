@@ -65,6 +65,69 @@ const PROPERTY_DEAL_TYPE_OPTIONS: Array<{ value: DealTypeOption; label: string }
   { value: 'carro_mais_dinheiro', label: 'Aceita carro + parte em dinheiro' },
 ];
 
+const VEHICLE_ACCESSORIES: string[] = [
+  'Ar-condicionado',
+  'Ar-condicionado digital',
+  'Ar-condicionado dual zone',
+  'Direção hidráulica',
+  'Direção elétrica',
+  'Vidros elétricos dianteiros',
+  'Vidros elétricos nas 4 portas',
+  'Travas elétricas',
+  'Retrovisores elétricos',
+  'Retrovisores rebatíveis',
+  'Alarme',
+  'Chave presencial (Keyless)',
+  'Partida por botão (Start/Stop)',
+  'Partida remota',
+  'Central multimídia',
+  'Apple CarPlay / Android Auto',
+  'Bluetooth',
+  'Entrada USB',
+  'GPS integrado',
+  'Carregador por indução',
+  'Painel digital',
+  'Head-Up Display',
+  'Volante multifuncional',
+  'Volante com regulagem de altura',
+  'Volante em couro',
+  'Paddle Shift (borboletas)',
+  'Piloto automático',
+  'Piloto automático adaptativo (ACC)',
+  'Computador de bordo',
+  'Bancos em couro',
+  'Bancos com ajuste elétrico',
+  'Bancos com aquecimento',
+  'Bancos com ventilação',
+  'Banco com ajuste de altura',
+  'Encosto de braço central',
+  'Teto solar',
+  'Teto panorâmico',
+  'Rodas de liga leve',
+  'Faróis de LED',
+  'Faróis de neblina',
+  'DRL (Luz diurna em LED)',
+  'Farol automático',
+  'Sensor de chuva',
+  'Sensor de estacionamento dianteiro',
+  'Sensor de estacionamento traseiro',
+  'Câmera de ré',
+  'Câmera 360°',
+  'Park Assist',
+  'Freios ABS',
+  'Airbags frontais',
+  'Airbags laterais e de cortina',
+  'Controle de tração e estabilidade',
+  'Assistente de partida em rampa',
+  'Alerta de ponto cego',
+  'Frenagem autônoma de emergência',
+  'Assistente de permanência em faixa',
+  'ISOFIX',
+  'Engate para reboque',
+  'Rack de teto / Bagageiro',
+  'Capota marítima / Protetor de caçamba',
+];
+
 export default function AnunciarPage() {
   const router = useRouter();
   const { userId, isAuthenticated } = useActiveUser();
@@ -84,6 +147,13 @@ export default function AnunciarPage() {
   const [askingPrice, setAskingPrice] = useState('');
   const [minConfidentialPrice, setMinConfidentialPrice] = useState('');
   const [description, setDescription] = useState('');
+  const [selectedAccessories, setSelectedAccessories] = useState<string[]>([]);
+
+  const toggleAccessory = (item: string) => {
+    setSelectedAccessories((prev) =>
+      prev.includes(item) ? prev.filter((a) => a !== item) : [...prev, item]
+    );
+  };
 
   // Campos de Veículos Móveis + API FIPE
   const [fipeBrands, setFipeBrands] = useState<FipeBrandOption[]>([]);
@@ -325,7 +395,10 @@ export default function AnunciarPage() {
             fipePrice: parseReaisValue(fipePrice) || parseReaisValue(askingPrice),
             askingPrice: parseReaisValue(askingPrice) || parseReaisValue(fipePrice),
             minConfidentialPrice: parseReaisValue(minConfidentialPrice) || undefined,
-            description,
+            description:
+              selectedAccessories.length > 0
+                ? selectedAccessories.join(' • ')
+                : 'Veículo sem acessórios marcados',
             images: photos.map((p) => p.dataUrl),
             propertyType,
             totalAreaM2: Number(totalAreaM2) || undefined,
@@ -356,7 +429,10 @@ export default function AnunciarPage() {
             fipePrice: parseReaisValue(fipePrice) || parseReaisValue(askingPrice),
             askingPrice: parseReaisValue(askingPrice) || parseReaisValue(fipePrice),
             minConfidentialPrice: parseReaisValue(minConfidentialPrice) || undefined,
-            description,
+            description:
+              selectedAccessories.length > 0
+                ? selectedAccessories.join(' • ')
+                : 'Veículo sem acessórios marcados',
             images: photos.map((p) => p.dataUrl),
           };
 
@@ -1036,28 +1112,65 @@ export default function AnunciarPage() {
             }
           />
 
-          <div>
-            <div className="mb-1 flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-700">
-                {isProperty ? 'Informações do imóvel' : 'Informações do veículo'} (até 200 caracteres
-                no card)
-              </label>
-              <span className="text-[11px] text-slate-400">{description.length}/200</span>
+          {isProperty ? (
+            <div>
+              <div className="mb-1 flex items-center justify-between">
+                <label className="block text-xs font-semibold text-slate-700">
+                  Informações do imóvel (até 200 caracteres no card)
+                </label>
+                <span className="text-[11px] text-slate-400">{description.length}/200</span>
+              </div>
+              <textarea
+                required
+                rows={3}
+                maxLength={200}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Ex: Documentação 100% regularizada, piscina, área gourmet..."
+                className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-uva-700 focus:outline-none"
+              />
             </div>
-            <textarea
-              required
-              rows={3}
-              maxLength={200}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={
-                isProperty
-                  ? 'Ex: Documentação 100% regularizada, piscina, área gourmet...'
-                  : 'Ex: 4 pneus novos, lataria com polimento cristalizado...'
-              }
-              className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-uva-700 focus:outline-none"
-            />
-          </div>
+          ) : (
+            <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs font-bold text-slate-800">
+                  Acessórios do Veículo ({selectedAccessories.length}/60 selecionados)
+                </span>
+                {selectedAccessories.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAccessories([])}
+                    className="text-xs font-semibold text-logo-purple hover:underline"
+                  >
+                    Limpar marcações
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                {VEHICLE_ACCESSORIES.map((acc) => {
+                  const checked = selectedAccessories.includes(acc);
+                  return (
+                    <label
+                      key={acc}
+                      className={`flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs transition ${
+                        checked
+                          ? 'border-logo-purple bg-uva-50 font-bold text-logo-purple'
+                          : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleAccessory(acc)}
+                        className="h-3.5 w-3.5 shrink-0 accent-logo-purple"
+                      />
+                      <span className="leading-tight">{acc}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-700">
