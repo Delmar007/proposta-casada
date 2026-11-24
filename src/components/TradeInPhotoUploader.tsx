@@ -100,13 +100,17 @@ export function TradeInPhotoUploader({
   return (
     <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h4 className="flex items-center gap-2 text-sm font-bold text-slate-900">
-            <Camera className="h-4 w-4 text-logo-purple" />
-            {title} ({photos.length}/{maxPhotos})
-          </h4>
-          {hint && <p className="mt-0.5 text-xs text-slate-500">{hint}</p>}
-        </div>
+        {(title || hint) && (
+          <div>
+            {title && (
+              <h4 className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                <Camera className="h-4 w-4 text-logo-purple" />
+                {title} ({photos.length}/{maxPhotos})
+              </h4>
+            )}
+            {hint && <p className="mt-0.5 text-xs text-slate-500">{hint}</p>}
+          </div>
+        )}
 
         {photos.length < maxPhotos && (
           <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-logo-green px-3 py-2 text-xs font-extrabold text-logo-purple-950 hover:bg-logo-green-hover">

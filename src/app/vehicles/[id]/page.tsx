@@ -93,7 +93,10 @@ export default function VehicleDetailPage() {
   const [stateUF, setStateUF] = useState('');
   const [declaredValue, setDeclaredValue] = useState('');
   const [cashComplement, setCashComplement] = useState('');
-  const [aboutVehicle, setAboutVehicle] = useState('');
+  const [ratingLata, setRatingLata] = useState('');
+  const [ratingMotor, setRatingMotor] = useState('');
+  const [ratingInterna, setRatingInterna] = useState('');
+  const [ratingPneus, setRatingPneus] = useState('');
   const [tradeInMessage, setTradeInMessage] = useState('');
   const [photos, setPhotos] = useState<UploadedPhotoItem[]>([]);
 
@@ -253,7 +256,7 @@ export default function VehicleDetailPage() {
               },
               cashComplement: Number(cashComplement),
               messageText: [
-                aboutVehicle.trim() ? `Sobre o veículo: ${aboutVehicle.trim()}` : '',
+                `Avaliação do veículo (0 a 10): Lata ${ratingLata}/10 • Motor ${ratingMotor}/10 • Interna ${ratingInterna}/10 • Pneus ${ratingPneus}/10`,
                 tradeInMessage.trim(),
               ]
                 .filter(Boolean)
@@ -757,21 +760,39 @@ export default function VehicleDetailPage() {
                       </div>
                     </div>
 
-                    <TradeInPhotoUploader photos={photos} onChange={setPhotos} />
+                    <TradeInPhotoUploader photos={photos} onChange={setPhotos} title="" hint="" />
 
-                    <div>
-                      <label className="mb-1 block text-xs font-semibold text-slate-700">
-                        Fale sobre o veículo
-                      </label>
-                      <textarea
-                        required
-                        rows={3}
-                        maxLength={400}
-                        value={aboutVehicle}
-                        onChange={(e) => setAboutVehicle(e.target.value)}
-                        placeholder="Ex: 4 pneus novos, lataria com polimento cristalizado, todas as revisões na concessionária..."
-                        className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-uva-700 focus:outline-none"
-                      />
+                    <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <p className="text-xs font-bold text-slate-800">
+                        Nota de 0 a 10 para o veículo oferecido
+                      </p>
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        {[
+                          { label: 'Lata', value: ratingLata, setter: setRatingLata },
+                          { label: 'Motor', value: ratingMotor, setter: setRatingMotor },
+                          { label: 'Interna', value: ratingInterna, setter: setRatingInterna },
+                          { label: 'Pneus', value: ratingPneus, setter: setRatingPneus },
+                        ].map((item) => (
+                          <div key={item.label}>
+                            <label className="mb-1 block text-xs font-semibold text-slate-700">
+                              {item.label}
+                            </label>
+                            <select
+                              required
+                              value={item.value}
+                              onChange={(e) => item.setter(e.target.value)}
+                              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
+                            >
+                              <option value="">Nota (0 a 10)</option>
+                              {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((n) => (
+                                <option key={n} value={String(n)}>
+                                  {n}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
                     <div>
