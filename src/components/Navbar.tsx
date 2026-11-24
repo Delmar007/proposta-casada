@@ -539,11 +539,11 @@ export function Navbar() {
                 openAuthModal();
               }
             }}
-            className="relative inline-flex items-center py-1 text-logo-purple transition hover:text-logo-purple-light"
+            className="relative inline-flex items-center py-1 text-logo-green transition hover:text-logo-green-hover"
             title="Anunciar veículo ou imóvel"
             aria-label="Anunciar veículo ou imóvel"
           >
-            <Plus className="h-[21px] w-[21px]" />
+            <Plus className="h-[21px] w-[21px]" strokeWidth={2.5} />
           </Link>
 
           {/* 4. Ícone de Coração — Página dedicada de Favoritos (sem círculo, oco ou vermelho vivo) */}
