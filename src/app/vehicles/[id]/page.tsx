@@ -493,7 +493,7 @@ export default function VehicleDetailPage() {
                       </div>
 
                       {fipeReferencePrice !== null && (
-                        <div className="w-full rounded-xl bg-uva-700 px-4 py-2.5 text-center text-sm font-bold text-white shadow-xs">
+                        <div className="w-full rounded-xl bg-uva-700 px-4 py-2.5 text-center text-[19px] font-bold text-white shadow-xs">
                           Tabela FIPE: {formatBRL(fipeReferencePrice)}
                           {fipeReferenceCode ? ` (Cód. ${fipeReferenceCode})` : ''}
                         </div>
@@ -678,6 +678,28 @@ export default function VehicleDetailPage() {
                           ))}
                         </select>
                       </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-slate-700">
+                          UF
+                        </label>
+                        <select
+                          required
+                          value={stateUF}
+                          onChange={(e) => {
+                            const nextUf = e.target.value;
+                            setStateUF(nextUf);
+                            setCity('');
+                          }}
+                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
+                        >
+                          <option value="">Selecione a UF...</option>
+                          {BRAZIL_STATES.map((st) => (
+                            <option key={st.uf} value={st.uf}>
+                              {st.uf}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                       <div className="sm:col-span-2">
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
                           Cidade
@@ -705,28 +727,6 @@ export default function VehicleDetailPage() {
                             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                           />
                         )}
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          UF
-                        </label>
-                        <select
-                          required
-                          value={stateUF}
-                          onChange={(e) => {
-                            const nextUf = e.target.value;
-                            setStateUF(nextUf);
-                            setCity('');
-                          }}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
-                        >
-                          <option value="">Selecione a UF...</option>
-                          {BRAZIL_STATES.map((st) => (
-                            <option key={st.uf} value={st.uf}>
-                              {st.uf}
-                            </option>
-                          ))}
-                        </select>
                       </div>
                     </div>
 
