@@ -519,12 +519,17 @@ export default function AnunciarPage() {
               {ALL_CATEGORIES.map((cat) => {
                 const selected = category === cat;
                 const isPropCat = (PROPERTY_CATEGORIES as readonly string[]).includes(cat);
+                const isLongLabel = cat === 'Triciclos/Quadriciclos/UTVs';
                 return (
                   <button
                     key={cat}
                     type="button"
                     onClick={() => handleCategoryChange(cat)}
-                    className={`rounded-xl border px-3 py-2.5 text-sm font-bold sm:text-[15px] transition ${
+                    className={`rounded-xl border py-2.5 font-bold transition ${
+                      isLongLabel
+                        ? 'px-1.5 text-[11px] sm:text-[12px]'
+                        : 'px-3 text-sm sm:text-[15px]'
+                    } ${
                       isPropCat
                         ? selected
                           ? 'border-logo-purple-950 bg-logo-purple text-white ring-2 ring-logo-green shadow-sm'
