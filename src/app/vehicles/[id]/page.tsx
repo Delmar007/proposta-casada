@@ -21,6 +21,30 @@ import {
   UploadedPhotoItem,
 } from '@/components/TradeInPhotoUploader';
 
+const TRANSMISSION_OPTIONS = [
+  'Automático',
+  'Manual',
+  'CVT',
+  'Automatizado',
+  'Dupla Embreagem (DCT / DSG)',
+  'Semi-automático',
+  'Elétrico (Direto)',
+];
+
+const TRACTION_OPTIONS = [
+  '4x2',
+  '4x4',
+  '6x2',
+  '6x4',
+  '6x6',
+  '8x2',
+  '8x4',
+  'AWD',
+  '4WD',
+  'Dianteira (FWD)',
+  'Traseira (RWD)',
+];
+
 export default function VehicleDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -62,8 +86,8 @@ export default function VehicleDetailPage() {
   const [manufactureYear, setManufactureYear] = useState('');
   const [mileage, setMileage] = useState('');
   const [fuel, setFuel] = useState('');
-  const [transmission, setTransmission] = useState('');
-  const [color, setColor] = useState('');
+  const [transmission, setTransmission] = useState('Automático');
+  const [traction, setTraction] = useState('4x2');
   const [city, setCity] = useState('');
   const [stateUF, setStateUF] = useState('');
   const [declaredValue, setDeclaredValue] = useState('');
@@ -221,7 +245,7 @@ export default function VehicleDetailPage() {
                 mileage: Number(mileage),
                 fuel,
                 transmission,
-                color,
+                color: `Tração ${traction}`,
                 city,
                 state: stateUF,
                 declaredValue: Number(declaredValue),
@@ -601,23 +625,35 @@ export default function VehicleDetailPage() {
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
                           Câmbio
                         </label>
-                        <input
+                        <select
                           required
                           value={transmission}
                           onChange={(e) => setTransmission(e.target.value)}
-                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                        />
+                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900"
+                        >
+                          {TRANSMISSION_OPTIONS.map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          Cor
+                          Tração
                         </label>
-                        <input
+                        <select
                           required
-                          value={color}
-                          onChange={(e) => setColor(e.target.value)}
-                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                        />
+                          value={traction}
+                          onChange={(e) => setTraction(e.target.value)}
+                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900"
+                        >
+                          {TRACTION_OPTIONS.map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div className="sm:col-span-2">
                         <label className="mb-1 block text-xs font-semibold text-slate-700">

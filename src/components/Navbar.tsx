@@ -113,10 +113,10 @@ export function Navbar() {
             {activeUf && activeCity
               ? `${activeUf}, ${activeCity}`
               : activeUf
-                ? `${activeUf}, Cidade`
+                ? `${activeUf}, Campo Grande`
                 : activeCity
-                  ? `UF, ${activeCity}`
-                  : 'UF, Cidade'}
+                  ? `MS, ${activeCity}`
+                  : 'MS, Campo Grande'}
           </span>
 
           <button

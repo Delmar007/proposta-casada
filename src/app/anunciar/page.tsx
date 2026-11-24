@@ -840,12 +840,26 @@ export default function AnunciarPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-slate-700">Câmbio</label>
-                  <input
+                  <select
                     required
                     value={transmission}
                     onChange={(e) => setTransmission(e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
-                  />
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900"
+                  >
+                    {[
+                      'Automático',
+                      'Manual',
+                      'CVT',
+                      'Automatizado',
+                      'Dupla Embreagem (DCT / DSG)',
+                      'Semi-automático',
+                      'Elétrico (Direto)',
+                    ].map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-slate-700">
@@ -860,12 +874,45 @@ export default function AnunciarPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-slate-700">Tração</label>
-                  <input
+                  <select
                     value={traction}
                     onChange={(e) => setTraction(e.target.value)}
-                    placeholder="Ex: 4x2"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
-                  />
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900"
+                  >
+                    {[
+                      '4x2',
+                      '4x4',
+                      '6x2',
+                      '6x4',
+                      '6x6',
+                      '8x2',
+                      '8x4',
+                      'AWD',
+                      '4WD',
+                      'Dianteira (FWD)',
+                      'Traseira (RWD)',
+                      ...(traction &&
+                      ![
+                        '4x2',
+                        '4x4',
+                        '6x2',
+                        '6x4',
+                        '6x6',
+                        '8x2',
+                        '8x4',
+                        'AWD',
+                        '4WD',
+                        'Dianteira (FWD)',
+                        'Traseira (RWD)',
+                      ].includes(traction)
+                        ? [traction]
+                        : []),
+                    ].map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-slate-700">Cor</label>
