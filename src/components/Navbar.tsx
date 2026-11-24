@@ -85,6 +85,7 @@ export function Navbar() {
   const [faceValidated, setFaceValidated] = useState(false);
   const [justApproved, setJustApproved] = useState(false);
   const [firstListingDone, setFirstListingDone] = useState(false);
+  const [anunciarModelSelected, setAnunciarModelSelected] = useState(false);
 
   useEffect(() => {
     const syncProfileStatus = () => {
@@ -93,6 +94,9 @@ export function Navbar() {
       setFaceValidated(window.sessionStorage.getItem('mp_face_validated') === 'true');
       setJustApproved(window.sessionStorage.getItem('mp_just_approved') === 'true');
       setFirstListingDone(window.localStorage.getItem('mp_first_listing_done') === 'true');
+      setAnunciarModelSelected(
+        window.sessionStorage.getItem('mp_anunciar_model_selected') === 'true'
+      );
     };
     syncProfileStatus();
     window.addEventListener('mp-profile-updated', syncProfileStatus);
@@ -214,8 +218,9 @@ export function Navbar() {
               </Link>
             ) : isAuthenticated && pathname?.startsWith('/anunciar') && !firstListingDone ? (
               <span className="tutorial-text-shine">
-                Escolha: Categoria (carro), Subcategoria (sedã), Tipo de Negócio (aceito carro de
-                menor valor). Selecione: Marca e Versão.
+                {anunciarModelSelected
+                  ? 'Adicione o km/horas.'
+                  : 'Escolha: Categoria (carro), Subcategoria (sedã), Tipo de Negócio (aceito carro de menor valor). Selecione: Marca e Versão.'}
               </span>
             ) : null}
           </div>

@@ -606,7 +606,7 @@ export default function VehicleDetailPage() {
                       </div>
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          Quilometragem
+                          Kilometragem
                         </label>
                         <input
                           type="number"

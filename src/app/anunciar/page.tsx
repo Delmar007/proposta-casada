@@ -273,8 +273,12 @@ export default function AnunciarPage() {
     const found = fipeModels.find((m) => m.code === modelCode);
     if (!found) {
       setFipeYearOptions([]);
+      window.sessionStorage.removeItem('mp_anunciar_model_selected');
+      window.dispatchEvent(new Event('mp-profile-updated'));
       return;
     }
+    window.sessionStorage.setItem('mp_anunciar_model_selected', 'true');
+    window.dispatchEvent(new Event('mp-profile-updated'));
     setModel(found.baseModel);
     setVersion(found.version);
     setEngine(found.engine);
@@ -920,7 +924,7 @@ export default function AnunciarPage() {
                 </div>
                 <div>
                   <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
-                    Quilometragem / Horas
+                    Kilometragem / Horas
                   </label>
                   <input
                     type="number"
@@ -929,7 +933,7 @@ export default function AnunciarPage() {
                     value={mileage}
                     onChange={(e) => setMileage(e.target.value)}
                     placeholder="Ex: 35000"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px]"
+                    className="w-full rounded-lg border border-logo-green/60 bg-logo-green/20 px-3 py-2.5 text-base sm:text-[15px] font-semibold text-slate-900"
                   />
                 </div>
                 <div>
