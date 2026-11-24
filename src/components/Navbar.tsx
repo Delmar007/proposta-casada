@@ -136,23 +136,23 @@ export function Navbar() {
                   : 'MS, Campo Grande'}
           </span>
 
-          {/* Tutorial passo a passo centralizado na faixa superior */}
-          <div className="order-3 flex w-full items-center justify-center text-center text-[13px] font-bold text-logo-purple md:order-2 md:w-auto md:flex-1 md:text-[14px]">
+          {/* Tutorial passo a passo centralizado na faixa superior com reflexo de luz */}
+          <div className="order-3 flex w-full items-center justify-center text-center text-[13px] font-extrabold text-logo-purple md:order-2 md:w-auto md:flex-1 md:text-[14px]">
             {!isAuthenticated ? (
               <button
                 type="button"
                 onClick={openAuthModal}
                 className="inline-flex flex-wrap items-center justify-center gap-1 text-logo-purple transition hover:underline"
               >
-                <span>Para entrar clique em</span>
+                <span className="tutorial-text-shine">Para entrar clique em</span>
                 <span className="inline-flex items-center gap-0.5 rounded-md bg-logo-purple/10 px-1.5 py-0.5 font-extrabold">
-                  <LogIn className="h-4 w-4" />
-                  <span>Entrar</span>
+                  <LogIn className="h-4 w-4 text-logo-purple" />
+                  <span className="tutorial-text-shine">Entrar</span>
                 </span>
-                <span>e faça o login.</span>
+                <span className="tutorial-text-shine">e faça o login.</span>
               </button>
             ) : pathname?.startsWith('/perfil') ? (
-              <span>
+              <span className="tutorial-text-shine">
                 {cnhImported
                   ? 'Clique em Iniciar Câmera, tire uma foto do seu rosto, Fotografar e validar rosto.'
                   : 'Adicione nº de celular, importe o PDF da sua CNH.'}
@@ -162,7 +162,7 @@ export function Navbar() {
                 href="/perfil"
                 className="inline-flex flex-wrap items-center justify-center gap-1.5 text-logo-purple transition hover:underline"
               >
-                <span>Clique no seu</span>
+                <span className="tutorial-text-shine">Clique no seu</span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-logo-purple/10 px-2 py-0.5 font-extrabold">
                   {userAvatarUrl ? (
                     <img
@@ -175,23 +175,33 @@ export function Navbar() {
                       {currentUser.label.trim().charAt(0).toUpperCase()}
                     </span>
                   )}
-                  <span>{currentUser.label.split(' ')[0]}</span>
+                  <span className="tutorial-text-shine">{currentUser.label.split(' ')[0]}</span>
                 </span>
-                <span>para concluir cadastro.</span>
+                <span className="tutorial-text-shine">para concluir cadastro.</span>
               </Link>
             ) : pathname?.startsWith('/anunciar') ? (
-              <span>Preencha a categoria, os dados e publique seu anúncio.</span>
+              <span className="tutorial-text-shine">
+                Preencha a categoria, os dados e publique seu anúncio.
+              </span>
             ) : pathname?.startsWith('/vehicles/') ? (
-              <span>Escolha dinheiro ou permuta e envie sua proposta protegida.</span>
+              <span className="tutorial-text-shine">
+                Escolha dinheiro ou permuta e envie sua proposta protegida.
+              </span>
             ) : pathname?.startsWith('/negociacoes') ? (
-              <span>Acompanhe suas propostas e negocie com segurança.</span>
+              <span className="tutorial-text-shine">
+                Acompanhe suas propostas e negocie com segurança.
+              </span>
             ) : pathname?.startsWith('/favoritos') ? (
-              <span>Seus anúncios favoritos salvos para comparar e negociar.</span>
+              <span className="tutorial-text-shine">
+                Seus anúncios favoritos salvos para comparar e negociar.
+              </span>
             ) : (
               <span className="inline-flex flex-wrap items-center justify-center gap-1">
-                <span>Clique em</span>
-                <Plus className="inline h-4 w-4" strokeWidth={2.5} />
-                <span>para anunciar ou envie sua proposta nos anúncios.</span>
+                <span className="tutorial-text-shine">Clique em</span>
+                <Plus className="inline h-4 w-4 text-logo-purple" strokeWidth={2.5} />
+                <span className="tutorial-text-shine">
+                  para anunciar ou envie sua proposta nos anúncios.
+                </span>
               </span>
             )}
           </div>

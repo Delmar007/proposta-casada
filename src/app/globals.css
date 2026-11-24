@@ -100,3 +100,26 @@ input[type='number'] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+@keyframes tutorialTextShine {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.tutorial-text-shine {
+  background: linear-gradient(
+    110deg,
+    #4d0174 36%,
+    #ffffff 50%,
+    #4d0174 64%
+  );
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: tutorialTextShine 3.2s linear infinite;
+}
