@@ -71,7 +71,7 @@ export default function AnunciarPage() {
 
   const [category, setCategory] = useState<string>('Carros');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
-  const [openSubcategoryMenu, setOpenSubcategoryMenu] = useState<boolean>(true);
+  const [openSubcategoryMenu, setOpenSubcategoryMenu] = useState<boolean>(false);
   const [dealTypes, setDealTypes] = useState<DealTypeOption[]>(['no_dinheiro']);
   const [photos, setPhotos] = useState<UploadedPhotoItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
