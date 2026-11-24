@@ -390,7 +390,7 @@ export default function PerfilPage() {
                 type="file"
                 accept="application/pdf,.pdf"
                 onChange={handleImportCnhPdf}
-                className="hidden"
+                className="sr-only"
               />
               <button
                 type="button"

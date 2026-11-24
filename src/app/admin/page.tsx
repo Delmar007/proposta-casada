@@ -384,7 +384,7 @@ export default function AdminDashboardPage() {
                   type="file"
                   accept="image/*"
                   onChange={handleImportFile}
-                  className="hidden"
+                  className="sr-only"
                 />
                 <button
                   type="button"

@@ -30,10 +30,45 @@ export function TradeInPhotoUploader({
 
   const readFileAsDataUrl = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const maxDim = 1280;
+          let width = img.naturalWidth || img.width;
+          let height = img.naturalHeight || img.height;
+          if (width > maxDim || height > maxDim) {
+            const ratio = Math.min(maxDim / width, maxDim / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            URL.revokeObjectURL(objectUrl);
+            resolve(canvas.toDataURL('image/jpeg', 0.85));
+            return;
+          }
+        } catch {
+          // fallback para FileReader abaixo
+        }
+        URL.revokeObjectURL(objectUrl);
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      };
+      img.src = objectUrl;
     });
 
   const handleAddFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,16 +79,22 @@ export function TradeInPhotoUploader({
 
     const added: UploadedPhotoItem[] = [];
     for (let i = 0; i < selected.length; i++) {
-      const dataUrl = await readFileAsDataUrl(selected[i]);
-      const orderIdx = photos.length + i;
-      added.push({
-        id: `${Date.now()}-${orderIdx}-${Math.random().toString(36).slice(2, 6)}`,
-        dataUrl,
-        slotLabel: PHOTO_SLOT_LABELS[orderIdx] ?? `Foto ${orderIdx + 1}`,
-      });
+      try {
+        const dataUrl = await readFileAsDataUrl(selected[i]);
+        const orderIdx = photos.length + added.length;
+        added.push({
+          id: `${Date.now()}-${orderIdx}-${Math.random().toString(36).slice(2, 6)}`,
+          dataUrl,
+          slotLabel: PHOTO_SLOT_LABELS[orderIdx] ?? `Foto ${orderIdx + 1}`,
+        });
+      } catch {
+        // ignora arquivo corrompido sem interromper os demais
+      }
     }
 
-    onChange([...photos, ...added]);
+    if (added.length > 0) {
+      onChange([...photos, ...added]);
+    }
     e.target.value = '';
   };
 
@@ -113,7 +154,7 @@ export function TradeInPhotoUploader({
         )}
 
         {photos.length < maxPhotos && (
-          <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-logo-green px-3 py-2 text-xs font-extrabold text-logo-purple-950 hover:bg-logo-green-hover">
+          <label className="relative inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-logo-green px-3 py-2 text-xs font-extrabold text-logo-purple-950 hover:bg-logo-green-hover">
             <Upload className="h-3.5 w-3.5" />
             Adicionar fotos
             <input
@@ -121,7 +162,7 @@ export function TradeInPhotoUploader({
               accept="image/*"
               multiple
               onChange={handleAddFiles}
-              className="hidden"
+              className="sr-only"
             />
           </label>
         )}
@@ -132,7 +173,7 @@ export function TradeInPhotoUploader({
         type="file"
         accept="image/*"
         onChange={handleReplaceFile}
-        className="hidden"
+        className="sr-only"
       />
 
       {photos.length === 0 ? (
