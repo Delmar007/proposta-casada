@@ -346,7 +346,7 @@ export default function AnunciarPage() {
             engine,
             traction,
             manufactureYear: Number(manufactureYear),
-            modelYear: Number(modelYear),
+            modelYear: Number(manufactureYear) || new Date().getFullYear(),
             mileage: Number(mileage),
             fuel,
             transmission,
@@ -694,11 +694,19 @@ export default function AnunciarPage() {
               <div className="space-y-4">
                 {/* Consulta automática API Tabela FIPE: Marca -> Modelo/Versão/Motor/Combustível -> Anos da versão */}
                 <div className="space-y-3 rounded-xl border border-logo-purple/25 bg-logo-purple-50/70 p-3.5">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-logo-purple" />
-                    <span className="text-xs font-extrabold uppercase tracking-wider text-logo-purple">
-                      API Tabela FIPE — Marca, Modelo, Versão, Motor, Combustível e Anos
-                    </span>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-logo-purple" />
+                      <span className="text-xs font-extrabold uppercase tracking-wider text-logo-purple">
+                        API Tabela FIPE — Marca, Modelo, Versão, Motor, Combustível e Anos
+                      </span>
+                    </div>
+                    {fipePrice && (
+                      <span className="rounded-full bg-uva-700 px-3 py-1 text-xs font-bold text-white">
+                        Tabela FIPE: {fipePrice}
+                        {fipeOfficialMeta?.fipeCode ? ` (Cód. ${fipeOfficialMeta.fipeCode})` : ''}
+                      </span>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
@@ -804,19 +812,6 @@ export default function AnunciarPage() {
                       className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
                     />
                   )}
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-semibold text-slate-700">
-                    Ano Modelo
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    value={modelYear}
-                    onChange={(e) => setModelYear(e.target.value)}
-                    placeholder="Ex: 2023"
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
-                  />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-slate-700">

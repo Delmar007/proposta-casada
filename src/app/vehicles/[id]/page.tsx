@@ -14,7 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { PublicVehicle, NegotiationModality } from '@/lib/domain/types';
-import type { FipeBrandOption, FipeModelOption } from '@/lib/fipe/fipe-service';
+import type { FipeBrandOption, FipeModelOption, FipeYearOption } from '@/lib/fipe/fipe-service';
 import { useActiveUser } from '@/components/ActiveUserProvider';
 import {
   TradeInPhotoUploader,
@@ -45,18 +45,21 @@ export default function VehicleDetailPage() {
   // Consulta API FIPE para precificar o veículo da permuta
   const [fipeBrands, setFipeBrands] = useState<FipeBrandOption[]>([]);
   const [fipeModels, setFipeModels] = useState<FipeModelOption[]>([]);
-  const [selectedFipeBrand, setSelectedFipeBrand] = useState('');
+  const [fipeYearOptions, setFipeYearOptions] = useState<FipeYearOption[]>([]);
+  const [selectedFipeBrandCode, setSelectedFipeBrandCode] = useState('');
+  const [selectedFipeBrandName, setSelectedFipeBrandName] = useState('');
   const [selectedFipeModelCode, setSelectedFipeModelCode] = useState('');
+  const [selectedFipeYearCode, setSelectedFipeYearCode] = useState('');
   const [fipeReferencePrice, setFipeReferencePrice] = useState<number | null>(null);
   const [fipeReferenceCode, setFipeReferenceCode] = useState<string>('');
   const [loadingFipe, setLoadingFipe] = useState(false);
+  const [loadingYears, setLoadingYears] = useState(false);
 
   // Modalidade B: Permuta + dinheiro
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
   const [version, setVersion] = useState('');
   const [manufactureYear, setManufactureYear] = useState('');
-  const [modelYear, setModelYear] = useState('');
   const [mileage, setMileage] = useState('');
   const [fuel, setFuel] = useState('');
   const [transmission, setTransmission] = useState('');
@@ -81,19 +84,28 @@ export default function VehicleDetailPage() {
       .catch(() => {});
   }, [params.id]);
 
-  const handleFipeBrandChange = async (brandName: string) => {
-    setSelectedFipeBrand(brandName);
+  const handleFipeBrandChange = async (brandCode: string) => {
+    setSelectedFipeBrandCode(brandCode);
     setSelectedFipeModelCode('');
+    setSelectedFipeYearCode('');
+    setFipeYearOptions([]);
     setFipeReferencePrice(null);
     setFipeReferenceCode('');
-    if (!brandName) {
+    setManufactureYear('');
+    const brandObj = fipeBrands.find((b) => b.code === brandCode);
+    if (!brandCode || !brandObj) {
+      setSelectedFipeBrandName('');
       setFipeModels([]);
       return;
     }
-    setBrand(brandName);
+    const cleanBrandName = brandObj.name.replace(/\s*\(Caminhões\/Ônibus\)$/i, '');
+    setSelectedFipeBrandName(cleanBrandName);
+    setBrand(cleanBrandName);
     setLoadingFipe(true);
     try {
-      const res = await fetch(`/api/fipe?brand=${encodeURIComponent(brandName)}`);
+      const res = await fetch(
+        `/api/fipe?brand=${encodeURIComponent(cleanBrandName)}&brandCode=${encodeURIComponent(brandCode)}`
+      );
       const data = await res.json();
       setFipeModels(data.models ?? []);
     } finally {
@@ -101,16 +113,78 @@ export default function VehicleDetailPage() {
     }
   };
 
-  const handleFipeModelChange = (modelCode: string) => {
+  const handleFipeModelChange = async (modelCode: string) => {
     setSelectedFipeModelCode(modelCode);
+    setSelectedFipeYearCode('');
     const found = fipeModels.find((m) => m.code === modelCode);
-    if (!found) return;
+    if (!found) {
+      setFipeYearOptions([]);
+      return;
+    }
     setModel(found.baseModel);
     setVersion(found.version);
     setFuel(found.fuel);
-    setFipeReferencePrice(found.fipePrice);
-    setFipeReferenceCode(found.fipeCode);
-    setDeclaredValue(String(found.fipePrice));
+    if (found.fipePrice > 0) {
+      setFipeReferencePrice(found.fipePrice);
+      setFipeReferenceCode(found.fipeCode);
+      setDeclaredValue(String(found.fipePrice));
+    }
+
+    setLoadingYears(true);
+    try {
+      const res = await fetch(
+        `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(modelCode)}`
+      );
+      const data = await res.json();
+      const opts: FipeYearOption[] = Array.isArray(data.yearOptions) ? data.yearOptions : [];
+      setFipeYearOptions(opts);
+      if (opts.length > 0) {
+        const first = opts[0];
+        setSelectedFipeYearCode(first.code);
+        setManufactureYear(String(first.year));
+        const priceRes = await fetch(
+          `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(modelCode)}&yearCode=${encodeURIComponent(first.code)}`
+        );
+        const priceJson = await priceRes.json();
+        if (priceJson?.priceInfo?.price) {
+          setFipeReferencePrice(priceJson.priceInfo.price);
+          if (priceJson.priceInfo.fipeCode) {
+            setFipeReferenceCode(priceJson.priceInfo.fipeCode);
+          }
+          if (priceJson.priceInfo.fuel) {
+            setFuel(priceJson.priceInfo.fuel);
+          }
+          setDeclaredValue(String(priceJson.priceInfo.price));
+        }
+      }
+    } finally {
+      setLoadingYears(false);
+    }
+  };
+
+  const handleFipeYearChange = async (yearCode: string) => {
+    setSelectedFipeYearCode(yearCode);
+    const opt = fipeYearOptions.find((y) => y.code === yearCode);
+    if (!opt) return;
+    setManufactureYear(String(opt.year));
+    try {
+      const priceRes = await fetch(
+        `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(selectedFipeModelCode)}&yearCode=${encodeURIComponent(yearCode)}`
+      );
+      const priceJson = await priceRes.json();
+      if (priceJson?.priceInfo?.price) {
+        setFipeReferencePrice(priceJson.priceInfo.price);
+        if (priceJson.priceInfo.fipeCode) {
+          setFipeReferenceCode(priceJson.priceInfo.fipeCode);
+        }
+        if (priceJson.priceInfo.fuel) {
+          setFuel(priceJson.priceInfo.fuel);
+        }
+        setDeclaredValue(String(priceJson.priceInfo.price));
+      }
+    } catch {
+      // mantém valor atual
+    }
   };
 
   const totalTradeInOffer =
@@ -146,7 +220,7 @@ export default function VehicleDetailPage() {
                 model,
                 version,
                 manufactureYear: Number(manufactureYear),
-                modelYear: Number(modelYear),
+                modelYear: Number(manufactureYear) || new Date().getFullYear(),
                 mileage: Number(mileage),
                 fuel,
                 transmission,
@@ -404,13 +478,13 @@ export default function VehicleDetailPage() {
                             Selecionar Marca (FIPE)
                           </label>
                           <select
-                            value={selectedFipeBrand}
+                            value={selectedFipeBrandCode}
                             onChange={(e) => handleFipeBrandChange(e.target.value)}
                             className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900"
                           >
                             <option value="">Escolha a marca na Tabela FIPE...</option>
                             {fipeBrands.map((b) => (
-                              <option key={b.code} value={b.name}>
+                              <option key={b.code} value={b.code}>
                                 {b.name}
                               </option>
                             ))}
@@ -423,7 +497,7 @@ export default function VehicleDetailPage() {
                           <select
                             value={selectedFipeModelCode}
                             onChange={(e) => handleFipeModelChange(e.target.value)}
-                            disabled={!selectedFipeBrand || loadingFipe}
+                            disabled={!selectedFipeBrandCode || loadingFipe}
                             className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-900 disabled:opacity-50"
                           >
                             <option value="">
@@ -433,7 +507,7 @@ export default function VehicleDetailPage() {
                             </option>
                             {fipeModels.map((m) => (
                               <option key={m.code} value={m.code}>
-                                {m.name} — {formatBRL(m.fipePrice)}
+                                {m.name}
                               </option>
                             ))}
                           </select>
@@ -477,27 +551,31 @@ export default function VehicleDetailPage() {
                       </div>
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          Ano de fabricação
+                          Ano de fabricação {loadingYears ? '(carregando...)' : ''}
                         </label>
-                        <input
-                          type="number"
-                          required
-                          value={manufactureYear}
-                          onChange={(e) => setManufactureYear(e.target.value)}
-                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          Ano modelo
-                        </label>
-                        <input
-                          type="number"
-                          required
-                          value={modelYear}
-                          onChange={(e) => setModelYear(e.target.value)}
-                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                        />
+                        {fipeYearOptions.length > 0 ? (
+                          <select
+                            required
+                            value={selectedFipeYearCode}
+                            onChange={(e) => handleFipeYearChange(e.target.value)}
+                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
+                          >
+                            <option value="">Selecione o ano da versão...</option>
+                            {fipeYearOptions.map((y) => (
+                              <option key={y.code} value={y.code}>
+                                {y.name}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type="number"
+                            required
+                            value={manufactureYear}
+                            onChange={(e) => setManufactureYear(e.target.value)}
+                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                          />
+                        )}
                       </div>
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
