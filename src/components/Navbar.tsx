@@ -82,11 +82,13 @@ export function Navbar() {
   const [adminPasswordError, setAdminPasswordError] = useState('');
   const [profileCompleted, setProfileCompleted] = useState(false);
   const [cnhImported, setCnhImported] = useState(false);
+  const [faceValidated, setFaceValidated] = useState(false);
 
   useEffect(() => {
     const syncProfileStatus = () => {
       setProfileCompleted(window.localStorage.getItem('mp_profile_completed') === 'true');
       setCnhImported(window.sessionStorage.getItem('mp_cnh_imported') === 'true');
+      setFaceValidated(window.sessionStorage.getItem('mp_face_validated') === 'true');
     };
     syncProfileStatus();
     window.addEventListener('mp-profile-updated', syncProfileStatus);
@@ -153,9 +155,11 @@ export function Navbar() {
               </button>
             ) : pathname?.startsWith('/perfil') ? (
               <span className="tutorial-text-shine">
-                {cnhImported
-                  ? 'Clique em Iniciar Câmera, tire uma foto do seu rosto, Fotografar e validar rosto.'
-                  : 'Adicione nº de celular, importe o PDF da sua CNH.'}
+                {faceValidated
+                  ? 'Clique em Salvar Perfil e Documentos.'
+                  : cnhImported
+                    ? 'Clique em Iniciar Câmera, tire uma foto do seu rosto, Fotografar e validar rosto.'
+                    : 'Adicione nº de celular, importe o PDF da sua CNH.'}
               </span>
             ) : !profileCompleted ? (
               <Link
@@ -196,13 +200,15 @@ export function Navbar() {
                 Seus anúncios favoritos salvos para comparar e negociar.
               </span>
             ) : (
-              <span className="inline-flex flex-wrap items-center justify-center gap-1">
-                <span className="tutorial-text-shine">Clique em</span>
-                <Plus className="inline h-4 w-4 text-logo-purple" strokeWidth={2.5} />
+              <Link
+                href="/anunciar"
+                className="inline-flex flex-wrap items-center justify-center gap-1 transition hover:underline"
+              >
                 <span className="tutorial-text-shine">
-                  para anunciar ou envie sua proposta nos anúncios.
+                  Cadastro Aprovado, agora se quiser anunciar clique no
                 </span>
-              </span>
+                <Plus className="inline h-4 w-4 text-logo-purple" strokeWidth={2.5} />
+              </Link>
             )}
           </div>
 

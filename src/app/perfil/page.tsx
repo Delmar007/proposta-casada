@@ -217,6 +217,10 @@ export default function PerfilPage() {
     try {
       const result = await compareSelfieWithCnhImage(captured, cnhImageDataUrl);
       setFaceResult(result);
+      if (result.matched) {
+        window.sessionStorage.setItem('mp_face_validated', 'true');
+        window.dispatchEvent(new Event('mp-profile-updated'));
+      }
     } catch {
       setFaceResult({
         matched: false,
@@ -646,6 +650,10 @@ export default function PerfilPage() {
                       try {
                         const res = await compareSelfieWithCnhImage(selfieDataUrl, cnhImageDataUrl);
                         setFaceResult(res);
+                        if (res.matched) {
+                          window.sessionStorage.setItem('mp_face_validated', 'true');
+                          window.dispatchEvent(new Event('mp-profile-updated'));
+                        }
                       } finally {
                         setComparingFaces(false);
                       }
