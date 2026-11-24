@@ -89,6 +89,7 @@ export default function VehicleDetailPage() {
   const [fuel, setFuel] = useState('');
   const [transmission, setTransmission] = useState('Automático');
   const [traction, setTraction] = useState('4x2');
+  const [ownerCount, setOwnerCount] = useState('1');
   const [city, setCity] = useState('');
   const [stateUF, setStateUF] = useState('');
   const [declaredValue, setDeclaredValue] = useState('');
@@ -256,7 +257,7 @@ export default function VehicleDetailPage() {
               },
               cashComplement: Number(cashComplement),
               messageText: [
-                `Avaliação do veículo (0 a 10): Lata ${ratingLata}/10 • Motor ${ratingMotor}/10 • Interna ${ratingInterna}/10 • Pneus ${ratingPneus}/10`,
+                `Nº de proprietário: ${ownerCount} • Avaliação do veículo (0 a 10): Lata ${ratingLata}/10 • Motor ${ratingMotor}/10 • Interna ${ratingInterna}/10 • Pneus ${ratingPneus}/10`,
                 tradeInMessage.trim(),
               ]
                 .filter(Boolean)
@@ -661,22 +662,17 @@ export default function VehicleDetailPage() {
                       </div>
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          UF
+                          Nº de proprietário
                         </label>
                         <select
                           required
-                          value={stateUF}
-                          onChange={(e) => {
-                            const nextUf = e.target.value;
-                            setStateUF(nextUf);
-                            setCity('');
-                          }}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
+                          value={ownerCount}
+                          onChange={(e) => setOwnerCount(e.target.value)}
+                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900"
                         >
-                          <option value="">Selecione a UF...</option>
-                          {BRAZIL_STATES.map((st) => (
-                            <option key={st.uf} value={st.uf}>
-                              {st.uf}
+                          {['1', '2', '3', '4', '5', '6', '7', '8', 'Não sabe'].map((opt) => (
+                            <option key={opt} value={opt}>
+                              {opt}
                             </option>
                           ))}
                         </select>
@@ -704,10 +700,32 @@ export default function VehicleDetailPage() {
                             required
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
-                            placeholder="Selecione a UF primeiro..."
+                            placeholder="Selecione a UF ao lado..."
                             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
                           />
                         )}
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-slate-700">
+                          UF
+                        </label>
+                        <select
+                          required
+                          value={stateUF}
+                          onChange={(e) => {
+                            const nextUf = e.target.value;
+                            setStateUF(nextUf);
+                            setCity('');
+                          }}
+                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
+                        >
+                          <option value="">Selecione a UF...</option>
+                          {BRAZIL_STATES.map((st) => (
+                            <option key={st.uf} value={st.uf}>
+                              {st.uf}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
