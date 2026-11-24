@@ -490,13 +490,14 @@ export default function VehicleDetailPage() {
                             Precificação Oficial via API FIPE
                           </h3>
                         </div>
-                        {fipeReferencePrice !== null && (
-                          <span className="rounded-full bg-uva-700 px-3 py-1 text-xs font-bold text-white">
-                            Tabela FIPE: {formatBRL(fipeReferencePrice)}
-                            {fipeReferenceCode ? ` (Cód. ${fipeReferenceCode})` : ''}
-                          </span>
-                        )}
                       </div>
+
+                      {fipeReferencePrice !== null && (
+                        <div className="w-full rounded-xl bg-uva-700 px-4 py-2.5 text-center text-sm font-bold text-white shadow-xs">
+                          Tabela FIPE: {formatBRL(fipeReferencePrice)}
+                          {fipeReferenceCode ? ` (Cód. ${fipeReferenceCode})` : ''}
+                        </div>
+                      )}
 
                       <div className="grid gap-3 sm:grid-cols-2">
                         <div>
@@ -747,22 +748,6 @@ export default function VehicleDetailPage() {
                       </div>
 
                       <div>
-                        <span className="mb-1 block text-xs font-semibold text-slate-700">
-                          Preço FIPE
-                        </span>
-                        <div className="flex h-[42px] w-full items-center justify-between rounded-lg bg-logo-purple px-3 text-white shadow-xs">
-                          <span className="text-sm font-bold">
-                            {fipeReferencePrice !== null ? formatBRL(fipeReferencePrice) : '—'}
-                          </span>
-                          {fipeReferenceCode && (
-                            <span className="text-[10px] font-medium text-uva-100">
-                              {fipeReferenceCode}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
                           Complemento em dinheiro (R$)
                         </label>
@@ -775,6 +760,17 @@ export default function VehicleDetailPage() {
                           placeholder="0"
                           className="h-[42px] w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold"
                         />
+                      </div>
+
+                      <div>
+                        <span className="mb-1 block text-xs font-semibold text-slate-700">
+                          Total do pagamento
+                        </span>
+                        <div className="flex h-[42px] w-full items-center rounded-lg bg-logo-purple px-3 text-white shadow-xs">
+                          <span className="text-sm font-bold">
+                            {formatBRL(totalTradeInOffer)}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
