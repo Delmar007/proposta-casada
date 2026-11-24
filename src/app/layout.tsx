@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className="min-h-screen bg-logo-green/20 text-slate-900 antialiased">
+      <body className="min-h-screen bg-white text-slate-900 antialiased">
         <ActiveUserProvider>
           <Navbar />
           <main className="mx-auto w-full max-w-[1024px] pt-[5px] pb-6 px-3 sm:px-0">{children}</main>
