@@ -402,15 +402,18 @@ export async function fetchFipeYearsForModel(
       if (res.ok) {
         const items: Array<{ code: string; name: string }> = await res.json();
         if (Array.isArray(items) && items.length > 0) {
-          const yearOptions: FipeYearOption[] = items.map((it) => {
-            const rawYear = parseInt(String(it.code).split('-')[0], 10);
-            const normalizedYear = rawYear === 32000 ? new Date().getFullYear() : rawYear;
-            return {
-              code: String(it.code),
-              name: String(it.name),
-              year: Number.isNaN(normalizedYear) ? new Date().getFullYear() : normalizedYear,
-            };
-          });
+          const yearOptions: FipeYearOption[] = items
+            .map((it) => {
+              const rawYear = parseInt(String(it.code).split('-')[0], 10);
+              const isZeroKm = rawYear === 32000 || /zero\s*km/i.test(String(it.name));
+              const normalizedYear = isZeroKm ? new Date().getFullYear() : rawYear;
+              return {
+                code: String(it.code),
+                name: isZeroKm ? `Zero KM (${normalizedYear})` : String(it.name),
+                year: Number.isNaN(normalizedYear) ? new Date().getFullYear() : normalizedYear,
+              };
+            })
+            .sort((a, b) => b.year - a.year);
           const years = Array.from(new Set(yearOptions.map((y) => y.year))).sort((a, b) => b - a);
           return { years, yearOptions };
         }
@@ -435,7 +438,12 @@ export async function fetchFipePriceForYear(
   modelCode: string,
   yearCode: string,
   brandCode?: string
-): Promise<{ price: number; fipeCode?: string } | null> {
+): Promise<{
+  price: number;
+  fipeCode?: string;
+  referenceMonth?: string;
+  fuel?: string;
+} | null> {
   const brandEntry = resolveBrandEntry(brandName, brandCode);
   const resolvedCode = brandCode || brandEntry?.codigo;
   const fipeVehicleType = brandEntry?.isTruck ? 'trucks' : 'cars';
@@ -457,6 +465,8 @@ export async function fetchFipePriceForYear(
     return {
       price: Math.round(numeric),
       fipeCode: data?.codeFipe ? String(data.codeFipe) : undefined,
+      referenceMonth: data?.referenceMonth ? String(data.referenceMonth) : undefined,
+      fuel: data?.fuel ? String(data.fuel) : undefined,
     };
   } catch {
     return null;

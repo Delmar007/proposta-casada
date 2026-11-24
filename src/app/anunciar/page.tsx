@@ -95,6 +95,11 @@ export default function AnunciarPage() {
   const [selectedFipeYearCode, setSelectedFipeYearCode] = useState('');
   const [loadingFipe, setLoadingFipe] = useState(false);
   const [loadingYears, setLoadingYears] = useState(false);
+  const [loadingFipePrice, setLoadingFipePrice] = useState(false);
+  const [fipeOfficialMeta, setFipeOfficialMeta] = useState<{
+    fipeCode?: string;
+    referenceMonth?: string;
+  } | null>(null);
 
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
@@ -147,6 +152,7 @@ export default function AnunciarPage() {
     setSelectedFipeModelCode('');
     setSelectedFipeYearCode('');
     setFipeYearOptions([]);
+    setFipeOfficialMeta(null);
     setManufactureYear('');
     if (!brandCode) {
       setSelectedFipeBrandName('');
@@ -174,6 +180,7 @@ export default function AnunciarPage() {
   const handleFipeModelChange = async (modelCode: string) => {
     setSelectedFipeModelCode(modelCode);
     setSelectedFipeYearCode('');
+    setFipeOfficialMeta(null);
     const found = fipeModels.find((m) => m.code === modelCode);
     if (!found) {
       setFipeYearOptions([]);
@@ -201,12 +208,24 @@ export default function AnunciarPage() {
         setSelectedFipeYearCode(first.code);
         setManufactureYear(String(first.year));
         setModelYear(String(first.year));
-        const priceRes = await fetch(
-          `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(modelCode)}&yearCode=${encodeURIComponent(first.code)}`
-        );
-        const priceJson = await priceRes.json();
-        if (priceJson?.priceInfo?.price) {
-          setFipePrice(formatBRL(priceJson.priceInfo.price));
+        setLoadingFipePrice(true);
+        try {
+          const priceRes = await fetch(
+            `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(modelCode)}&yearCode=${encodeURIComponent(first.code)}`
+          );
+          const priceJson = await priceRes.json();
+          if (priceJson?.priceInfo?.price) {
+            setFipePrice(formatBRL(priceJson.priceInfo.price));
+            if (priceJson.priceInfo.fuel) {
+              setFuel(priceJson.priceInfo.fuel);
+            }
+            setFipeOfficialMeta({
+              fipeCode: priceJson.priceInfo.fipeCode,
+              referenceMonth: priceJson.priceInfo.referenceMonth,
+            });
+          }
+        } finally {
+          setLoadingFipePrice(false);
         }
       }
     } finally {
@@ -220,6 +239,7 @@ export default function AnunciarPage() {
     if (!opt) return;
     setManufactureYear(String(opt.year));
     setModelYear(String(opt.year));
+    setLoadingFipePrice(true);
     try {
       const priceRes = await fetch(
         `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(selectedFipeModelCode)}&yearCode=${encodeURIComponent(yearCode)}`
@@ -227,9 +247,18 @@ export default function AnunciarPage() {
       const priceJson = await priceRes.json();
       if (priceJson?.priceInfo?.price) {
         setFipePrice(formatBRL(priceJson.priceInfo.price));
+        if (priceJson.priceInfo.fuel) {
+          setFuel(priceJson.priceInfo.fuel);
+        }
+        setFipeOfficialMeta({
+          fipeCode: priceJson.priceInfo.fipeCode,
+          referenceMonth: priceJson.priceInfo.referenceMonth,
+        });
       }
     } catch {
       // mantém valor atual
+    } finally {
+      setLoadingFipePrice(false);
     }
   };
 
@@ -855,7 +884,7 @@ export default function AnunciarPage() {
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-slate-700">
-                    Preço FIPE (R$)
+                    Preço FIPE (R$) {loadingFipePrice ? '(consultando...)' : ''}
                   </label>
                   <input
                     type="text"
@@ -868,6 +897,14 @@ export default function AnunciarPage() {
                     placeholder="R$ 278.000,00"
                     className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold"
                   />
+                  {fipeOfficialMeta?.fipeCode && (
+                    <p className="mt-1 text-[10px] font-semibold text-logo-purple">
+                      FIPE Oficial • Cód. {fipeOfficialMeta.fipeCode}
+                      {fipeOfficialMeta.referenceMonth
+                        ? ` • ${fipeOfficialMeta.referenceMonth}`
+                        : ''}
+                    </p>
+                  )}
                 </div>
               </div>
               </div>
