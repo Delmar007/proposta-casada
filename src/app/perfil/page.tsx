@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   Camera,
@@ -32,6 +33,7 @@ function formatWhatsapp(raw: string): string {
 }
 
 export default function PerfilPage() {
+  const router = useRouter();
   const { userId, currentUser, userEmail, isAuthenticated, logout } = useActiveUser();
 
   const [fullName, setFullName] = useState('');
@@ -228,6 +230,11 @@ export default function PerfilPage() {
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    const phoneDigits = whatsapp.replace(/\D/g, '');
+    if (phoneDigits.length < 10) {
+      setSaveError('Informe seu número de telefone (WhatsApp) com DDD antes de salvar.');
+      return;
+    }
     setSaving(true);
     setSaveMessage('');
     setSaveError('');
@@ -261,6 +268,7 @@ export default function PerfilPage() {
         setSaveMessage(
           'Cadastro do perfil e documentos da CNH arquivados com sucesso no banco de dados!'
         );
+        router.push('/');
       }
     } catch {
       setSaveError('Erro de conexão ao salvar o perfil.');
@@ -659,11 +667,16 @@ export default function PerfilPage() {
             </div>
           )}
 
-          <div className="flex justify-end">
+          <div className="flex flex-col items-end gap-1.5">
+            {whatsapp.replace(/\D/g, '').length < 10 && (
+              <p className="text-xs font-semibold text-amber-700">
+                Preencha seu número de telefone (WhatsApp com DDD) para liberar o salvamento.
+              </p>
+            )}
             <button
               type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-2 rounded-xl bg-logo-green px-6 py-3.5 text-[15px] font-extrabold text-logo-purple-950 shadow-xs transition hover:bg-logo-green-hover disabled:opacity-50"
+              disabled={saving || whatsapp.replace(/\D/g, '').length < 10}
+              className="inline-flex items-center gap-2 rounded-xl bg-logo-green px-6 py-3.5 text-[15px] font-extrabold text-logo-purple-950 shadow-xs transition hover:bg-logo-green-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Save className="h-4 w-4" />
               {saving ? 'Salvando no banco de dados...' : 'Salvar Perfil e Documentos'}

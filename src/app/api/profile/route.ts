@@ -30,6 +30,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (whatsapp.replace(/\D/g, '').length < 10) {
+      return NextResponse.json(
+        { error: 'Informe um número de telefone (WhatsApp) válido com DDD.' },
+        { status: 400 }
+      );
+    }
+
     const { record, storage } = await saveUserProfile({
       userId: resolvedUserId,
       fullName,
