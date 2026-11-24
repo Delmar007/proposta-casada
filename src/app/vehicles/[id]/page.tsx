@@ -734,7 +734,7 @@ export default function VehicleDetailPage() {
                     <div className="grid grid-cols-1 items-end gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          Preço para negócio (R$)
+                          Preço para negócio
                         </label>
                         <input
                           type="number"
@@ -742,14 +742,14 @@ export default function VehicleDetailPage() {
                           min={1}
                           value={declaredValue}
                           onChange={(e) => setDeclaredValue(e.target.value)}
-                          placeholder="Digite o valor pedido"
+                          placeholder="Valor do veículo"
                           className="h-[42px] w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold"
                         />
                       </div>
 
                       <div>
                         <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          Complemento em dinheiro (R$)
+                          Complemento em dinheiro
                         </label>
                         <input
                           type="number"
@@ -757,7 +757,7 @@ export default function VehicleDetailPage() {
                           min={0}
                           value={cashComplement}
                           onChange={(e) => setCashComplement(e.target.value)}
-                          placeholder="0"
+                          placeholder="Diferença em dinheiro"
                           className="h-[42px] w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold"
                         />
                       </div>
@@ -797,7 +797,7 @@ export default function VehicleDetailPage() {
                               onChange={(e) => item.setter(e.target.value)}
                               className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
                             >
-                              <option value="">Nota (0 a 10)</option>
+                              <option value=""></option>
                               {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((n) => (
                                 <option key={n} value={String(n)}>
                                   {n}
