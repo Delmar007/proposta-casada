@@ -80,6 +80,20 @@ export function Navbar() {
   const [showAdminPasswordModal, setShowAdminPasswordModal] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [adminPasswordError, setAdminPasswordError] = useState('');
+  const [profileCompleted, setProfileCompleted] = useState(false);
+
+  useEffect(() => {
+    const syncProfileStatus = () => {
+      setProfileCompleted(window.localStorage.getItem('mp_profile_completed') === 'true');
+    };
+    syncProfileStatus();
+    window.addEventListener('mp-profile-updated', syncProfileStatus);
+    window.addEventListener('storage', syncProfileStatus);
+    return () => {
+      window.removeEventListener('mp-profile-updated', syncProfileStatus);
+      window.removeEventListener('storage', syncProfileStatus);
+    };
+  }, []);
   const categoryNavRef = useRef<HTMLElement | null>(null);
   const dealMenuRef = useRef<HTMLDivElement | null>(null);
   const locationMenuRef = useRef<HTMLDivElement | null>(null);
@@ -135,6 +149,30 @@ export function Navbar() {
                 </span>
                 <span>e faça o login.</span>
               </button>
+            ) : pathname?.startsWith('/perfil') ? (
+              <span>Preencha seu WhatsApp, importe a CNH Digital e conclua seu cadastro.</span>
+            ) : !profileCompleted ? (
+              <Link
+                href="/perfil"
+                className="inline-flex flex-wrap items-center justify-center gap-1.5 text-logo-purple transition hover:underline"
+              >
+                <span>Clique no seu</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-logo-purple/10 px-2 py-0.5 font-extrabold">
+                  {userAvatarUrl ? (
+                    <img
+                      src={userAvatarUrl}
+                      alt={currentUser.label.split(' ')[0]}
+                      className="h-4 w-4 rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-logo-purple text-[10px] font-extrabold text-white">
+                      {currentUser.label.trim().charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <span>{currentUser.label.split(' ')[0]}</span>
+                </span>
+                <span>para concluir cadastro.</span>
+              </Link>
             ) : pathname?.startsWith('/anunciar') ? (
               <span>Preencha a categoria, os dados e publique seu anúncio.</span>
             ) : pathname?.startsWith('/vehicles/') ? (
