@@ -150,7 +150,7 @@ export function Navbar() {
                 <span>e faça o login.</span>
               </button>
             ) : pathname?.startsWith('/perfil') ? (
-              <span>Preencha seu WhatsApp, importe a CNH Digital e conclua seu cadastro.</span>
+              <span>Adicione nº de celular, importe o PDF da sua CNH.</span>
             ) : !profileCompleted ? (
               <Link
                 href="/perfil"
