@@ -132,6 +132,8 @@ export default function PerfilPage() {
       });
       setCnhFileName(file.name);
       setCnhImageDataUrl(imageDataUrl);
+      window.sessionStorage.setItem('mp_cnh_imported', 'true');
+      window.dispatchEvent(new Event('mp-profile-updated'));
       if (extracted.cpf) setCpf(extracted.cpf);
       if (extracted.rg) setRg(extracted.rg);
       if (extracted.local) setLocalCityUf(extracted.local);

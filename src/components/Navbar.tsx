@@ -81,10 +81,12 @@ export function Navbar() {
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
   const [adminPasswordError, setAdminPasswordError] = useState('');
   const [profileCompleted, setProfileCompleted] = useState(false);
+  const [cnhImported, setCnhImported] = useState(false);
 
   useEffect(() => {
     const syncProfileStatus = () => {
       setProfileCompleted(window.localStorage.getItem('mp_profile_completed') === 'true');
+      setCnhImported(window.sessionStorage.getItem('mp_cnh_imported') === 'true');
     };
     syncProfileStatus();
     window.addEventListener('mp-profile-updated', syncProfileStatus);
@@ -150,7 +152,11 @@ export function Navbar() {
                 <span>e faça o login.</span>
               </button>
             ) : pathname?.startsWith('/perfil') ? (
-              <span>Adicione nº de celular, importe o PDF da sua CNH.</span>
+              <span>
+                {cnhImported
+                  ? 'Clique em Iniciar Câmera, tire uma foto do seu rosto, Fotografar e validar rosto.'
+                  : 'Adicione nº de celular, importe o PDF da sua CNH.'}
+              </span>
             ) : !profileCompleted ? (
               <Link
                 href="/perfil"
