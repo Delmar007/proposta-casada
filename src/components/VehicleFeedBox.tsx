@@ -92,6 +92,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
 
   const [activeImageIdx, setActiveImageIdx] = useState<number>(0);
   const [showGalleryModal, setShowGalleryModal] = useState<boolean>(false);
+  const [showModalInfoTab, setShowModalInfoTab] = useState<boolean>(false);
   const [imageRotation, setImageRotation] = useState<number>(0);
   const thumbsContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -611,6 +612,47 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
                 <ChevronDown className="hidden h-5 w-5 landscape:block md:block" />
               </button>
             </div>
+          </div>
+
+          {/* Aba inferior abaixo da caixa grande — Informações e Acessórios do veículo */}
+          <div className="shrink-0 border-t border-white/10 bg-slate-900">
+            <button
+              type="button"
+              onClick={() => setShowModalInfoTab((v) => !v)}
+              className="flex w-full items-center justify-between px-4 py-2.5 text-left text-xs font-bold text-white transition hover:bg-slate-800/80"
+            >
+              <span>
+                {vehicle.listingType === 'property'
+                  ? 'Informações do Imóvel'
+                  : 'Acessórios & Informações do Veículo'}
+              </span>
+              {showModalInfoTab ? (
+                <ChevronUp className="h-4 w-4 text-logo-green" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-logo-green" />
+              )}
+            </button>
+
+            {showModalInfoTab && (
+              <div className="max-h-36 overflow-y-auto border-t border-white/10 bg-slate-950/80 px-4 py-3 text-xs text-slate-200">
+                {vehicle.description && vehicle.description.includes('•') ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {vehicle.description.split('•').map((item, idx) => (
+                      <span
+                        key={idx}
+                        className="rounded-md border border-logo-green/35 bg-logo-green/15 px-2 py-1 text-[11px] font-semibold text-logo-green-100"
+                      >
+                        {item.trim()}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="leading-relaxed text-slate-200">
+                    {vehicle.description || 'Sem informações adicionais cadastradas.'}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
