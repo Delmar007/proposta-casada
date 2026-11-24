@@ -560,7 +560,7 @@ export default function AnunciarPage() {
                     Fechar
                   </button>
                 </div>
-                <ul className="flex max-h-64 flex-col gap-1 overflow-y-auto">
+                <ul className="grid max-h-80 grid-cols-2 gap-1 overflow-y-auto sm:grid-cols-3">
                   {CATEGORY_SUBCATEGORIES[category].map((sub) => {
                     const isSubSelected = selectedSubcategory === sub;
                     return (
