@@ -210,12 +210,31 @@ export default function AnunciarPage() {
     if (val > 0) setter(`R$ ${val.toLocaleString('pt-BR')}`);
   };
 
+  const fipeVehicleType: 'cars' | 'motorcycles' | 'trucks' =
+    category === 'Motos'
+      ? 'motorcycles'
+      : category === 'Caminhões' || category === 'Ônibus/Vans'
+        ? 'trucks'
+        : 'cars';
+
   useEffect(() => {
-    fetch('/api/fipe')
+    setSelectedFipeBrandCode('');
+    setSelectedFipeBrandName('');
+    setSelectedFipeModelCode('');
+    setSelectedFipeYearCode('');
+    setFipeModels([]);
+    setFipeYearOptions([]);
+    setFipeOfficialMeta(null);
+    setFipePrice('');
+    setBrand('');
+    setModel('');
+    setVersion('');
+    setManufactureYear('');
+    fetch(`/api/fipe?vehicleType=${encodeURIComponent(fipeVehicleType)}`)
       .then((r) => r.json())
       .then((d) => setFipeBrands(d.brands ?? []))
       .catch(() => {});
-  }, []);
+  }, [fipeVehicleType]);
 
   const handleFipeBrandChange = async (brandCode: string) => {
     setSelectedFipeBrandCode(brandCode);
@@ -238,7 +257,7 @@ export default function AnunciarPage() {
     setLoadingFipe(true);
     try {
       const res = await fetch(
-        `/api/fipe?brand=${encodeURIComponent(cleanBrandName)}&brandCode=${encodeURIComponent(brandCode)}`
+        `/api/fipe?vehicleType=${encodeURIComponent(fipeVehicleType)}&brand=${encodeURIComponent(cleanBrandName)}&brandCode=${encodeURIComponent(brandCode)}`
       );
       const data = await res.json();
       setFipeModels(data.models ?? []);
@@ -263,12 +282,14 @@ export default function AnunciarPage() {
     setTraction(found.traction);
     if (found.fipePrice > 0) {
       setFipePrice(formatBRL(found.fipePrice));
+    } else {
+      setFipePrice('');
     }
 
     setLoadingYears(true);
     try {
       const res = await fetch(
-        `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(modelCode)}`
+        `/api/fipe?vehicleType=${encodeURIComponent(fipeVehicleType)}&brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(modelCode)}`
       );
       const data = await res.json();
       const opts: FipeYearOption[] = Array.isArray(data.yearOptions) ? data.yearOptions : [];
@@ -281,7 +302,7 @@ export default function AnunciarPage() {
         setLoadingFipePrice(true);
         try {
           const priceRes = await fetch(
-            `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(modelCode)}&yearCode=${encodeURIComponent(first.code)}`
+            `/api/fipe?vehicleType=${encodeURIComponent(fipeVehicleType)}&brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(modelCode)}&yearCode=${encodeURIComponent(first.code)}`
           );
           const priceJson = await priceRes.json();
           if (priceJson?.priceInfo?.price) {
@@ -312,7 +333,7 @@ export default function AnunciarPage() {
     setLoadingFipePrice(true);
     try {
       const priceRes = await fetch(
-        `/api/fipe?brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(selectedFipeModelCode)}&yearCode=${encodeURIComponent(yearCode)}`
+        `/api/fipe?vehicleType=${encodeURIComponent(fipeVehicleType)}&brand=${encodeURIComponent(selectedFipeBrandName)}&brandCode=${encodeURIComponent(selectedFipeBrandCode)}&modelCode=${encodeURIComponent(selectedFipeModelCode)}&yearCode=${encodeURIComponent(yearCode)}`
       );
       const priceJson = await priceRes.json();
       if (priceJson?.priceInfo?.price) {

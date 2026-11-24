@@ -311,20 +311,87 @@ function resolveBrandEntry(brandName: string, brandCode?: string) {
   return FIPE_MARCAS.find((b) => b.nome.toLowerCase().includes(normalized));
 }
 
+export type FipeVehicleType = 'cars' | 'motorcycles' | 'trucks';
+
+const FIPE_MOTO_BRANDS_FALLBACK: FipeBrandOption[] = [
+  { code: '80', name: 'Honda' },
+  { code: '101', name: 'Yamaha' },
+  { code: '99', name: 'Suzuki' },
+  { code: '85', name: 'Kawasaki' },
+  { code: '67', name: 'BMW' },
+  { code: '100', name: 'Triumph' },
+  { code: '77', name: 'Harley-Davidson' },
+  { code: '74', name: 'Ducati' },
+  { code: '198', name: 'Royal Enfield' },
+  { code: '71', name: 'Dafra' },
+  { code: '97', name: 'Shineray' },
+  { code: '194', name: 'Haojue' },
+  { code: '87', name: 'KTM' },
+  { code: '246', name: 'Bajaj' },
+  { code: '64', name: 'Aprilia' },
+  { code: '176', name: 'Benelli' },
+  { code: '193', name: 'Zontes' },
+  { code: '205', name: 'CFMoto' },
+];
+
+export async function fetchFipeBrands(
+  vehicleType: FipeVehicleType = 'cars'
+): Promise<FipeBrandOption[]> {
+  if (vehicleType === 'motorcycles') {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch('https://fipe.parallelum.com.br/api/v2/motorcycles/brands', {
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (res.ok) {
+        const items: Array<{ code: string; name: string }> = await res.json();
+        if (Array.isArray(items) && items.length > 0) {
+          return items.map((b) => ({ code: String(b.code), name: String(b.name) }));
+        }
+      }
+    } catch {
+      // fallback abaixo
+    }
+    return FIPE_MOTO_BRANDS_FALLBACK;
+  }
+
+  if (vehicleType === 'trucks') {
+    return FIPE_MARCAS.filter((b) => b.isTruck).map((b) => ({
+      code: b.codigo,
+      name: b.nome,
+      isTruck: true,
+    }));
+  }
+
+  return FIPE_MARCAS.filter((b) => !b.isTruck).map((b) => ({
+    code: b.codigo,
+    name: b.nome,
+    isTruck: false,
+  }));
+}
+
 /**
  * Busca modelos da marca na API FIPE pública (Parallelum FIPE v2) com fallback instantâneo
  * para o catálogo FIPE integrado.
  */
 export async function fetchFipeModelsForBrand(
   brandName: string,
-  brandCode?: string
+  brandCode?: string,
+  vehicleType: FipeVehicleType = 'cars'
 ): Promise<FipeModelOption[]> {
   const key = brandName.trim().toLowerCase();
-  const fallbackEntry = FIPE_CATALOG_FALLBACK[key];
+  const fallbackEntry = vehicleType === 'cars' ? FIPE_CATALOG_FALLBACK[key] : undefined;
   const fallbackModels = fallbackEntry?.models ?? [];
-  const brandEntry = resolveBrandEntry(brandName, brandCode);
+  const brandEntry = vehicleType === 'motorcycles' ? undefined : resolveBrandEntry(brandName, brandCode);
   const resolvedCode = brandCode || brandEntry?.codigo || fallbackEntry?.code;
-  const fipeVehicleType = brandEntry?.isTruck ? 'trucks' : 'cars';
+  const fipeVehicleType: FipeVehicleType =
+    vehicleType === 'motorcycles'
+      ? 'motorcycles'
+      : vehicleType === 'trucks' || brandEntry?.isTruck
+        ? 'trucks'
+        : 'cars';
 
   if (!resolvedCode) {
     return fallbackModels;
@@ -353,6 +420,7 @@ export async function fetchFipeModelsForBrand(
       const parsed = parseFipeModelName(brandName, item.name);
       return {
         ...parsed,
+        fipePrice: 0,
         code: String(item.code),
       };
     });
@@ -381,13 +449,19 @@ const DEFAULT_MANUFACTURE_YEARS = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 201
 export async function fetchFipeYearsForModel(
   brandName: string,
   modelCode: string,
-  brandCode?: string
+  brandCode?: string,
+  vehicleType: FipeVehicleType = 'cars'
 ): Promise<{ years: number[]; yearOptions: FipeYearOption[] }> {
   const key = brandName.trim().toLowerCase();
-  const fallbackEntry = FIPE_CATALOG_FALLBACK[key];
-  const brandEntry = resolveBrandEntry(brandName, brandCode);
+  const fallbackEntry = vehicleType === 'cars' ? FIPE_CATALOG_FALLBACK[key] : undefined;
+  const brandEntry = vehicleType === 'motorcycles' ? undefined : resolveBrandEntry(brandName, brandCode);
   const resolvedCode = brandCode || brandEntry?.codigo || fallbackEntry?.code;
-  const fipeVehicleType = brandEntry?.isTruck ? 'trucks' : 'cars';
+  const fipeVehicleType: FipeVehicleType =
+    vehicleType === 'motorcycles'
+      ? 'motorcycles'
+      : vehicleType === 'trucks' || brandEntry?.isTruck
+        ? 'trucks'
+        : 'cars';
 
   if (resolvedCode && !modelCode.includes('-')) {
     try {
@@ -437,16 +511,22 @@ export async function fetchFipePriceForYear(
   brandName: string,
   modelCode: string,
   yearCode: string,
-  brandCode?: string
+  brandCode?: string,
+  vehicleType: FipeVehicleType = 'cars'
 ): Promise<{
   price: number;
   fipeCode?: string;
   referenceMonth?: string;
   fuel?: string;
 } | null> {
-  const brandEntry = resolveBrandEntry(brandName, brandCode);
+  const brandEntry = vehicleType === 'motorcycles' ? undefined : resolveBrandEntry(brandName, brandCode);
   const resolvedCode = brandCode || brandEntry?.codigo;
-  const fipeVehicleType = brandEntry?.isTruck ? 'trucks' : 'cars';
+  const fipeVehicleType: FipeVehicleType =
+    vehicleType === 'motorcycles'
+      ? 'motorcycles'
+      : vehicleType === 'trucks' || brandEntry?.isTruck
+        ? 'trucks'
+        : 'cars';
   if (!resolvedCode || modelCode.includes('-')) return null;
 
   try {
