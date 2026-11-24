@@ -98,7 +98,7 @@ export function TradeInPhotoUploader({
   };
 
   return (
-    <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <div className="space-y-4 rounded-xl border border-logo-purple/25 bg-logo-purple/20 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         {(title || hint) && (
           <div>

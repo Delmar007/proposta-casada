@@ -627,7 +627,7 @@ export default function AnunciarPage() {
           </div>
 
           {/* 3. Dados Específicos (Veículo Móvel vs Imóvel) */}
-          <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+          <div className="space-y-4 rounded-2xl border border-logo-purple/25 bg-logo-purple/20 p-4">
             <h2 className="text-sm font-extrabold uppercase tracking-wider sm:text-[15px] text-uva-800">
               3. {isProperty ? `Dados do Imóvel (${category})` : `Dados do Veículo (${category})`}
             </h2>
@@ -774,7 +774,7 @@ export default function AnunciarPage() {
             ) : (
               <div className="space-y-4">
                 {/* Consulta automática API Tabela FIPE: Marca -> Modelo/Versão/Motor/Combustível -> Anos da versão */}
-                <div className="space-y-3 rounded-xl border border-logo-purple/25 bg-logo-purple-50/70 p-3.5">
+                <div className="space-y-3 rounded-xl border border-logo-green-hover bg-logo-green p-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-logo-purple" />
@@ -1141,7 +1141,7 @@ export default function AnunciarPage() {
               />
             </div>
           ) : (
-            <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+            <div className="space-y-3 rounded-2xl border border-logo-purple/25 bg-logo-purple/20 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-[15px] font-bold text-slate-800">
                   Acessórios do Veículo ({selectedAccessories.length}/60 selecionados)
