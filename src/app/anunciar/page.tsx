@@ -130,7 +130,7 @@ const VEHICLE_ACCESSORIES: string[] = [
 
 export default function AnunciarPage() {
   const router = useRouter();
-  const { userId, isAuthenticated } = useActiveUser();
+  const { userId, isAuthenticated, activeUf, activeCity } = useActiveUser();
 
   const [category, setCategory] = useState<string>('Carros');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
@@ -415,15 +415,12 @@ export default function AnunciarPage() {
             fuel: category,
             transmission: `${bedrooms || 0} qts`,
             color: `${parkingSpaces || 0} vagas`,
-            city,
-            state: stateUF,
+            city: activeCity || city || 'Campo Grande',
+            state: activeUf || stateUF || 'MS',
             fipePrice: parseReaisValue(fipePrice) || parseReaisValue(askingPrice),
             askingPrice: parseReaisValue(askingPrice) || parseReaisValue(fipePrice),
             minConfidentialPrice: parseReaisValue(minConfidentialPrice) || undefined,
-            description:
-              selectedAccessories.length > 0
-                ? selectedAccessories.join(' • ')
-                : 'Veículo sem acessórios marcados',
+            description,
             images: photos.map((p) => p.dataUrl),
             propertyType,
             totalAreaM2: Number(totalAreaM2) || undefined,
@@ -449,8 +446,8 @@ export default function AnunciarPage() {
             fuel,
             transmission,
             color: 'Não informada',
-            city,
-            state: stateUF,
+            city: activeCity || city || 'Campo Grande',
+            state: activeUf || stateUF || 'MS',
             fipePrice: parseReaisValue(fipePrice) || parseReaisValue(askingPrice),
             askingPrice: parseReaisValue(askingPrice) || parseReaisValue(fipePrice),
             minConfidentialPrice: parseReaisValue(minConfidentialPrice) || undefined,
@@ -1023,6 +1020,10 @@ export default function AnunciarPage() {
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* 4 caixas na mesma linha: Preço FIPE, Valor Pedido, Valor mínimo aceito e Aviso WhatsApp */}
+              <div className="grid grid-cols-1 gap-3 border-t border-logo-purple/15 pt-3 md:grid-cols-4 md:items-start">
                 <div>
                   <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
                     Preço FIPE (R$) {loadingFipePrice ? '(consultando...)' : ''}
@@ -1047,94 +1048,105 @@ export default function AnunciarPage() {
                     </p>
                   )}
                 </div>
+
+                <div>
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
+                    Valor Pedido R$
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    required
+                    value={askingPrice}
+                    onChange={(e) => handleReaisChange(e.target.value, setAskingPrice)}
+                    onBlur={() => handleReaisBlur(askingPrice, setAskingPrice)}
+                    onFocus={() => handleReaisFocus(askingPrice, setAskingPrice)}
+                    placeholder="R$ 0,00"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px] font-bold"
+                  />
+                  <span className="mt-0.5 block text-xs text-slate-600">
+                    Confidencial — não aparece no anúncio
+                  </span>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
+                    Valor mínimo aceito (R$)
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    required
+                    value={minConfidentialPrice}
+                    onChange={(e) => handleReaisChange(e.target.value, setMinConfidentialPrice)}
+                    onBlur={() => handleReaisBlur(minConfidentialPrice, setMinConfidentialPrice)}
+                    onFocus={() => handleReaisFocus(minConfidentialPrice, setMinConfidentialPrice)}
+                    placeholder="R$ 0,00 (confidencial)"
+                    className="w-full rounded-lg border border-logo-green/60 bg-logo-green/20 px-3 py-2.5 text-base sm:text-[15px] font-bold text-slate-900"
+                  />
+                  <span className="mt-0.5 block text-xs text-slate-600">
+                    Confidencial — não aparece no anúncio
+                  </span>
+                </div>
+
+                <div className="md:pt-7">
+                  <div className="flex min-h-[46px] items-center rounded-xl border border-logo-green/60 bg-logo-green-50 px-3 py-2 text-[15px] font-semibold leading-snug text-logo-purple-950">
+                    Proposta igual ou maior que esse valor será enviada no seu WhatsApp.
+                  </div>
+                </div>
               </div>
               </div>
             )}
-          </div>
 
-          {/* 4. Localização (Estado UF primeiro, depois Cidade) e Valores Confidenciais */}
-          <div className="grid grid-cols-1 gap-2.5 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-12 md:items-start">
-            <div className="md:col-span-1">
-              <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">UF</label>
-              <select
-                required
-                value={stateUF}
-                onChange={(e) => {
-                  setStateUF(e.target.value);
-                  setCity('');
-                }}
-                className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2.5 text-base sm:text-[15px] font-semibold"
-              >
-                <option value="">UF</option>
-                {BRAZIL_STATES.map((st) => (
-                  <option key={st.uf} value={st.uf}>
-                    {st.uf}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="md:col-span-2">
-              <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">Cidade</label>
-              <select
-                required
-                value={city}
-                disabled={!stateUF}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2.5 text-base sm:text-[15px] font-semibold disabled:bg-slate-50 disabled:text-slate-400"
-              >
-                <option value="">
-                  {stateUF ? 'Cidade...' : 'UF primeiro'}
-                </option>
-                {getCitiesByUF(stateUF).map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="md:col-span-2">
-              <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
-                Valor Pedido R$
-              </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                required
-                value={askingPrice}
-                onChange={(e) => handleReaisChange(e.target.value, setAskingPrice)}
-                onBlur={() => handleReaisBlur(askingPrice, setAskingPrice)}
-                onFocus={() => handleReaisFocus(askingPrice, setAskingPrice)}
-                placeholder="R$ 0,00"
-                className="w-full rounded-lg border border-slate-200 px-2.5 py-2.5 text-base sm:text-[15px] font-bold"
-              />
-              <span className="mt-0.5 block text-xs text-slate-500">
-                Confidencial — não aparece no anúncio
-              </span>
-            </div>
-            <div className="md:col-span-3">
-              <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
-                Valor mínimo aceito (R$)
-              </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                required
-                value={minConfidentialPrice}
-                onChange={(e) => handleReaisChange(e.target.value, setMinConfidentialPrice)}
-                onBlur={() => handleReaisBlur(minConfidentialPrice, setMinConfidentialPrice)}
-                onFocus={() => handleReaisFocus(minConfidentialPrice, setMinConfidentialPrice)}
-                placeholder="R$ 0,00 (confidencial)"
-                className="w-full rounded-lg border border-logo-green/60 bg-logo-green/20 px-3 py-2.5 text-base sm:text-[15px] font-bold text-slate-900"
-              />
-              <span className="mt-0.5 block text-xs text-slate-500">
-                Confidencial — não aparece no anúncio
-              </span>
-            </div>
-            <div className="md:col-span-4 md:pt-5">
-              <div className="flex min-h-[40px] items-center rounded-xl border border-logo-green/60 bg-logo-green-50 px-3 py-2 text-[15px] font-semibold leading-snug text-logo-purple-950">
-                Proposta igual ou maior que esse valor será enviada no seu WhatsApp.
+            {isProperty && (
+              <div className="grid grid-cols-1 gap-3 border-t border-logo-purple/15 pt-3 md:grid-cols-3 md:items-start">
+                <div>
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
+                    Valor Pedido R$
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    required
+                    value={askingPrice}
+                    onChange={(e) => handleReaisChange(e.target.value, setAskingPrice)}
+                    onBlur={() => handleReaisBlur(askingPrice, setAskingPrice)}
+                    onFocus={() => handleReaisFocus(askingPrice, setAskingPrice)}
+                    placeholder="R$ 0,00"
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base sm:text-[15px] font-bold"
+                  />
+                  <span className="mt-0.5 block text-xs text-slate-600">
+                    Confidencial — não aparece no anúncio
+                  </span>
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
+                    Valor mínimo aceito (R$)
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    required
+                    value={minConfidentialPrice}
+                    onChange={(e) => handleReaisChange(e.target.value, setMinConfidentialPrice)}
+                    onBlur={() => handleReaisBlur(minConfidentialPrice, setMinConfidentialPrice)}
+                    onFocus={() => handleReaisFocus(minConfidentialPrice, setMinConfidentialPrice)}
+                    placeholder="R$ 0,00 (confidencial)"
+                    className="w-full rounded-lg border border-logo-green/60 bg-logo-green/20 px-3 py-2.5 text-base sm:text-[15px] font-bold text-slate-900"
+                  />
+                  <span className="mt-0.5 block text-xs text-slate-600">
+                    Confidencial — não aparece no anúncio
+                  </span>
+                </div>
+
+                <div className="md:pt-7">
+                  <div className="flex min-h-[46px] items-center rounded-xl border border-logo-green/60 bg-logo-green-50 px-3 py-2 text-[15px] font-semibold leading-snug text-logo-purple-950">
+                    Proposta igual ou maior que esse valor será enviada no seu WhatsApp.
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* 5. Fotografias & Informações */}
