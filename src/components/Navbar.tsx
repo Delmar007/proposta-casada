@@ -219,7 +219,7 @@ export function Navbar() {
             ) : isAuthenticated && pathname?.startsWith('/anunciar') && !firstListingDone ? (
               <span className="tutorial-text-shine">
                 {anunciarModelSelected
-                  ? 'Adicione o km/horas.'
+                  ? 'Adicione o KM/HORAS, Valor Pedido (R$), Valor mínimo aceito, Importe as fotos, Marque os Acessórios e para finalizar, Publicar Anúncio.'
                   : 'Escolha: Categoria (carro), Subcategoria (sedã), Tipo de Negócio (aceito carro de menor valor). Selecione: Marca e Versão.'}
               </span>
             ) : null}
