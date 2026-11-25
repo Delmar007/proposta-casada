@@ -381,11 +381,11 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
           ))}
 
           <div className="col-span-2 flex min-h-0 min-w-0 flex-col justify-start overflow-hidden rounded-md border border-slate-200 bg-slate-50 px-3 py-2 md:px-2 md:py-1">
-            <span className="shrink-0 text-[14px] font-bold uppercase leading-none tracking-wider text-slate-500 md:text-[11px]">
-              Informações do veículo
+            <span className="shrink-0 text-[14px] font-bold uppercase leading-none tracking-wider text-logo-purple md:text-[11px]">
+              Aceito:
             </span>
-            <p className="mt-0.5 min-h-0 flex-1 overflow-y-auto pr-1 break-words text-[15px] font-medium leading-tight text-slate-700 md:text-[13px]">
-              {(vehicle.description || '4 pneus novos, lataria com polimento cristalizado.').slice(0, 200)}
+            <p className="mt-0.5 min-h-0 flex-1 overflow-y-auto pr-1 break-words text-[15px] font-semibold leading-tight text-slate-800 md:text-[13px]">
+              {vehicle.desiredTradeIn || formatDealTypesLabel(vehicle.dealTypes)}
             </p>
           </div>
         </div>

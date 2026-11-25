@@ -333,6 +333,7 @@ export class MarketplaceStore {
       listingType: v.listingType,
       category: v.category,
       dealTypes: v.dealTypes,
+      desiredTradeIn: v.desiredTradeIn,
       brand: v.brand,
       brandLogoUrl: v.brandLogoUrl,
       model: v.model,
@@ -382,6 +383,7 @@ export class MarketplaceStore {
     listingType: 'vehicle' | 'property';
     category: string;
     dealTypes: PublicVehicle['dealTypes'];
+    desiredTradeIn?: string;
     brand: string;
     model: string;
     version: string;
@@ -424,6 +426,7 @@ export class MarketplaceStore {
       listingType: input.listingType,
       category: input.category,
       dealTypes: input.dealTypes && input.dealTypes.length > 0 ? input.dealTypes : ['no_dinheiro'],
+      desiredTradeIn: input.desiredTradeIn,
       brand: input.brand,
       model: input.model,
       version: input.version,

@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
       listingType,
       category: String(body.category || (listingType === 'property' ? 'Residências' : 'Carros')),
       dealTypes: Array.isArray(body.dealTypes) ? body.dealTypes : ['no_dinheiro'],
+      desiredTradeIn: body.desiredTradeIn ? String(body.desiredTradeIn) : undefined,
       brand: String(body.brand || (listingType === 'property' ? body.propertyType || 'Imóvel' : '')),
       model: String(body.model || ''),
       version: String(body.version || ''),

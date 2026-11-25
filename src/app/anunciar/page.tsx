@@ -171,6 +171,19 @@ export default function AnunciarPage() {
     referenceMonth?: string;
   } | null>(null);
 
+  // Veículo desejado para a troca (API FIPE)
+  const [desiredBrands, setDesiredBrands] = useState<FipeBrandOption[]>([]);
+  const [desiredBrandCode, setDesiredBrandCode] = useState('');
+  const [desiredBrandName, setDesiredBrandName] = useState('');
+  const [desiredModels, setDesiredModels] = useState<FipeModelOption[]>([]);
+  const [desiredModelCode, setDesiredModelCode] = useState('');
+  const [desiredModelName, setDesiredModelName] = useState('');
+  const [desiredYears, setDesiredYears] = useState<number[]>([]);
+  const [desiredYearStart, setDesiredYearStart] = useState('');
+  const [desiredYearEnd, setDesiredYearEnd] = useState('');
+  const [loadingDesiredModels, setLoadingDesiredModels] = useState(false);
+  const [loadingDesiredYears, setLoadingDesiredYears] = useState(false);
+
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
   const [version, setVersion] = useState('');
@@ -235,6 +248,94 @@ export default function AnunciarPage() {
       .then((d) => setFipeBrands(d.brands ?? []))
       .catch(() => {});
   }, [fipeVehicleType]);
+
+  useEffect(() => {
+    fetch('/api/fipe?vehicleType=cars')
+      .then((r) => r.json())
+      .then((d) => setDesiredBrands(d.brands ?? []))
+      .catch(() => {});
+  }, []);
+
+  const handleDesiredBrandChange = async (brandCode: string) => {
+    setDesiredBrandCode(brandCode);
+    setDesiredModelCode('');
+    setDesiredModelName('');
+    setDesiredModels([]);
+    setDesiredYears([]);
+    setDesiredYearStart('');
+    setDesiredYearEnd('');
+    if (!brandCode) {
+      setDesiredBrandName('');
+      return;
+    }
+    const foundBrand = desiredBrands.find((b) => b.code === brandCode);
+    const cleanName = (foundBrand?.name ?? '').trim();
+    setDesiredBrandName(cleanName);
+    setLoadingDesiredModels(true);
+    try {
+      const res = await fetch(
+        `/api/fipe?vehicleType=cars&brand=${encodeURIComponent(cleanName)}&brandCode=${encodeURIComponent(brandCode)}`
+      );
+      const data = await res.json();
+      setDesiredModels(data.models ?? []);
+    } finally {
+      setLoadingDesiredModels(false);
+    }
+  };
+
+  const handleDesiredModelChange = async (modelCode: string) => {
+    setDesiredModelCode(modelCode);
+    setDesiredYears([]);
+    setDesiredYearStart('');
+    setDesiredYearEnd('');
+    const found = desiredModels.find((m) => m.code === modelCode);
+    if (!found) {
+      setDesiredModelName('');
+      return;
+    }
+    setDesiredModelName(found.name);
+    setLoadingDesiredYears(true);
+    try {
+      const res = await fetch(
+        `/api/fipe?vehicleType=cars&brand=${encodeURIComponent(desiredBrandName)}&brandCode=${encodeURIComponent(desiredBrandCode)}&modelCode=${encodeURIComponent(modelCode)}`
+      );
+      const data = await res.json();
+      const yrs: number[] = Array.isArray(data.years)
+        ? data.years
+        : Array.isArray(data.yearOptions)
+          ? Array.from(new Set(data.yearOptions.map((y: FipeYearOption) => y.year)))
+          : [];
+      const sortedAsc = [...yrs].sort((a, b) => a - b);
+      setDesiredYears(sortedAsc);
+      if (sortedAsc.length > 0) {
+        setDesiredYearStart(String(sortedAsc[0]));
+        setDesiredYearEnd(String(sortedAsc[sortedAsc.length - 1]));
+      }
+    } finally {
+      setLoadingDesiredYears(false);
+    }
+  };
+
+  const showDesiredTradeInBox =
+    !(PROPERTY_CATEGORIES as readonly string[]).includes(category) &&
+    dealTypes.some(
+      (d) => d === 'menor_valor' || d === 'maior_valor' || d === 'troca_na_orelha'
+    );
+
+  const desiredTradeInSummary = (() => {
+    if (!desiredBrandName) return '';
+    const base = desiredModelName
+      ? `${desiredBrandName}, ${desiredModelName}`
+      : desiredBrandName;
+    if (desiredYearStart && desiredYearEnd) {
+      return desiredYearStart === desiredYearEnd
+        ? `${base} (${desiredYearStart})`
+        : `${base} de ${desiredYearStart} a ${desiredYearEnd}`;
+    }
+    if (desiredYearStart) return `${base} a partir de ${desiredYearStart}`;
+    if (desiredYearEnd) return `${base} até ${desiredYearEnd}`;
+    return base;
+  })();
 
   const handleFipeBrandChange = async (brandCode: string) => {
     setSelectedFipeBrandCode(brandCode);
@@ -435,6 +536,10 @@ export default function AnunciarPage() {
             listingType: 'vehicle',
             category,
             dealTypes,
+            desiredTradeIn:
+              showDesiredTradeInBox && desiredTradeInSummary
+                ? desiredTradeInSummary
+                : undefined,
             brand,
             model,
             version,
@@ -648,6 +753,114 @@ export default function AnunciarPage() {
                 );
               })}
             </div>
+
+            {/* Caixa condicional: Veículo que quero para a troca (API FIPE) — oculta quando for só No dinheiro */}
+            {showDesiredTradeInBox && (
+              <div className="mt-3 space-y-3 rounded-2xl border border-logo-green-hover bg-logo-green/20 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5 text-sm font-extrabold uppercase tracking-wider text-logo-purple sm:text-[15px]">
+                    <Sparkles className="h-4 w-4 text-logo-purple" />
+                    Veículo que quero para a troca:
+                  </span>
+                  {desiredTradeInSummary && (
+                    <span className="rounded-full bg-logo-purple px-3 py-1 text-xs font-bold text-white">
+                      Aceito: {desiredTradeInSummary}
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <div>
+                    <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
+                      Marca (FIPE)
+                    </label>
+                    <select
+                      value={desiredBrandCode}
+                      onChange={(e) => handleDesiredBrandChange(e.target.value)}
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base font-semibold text-slate-900 sm:text-[15px]"
+                    >
+                      <option value="">Selecione a marca...</option>
+                      {desiredBrands.map((b) => (
+                        <option key={b.code} value={b.code}>
+                          {b.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
+                      Versão (FIPE)
+                    </label>
+                    <select
+                      value={desiredModelCode}
+                      onChange={(e) => handleDesiredModelChange(e.target.value)}
+                      disabled={!desiredBrandCode || loadingDesiredModels}
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base font-semibold text-slate-900 sm:text-[15px] disabled:opacity-50"
+                    >
+                      <option value="">
+                        {loadingDesiredModels
+                          ? 'Consultando FIPE...'
+                          : 'Selecione a versão...'}
+                      </option>
+                      {desiredModels.map((m) => (
+                        <option key={m.code} value={m.code}>
+                          {m.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
+                      Ano início {loadingDesiredYears ? '(...)' : ''}
+                    </label>
+                    <select
+                      value={desiredYearStart}
+                      onChange={(e) => {
+                        setDesiredYearStart(e.target.value);
+                        if (
+                          desiredYearEnd &&
+                          Number(e.target.value) > Number(desiredYearEnd)
+                        ) {
+                          setDesiredYearEnd(e.target.value);
+                        }
+                      }}
+                      disabled={!desiredModelCode || loadingDesiredYears}
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base font-semibold text-slate-900 sm:text-[15px] disabled:opacity-50"
+                    >
+                      <option value="">Ano início...</option>
+                      {desiredYears.map((y) => (
+                        <option key={`start-${y}`} value={String(y)}>
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-[15px] font-semibold text-slate-800">
+                      Ano fim {loadingDesiredYears ? '(...)' : ''}
+                    </label>
+                    <select
+                      value={desiredYearEnd}
+                      onChange={(e) => setDesiredYearEnd(e.target.value)}
+                      disabled={!desiredModelCode || loadingDesiredYears}
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base font-semibold text-slate-900 sm:text-[15px] disabled:opacity-50"
+                    >
+                      <option value="">Ano fim...</option>
+                      {desiredYears
+                        .filter((y) => !desiredYearStart || y >= Number(desiredYearStart))
+                        .map((y) => (
+                          <option key={`end-${y}`} value={String(y)}>
+                            {y}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 3. Dados Específicos (Veículo Móvel vs Imóvel) */}

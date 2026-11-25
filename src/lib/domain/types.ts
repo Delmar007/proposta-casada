@@ -30,6 +30,7 @@ export interface PublicVehicle {
   listingType?: 'vehicle' | 'property';
   category?: string;
   dealTypes?: DealTypeOption[];
+  desiredTradeIn?: string;
   brand: string;
   brandLogoUrl?: string;
   model: string;
