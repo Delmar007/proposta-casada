@@ -388,7 +388,9 @@ export default function PerfilPage() {
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(formatWhatsapp(e.target.value))}
                   placeholder="(00) 90000-0000"
-                  className="w-full rounded-lg border border-logo-green/70 bg-white px-3 py-2.5 text-base font-semibold text-slate-900 sm:text-[15px]"
+                  className={`w-full rounded-lg border border-logo-green/70 px-3 py-2.5 text-base font-semibold text-slate-900 sm:text-[15px] transition ${
+                    !cnhImageDataUrl ? 'bg-logo-green/20' : 'bg-white'
+                  }`}
                 />
               </div>
             </div>
