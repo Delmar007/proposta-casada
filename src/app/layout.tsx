@@ -4,9 +4,9 @@ import { ActiveUserProvider } from '@/components/ActiveUserProvider';
 import { Navbar } from '@/components/Navbar';
 
 export const metadata: Metadata = {
-  title: 'AutoSeguro | Marketplace Automotivo com Negociação Protegida e Permuta',
+  title: 'Proposta Casada | Negociação Protegida, Venda e Permuta de Veículos e Imóveis',
   description:
-    'Marketplace automotivo com propostas em dinheiro, permuta de veículos, chat intermediado por moderação e encontro seguro.',
+    'Proposta Casada — Marketplace com propostas em dinheiro, permuta de veículos e imóveis, chat intermediado por moderação e encontro seguro.',
 };
 
 export default function RootLayout({
