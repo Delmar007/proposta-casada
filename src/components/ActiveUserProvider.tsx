@@ -54,6 +54,9 @@ interface ActiveUserContextValue {
   setActiveUf: (uf: string | null) => void;
   activeCity: string | null;
   setActiveCity: (city: string | null) => void;
+  feedViewMode: 'horizontal' | 'vertical';
+  setFeedViewMode: (mode: 'horizontal' | 'vertical') => void;
+  toggleFeedViewMode: () => void;
   clearAllFilters: () => void;
 }
 
@@ -75,7 +78,17 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
   const [activeDealType, setActiveDealType] = useState<DealTypeOption | null>(null);
   const [activeUf, setActiveUfState] = useState<string | null>(null);
   const [activeCity, setActiveCityState] = useState<string | null>(null);
+  const [feedViewMode, setFeedViewModeState] = useState<'horizontal' | 'vertical'>('horizontal');
   const [notifications, setNotifications] = useState<NegotiationNotification[]>([]);
+
+  const setFeedViewMode = (mode: 'horizontal' | 'vertical') => {
+    setFeedViewModeState(mode);
+    window.localStorage.setItem('mp_feed_view_mode', mode);
+  };
+
+  const toggleFeedViewMode = () => {
+    setFeedViewMode(feedViewMode === 'horizontal' ? 'vertical' : 'horizontal');
+  };
 
   const setActiveUf = (uf: string | null) => {
     setActiveUfState(uf);
@@ -115,6 +128,10 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
     const savedCity = window.localStorage.getItem('mp_active_city');
     if (savedCity) {
       setActiveCityState(savedCity);
+    }
+    const savedViewMode = window.localStorage.getItem('mp_feed_view_mode');
+    if (savedViewMode === 'vertical' || savedViewMode === 'horizontal') {
+      setFeedViewModeState(savedViewMode);
     }
     const savedAuth = window.localStorage.getItem('mp_is_authenticated');
     if (savedAuth === 'true') {
@@ -309,6 +326,9 @@ export function ActiveUserProvider({ children }: { children: React.ReactNode }) 
         setActiveUf,
         activeCity,
         setActiveCity,
+        feedViewMode,
+        setFeedViewMode,
+        toggleFeedViewMode,
         clearAllFilters,
       }}
     >

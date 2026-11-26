@@ -26,6 +26,7 @@ export default function MarketplaceHomePage() {
     activeDealType,
     activeUf,
     activeCity,
+    feedViewMode,
     clearAllFilters,
   } = useActiveUser();
 
@@ -350,9 +351,15 @@ export default function MarketplaceHomePage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-5">
+          <div
+            className={
+              feedViewMode === 'vertical'
+                ? 'grid grid-cols-1 gap-4 md:grid-cols-3'
+                : 'space-y-5'
+            }
+          >
             {filteredVehicles.map((v) => (
-              <VehicleFeedBox key={v.id} vehicle={v} />
+              <VehicleFeedBox key={v.id} vehicle={v} viewMode={feedViewMode} />
             ))}
           </div>
         )}

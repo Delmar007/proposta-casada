@@ -22,6 +22,7 @@ import { useActiveUser } from './ActiveUserProvider';
 
 interface VehicleFeedBoxProps {
   vehicle: PublicVehicle;
+  viewMode?: 'horizontal' | 'vertical';
 }
 
 const DEFAULT_EXTRA_GALLERY = [
@@ -80,7 +81,7 @@ function formatDealTypesLabel(dealTypes?: PublicVehicle['dealTypes']): string {
   return dealTypes.map((d) => DEAL_TYPE_LABELS[d] ?? d).join(' • ');
 }
 
-export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
+export function VehicleFeedBox({ vehicle, viewMode = 'horizontal' }: VehicleFeedBoxProps) {
   const router = useRouter();
   const { userId, isAuthenticated, openAuthModal, isFavorite, toggleFavorite } = useActiveUser();
 
@@ -228,6 +229,219 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
 
   return (
     <>
+    {viewMode === 'vertical' ? (
+      <article className="mx-auto flex aspect-[9/16] w-full max-w-[380px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:shadow-md md:max-w-none">
+        {/* ESPAÇO 1 (TOPO): Foto horizontal com setas para empurrar foto (sem menu lateral) */}
+        <div className="relative h-[34%] w-full shrink-0 overflow-hidden bg-uva-900">
+          <img
+            src={galleryImages[activeImageIdx] ?? vehicle.imageUrl}
+            alt={`${vehicle.brand} ${specs.model} - Foto ${activeImageIdx + 1}`}
+            onClick={() => setShowGalleryModal(true)}
+            className="h-full w-full cursor-zoom-in object-cover object-center transition-all duration-300"
+          />
+
+          <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5">
+            <BrandLogo brand={vehicle.brand} size={26} className="shadow-md" />
+            {isLocked && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-uva-700 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
+                <Lock className="h-2.5 w-2.5" />
+                Acordo
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => toggleFavorite(vehicle.id)}
+            className="absolute top-2 right-2 z-10 flex items-center justify-center p-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] transition hover:scale-110"
+            title={fav ? 'Remover dos favoritos' : 'Salvar nos favoritos'}
+            aria-label={fav ? 'Remover dos favoritos' : 'Salvar nos favoritos'}
+          >
+            <Heart
+              className={`h-5 w-5 transition ${
+                fav ? 'fill-red-600 text-red-600' : 'text-white hover:text-red-500'
+              }`}
+            />
+          </button>
+
+          {/* Setas esquerda/direita para empurrar as fotos */}
+          {galleryImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveImageIdx(
+                    (activeImageIdx - 1 + galleryImages.length) % galleryImages.length
+                  );
+                }}
+                className="absolute left-1.5 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white shadow-md backdrop-blur-xs transition hover:bg-logo-purple"
+                aria-label="Foto anterior"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveImageIdx((activeImageIdx + 1) % galleryImages.length);
+                }}
+                className="absolute right-1.5 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white shadow-md backdrop-blur-xs transition hover:bg-logo-purple"
+                aria-label="Próxima foto"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </>
+          )}
+
+          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-1.5">
+            <span className="inline-flex items-center gap-1 rounded-md bg-black/55 px-2 py-0.5 text-[11px] font-bold text-white backdrop-blur-xs">
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span className="truncate">
+                {vehicle.city}/{vehicle.state}
+              </span>
+            </span>
+
+            <div className="flex items-center gap-1.5">
+              <span className="rounded-md bg-black/55 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                {activeImageIdx + 1}/{galleryImages.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowGalleryModal(true)}
+                className="flex items-center justify-center rounded-md bg-black/55 p-1 text-white transition hover:bg-logo-purple"
+                title="Ampliar imagens"
+                aria-label="Ampliar imagens"
+              >
+                <ZoomIn className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ESPAÇO 2 (MEIO): Dados resumidos em 2 colunas + Tipo de negócio */}
+        <div className="flex min-h-0 flex-1 flex-col justify-between gap-1.5 border-b border-slate-100 p-2.5">
+          <div className="grid grid-cols-2 gap-1.5">
+            {[
+              { label: 'Marca', value: vehicle.brand },
+              { label: 'Modelo', value: specs.model },
+              { label: 'Versão', value: specs.version },
+              { label: 'Motor', value: specs.motor },
+              { label: 'KM', value: `${vehicle.mileage.toLocaleString('pt-BR')} km` },
+              { label: 'Ano', value: String(vehicle.manufactureYear) },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="flex min-w-0 flex-col justify-center rounded-md border border-slate-200 bg-slate-50 px-2 py-1"
+              >
+                <span className="text-[10px] font-bold uppercase leading-none tracking-wider text-slate-500">
+                  {item.label}
+                </span>
+                <strong className="mt-0.5 truncate text-[12px] font-extrabold leading-tight text-slate-900">
+                  {item.value}
+                </strong>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-1.5 rounded-md border border-logo-purple/20 bg-uva-50 px-2 py-1">
+            <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-wider text-logo-purple">
+              Tipo de negócio:
+            </span>
+            <span className="truncate text-[11px] font-bold text-slate-800">
+              {vehicle.desiredTradeIn || formatDealTypesLabel(vehicle.dealTypes)}
+            </span>
+          </div>
+        </div>
+
+        {/* ESPAÇO 3 (PARTE DE BAIXO): Preço FIPE + Grade 2x3 de Propostas + Valor + Salvar/Permuta */}
+        <div className="flex shrink-0 flex-col gap-1.5 bg-slate-50/70 p-2.5">
+          <button
+            type="button"
+            onClick={() => router.push(`/vehicles/${vehicle.id}`)}
+            className="grid h-8 w-full shrink-0 grid-cols-2 items-center overflow-hidden rounded-xl bg-logo-green text-logo-purple shadow-xs transition hover:bg-logo-green-hover"
+          >
+            <span className="flex h-full items-center justify-center border-r border-logo-purple/25 px-1.5 text-[11px] font-extrabold uppercase tracking-wider text-logo-purple">
+              PREÇO FIPE
+            </span>
+            <span className="flex h-full items-center justify-center px-1.5 text-[13px] font-black tracking-tight text-logo-purple">
+              {formatBRL(vehicle.fipePrice)}
+            </span>
+          </button>
+
+          {isLocked ? (
+            <div className="rounded-xl border border-uva-200 bg-uva-50 p-2 text-center text-[11px] font-bold text-uva-900">
+              Veículo com Acordo Confirmado
+            </div>
+          ) : (
+            <>
+              {/* Grade 2 colunas x 3 linhas (6 caixinhas de proposta em verde 20%) */}
+              <div className="grid grid-cols-2 grid-rows-3 gap-1 rounded-xl border border-slate-200 bg-white p-1.5">
+                {Array.from({ length: 6 }, (_, idx) => {
+                  const item = proposals[idx];
+                  const isWinner = idx === 0 && Boolean(item);
+                  return (
+                    <div
+                      key={idx}
+                      className={`flex h-7 items-center justify-center rounded-md border px-1 text-center text-[11px] font-bold transition ${
+                        isWinner
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-800 shadow-2xs'
+                          : item
+                          ? 'border-logo-green/60 bg-logo-green/20 text-slate-900'
+                          : 'border-dashed border-logo-green/50 bg-logo-green/20 text-logo-purple/40'
+                      }`}
+                    >
+                      {item ? formatBRL(item.amount) : ''}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {feedback && (
+                <p className="truncate text-[10px] font-semibold text-red-600">{feedback}</p>
+              )}
+
+              <form onSubmit={handleSaveProposal} className="space-y-1.5">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  required
+                  value={proposalAmount}
+                  onChange={handleProposalInputChange}
+                  onBlur={handleProposalInputBlur}
+                  onFocus={handleProposalInputFocus}
+                  placeholder="Valor da proposta R$"
+                  aria-label="Valor da proposta R$"
+                  className="h-9 w-full rounded-xl border border-slate-300 bg-white px-2.5 text-[14px] font-bold text-slate-900 placeholder:text-[12px] placeholder:font-medium placeholder:text-slate-400 focus:border-uva-700 focus:outline-none"
+                />
+
+                <div className="grid h-9 w-full grid-cols-2 overflow-hidden rounded-xl border border-logo-green-hover shadow-xs">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex items-center justify-center bg-logo-green px-1.5 text-center text-[12px] font-extrabold text-logo-purple-950 transition hover:bg-logo-green-hover disabled:opacity-50"
+                  >
+                    {submitting ? 'Salvando...' : 'Salvar proposta'}
+                  </button>
+                  <Link
+                    href={`/vehicles/${vehicle.id}?modality=trade_in_plus_cash`}
+                    onClick={(e) => {
+                      if (!isAuthenticated) {
+                        e.preventDefault();
+                        openAuthModal();
+                      }
+                    }}
+                    className="flex items-center justify-center border-l border-logo-green-hover/40 bg-white px-1.5 text-center text-[12px] font-bold text-logo-purple transition hover:bg-logo-purple-50"
+                  >
+                    Propor permuta
+                  </Link>
+                </div>
+              </form>
+            </>
+          )}
+        </div>
+      </article>
+    ) : (
     <article
       className="mx-auto flex w-full max-w-[440px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition hover:shadow-md md:h-[250px] md:max-w-[1024px] md:flex-row"
     >
@@ -501,6 +715,7 @@ export function VehicleFeedBox({ vehicle }: VehicleFeedBoxProps) {
         )}
       </div>
     </article>
+    )}
 
     {/* MODAL AMPLIADO DE IMAGENS — 1024 px, carrossel grande à direita, sem texto sobre as fotos, com botão Voltar */}
     {showGalleryModal && (
