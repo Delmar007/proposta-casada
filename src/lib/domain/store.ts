@@ -138,6 +138,7 @@ function createSeedState(): MarketplaceState {
         'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1000&q=80',
       ],
       status: 'active',
+      moderationStatus: 'approved',
       createdAt: now,
     },
     'veh-2': {
@@ -172,6 +173,7 @@ function createSeedState(): MarketplaceState {
         'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1000&q=80',
       ],
       status: 'active',
+      moderationStatus: 'approved',
       createdAt: now,
     },
     'veh-3': {
@@ -206,6 +208,7 @@ function createSeedState(): MarketplaceState {
         'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1000&q=80',
       ],
       status: 'active',
+      moderationStatus: 'approved',
       createdAt: now,
     },
   };
@@ -362,15 +365,53 @@ export class MarketplaceStore {
       condoFee: v.condoFee,
       iptu: v.iptu,
       status: v.status,
+      moderationStatus: v.moderationStatus ?? 'approved',
       createdAt: v.createdAt,
     };
   }
 
   public getPublicVehicles(): PublicVehicle[] {
     return Object.values(this.state.vehicles)
+      .filter((v) => (v.moderationStatus ?? 'approved') === 'approved')
       .reverse()
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .map((v) => this.toPublicVehicle(v));
+  }
+
+  public getAdminVehicles(): VehicleRecord[] {
+    const orderRank = (s?: VehicleRecord['moderationStatus']) =>
+      s === 'pending' ? 0 : s === 'paused' ? 1 : 2;
+    return Object.values(this.state.vehicles)
+      .map((v) => ({ ...v, moderationStatus: v.moderationStatus ?? 'approved' }))
+      .sort((a, b) => {
+        const rankDiff = orderRank(a.moderationStatus) - orderRank(b.moderationStatus);
+        if (rankDiff !== 0) return rankDiff;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+  }
+
+  public moderateVehicleListing(
+    vehicleId: string,
+    action: 'approve' | 'pause' | 'delete'
+  ): { deleted?: boolean; vehicle?: VehicleRecord } {
+    const existing = this.state.vehicles[vehicleId];
+    if (!existing) {
+      throw new Error('Anúncio não encontrado.');
+    }
+    if (action === 'delete') {
+      delete this.state.vehicles[vehicleId];
+      this.saveState();
+      return { deleted: true };
+    }
+    if (action === 'approve') {
+      existing.moderationStatus = 'approved';
+      if (existing.status === 'inactive') existing.status = 'active';
+    } else if (action === 'pause') {
+      existing.moderationStatus = 'paused';
+      existing.status = 'inactive';
+    }
+    this.saveState();
+    return { vehicle: existing };
   }
 
   public getPublicVehicleById(vehicleId: string): PublicVehicle | null {
@@ -455,6 +496,7 @@ export class MarketplaceStore {
       condoFee: input.condoFee,
       iptu: input.iptu,
       status: 'active',
+      moderationStatus: 'pending',
       createdAt: now,
     };
 
@@ -1193,6 +1235,53 @@ export class MarketplaceStore {
     return this.state.notifications
       .filter((n) => n.userId === userId)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  public getAdminProposals() {
+    return Object.values(this.state.negotiations)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      .map((neg) => {
+        const vehicle = this.state.vehicles[neg.vehicleId] ?? null;
+        const seller = this.state.profiles[neg.sellerId];
+        const buyer = this.state.profiles[neg.buyerId];
+        const offer =
+          Object.values(this.state.tradeInOffers).find((o) => o.negotiationId === neg.id) ?? null;
+        const tradeInVehicle =
+          Object.values(this.state.tradeInVehicles).find((t) => t.negotiationId === neg.id) ??
+          null;
+        const tradeInImages = tradeInVehicle
+          ? Object.values(this.state.tradeInImages)
+              .filter((i) => i.tradeInVehicleId === tradeInVehicle.id)
+              .sort((a, b) => a.displayOrder - b.displayOrder)
+              .map((i) => i.previewDataUrl)
+          : [];
+
+        return {
+          negotiation: neg,
+          vehicle,
+          seller: seller
+            ? {
+                id: seller.id,
+                fullName: seller.fullName,
+                whatsapp: seller.whatsapp,
+                phone: seller.phone,
+                email: seller.email,
+              }
+            : null,
+          buyer: buyer
+            ? {
+                id: buyer.id,
+                fullName: buyer.fullName,
+                whatsapp: buyer.whatsapp,
+                phone: buyer.phone,
+                email: buyer.email,
+              }
+            : null,
+          offer,
+          tradeInVehicle,
+          tradeInImages,
+        };
+      });
   }
 
   public getAdminDashboard(adminId: string) {

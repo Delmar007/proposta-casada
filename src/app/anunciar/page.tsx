@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, PlusCircle, Car, Building2, ShieldCheck, Check, Sparkles } from 'lucide-react';
+import { ArrowLeft, PlusCircle, Car, Building2, ShieldCheck, Check, Sparkles, Clock } from 'lucide-react';
 import { DealTypeOption } from '@/lib/domain/types';
 import type { FipeBrandOption, FipeModelOption, FipeYearOption } from '@/lib/fipe/fipe-service';
 import { useActiveUser } from '@/components/ActiveUserProvider';
@@ -139,6 +139,7 @@ export default function AnunciarPage() {
   const [photos, setPhotos] = useState<UploadedPhotoItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [submittedPending, setSubmittedPending] = useState(false);
 
   // Campos comuns
   const [city, setCity] = useState('');
@@ -580,7 +581,9 @@ export default function AnunciarPage() {
 
       window.localStorage.setItem('mp_first_listing_done', 'true');
       window.dispatchEvent(new Event('mp-profile-updated'));
-      router.push(`/vehicles/${json.vehicle.id}`);
+      setSubmitting(false);
+      setSubmittedPending(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       setError('Erro de conexão ao salvar anúncio.');
       setSubmitting(false);
@@ -595,6 +598,40 @@ export default function AnunciarPage() {
       >
         <></>
       </AuthGate>
+    );
+  }
+
+  if (submittedPending) {
+    return (
+      <div className="mx-auto w-full max-w-[720px] space-y-6 py-6">
+        <div className="rounded-2xl border border-emerald-200 bg-white p-8 text-center shadow-xs">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+            <Clock className="h-7 w-7" />
+          </div>
+          <h1 className="mt-4 text-2xl font-extrabold text-slate-900">
+            Anúncio enviado para aprovação!
+          </h1>
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
+            Seu anúncio foi recebido e está na fila de conferência da moderação. Assim que as fotos
+            e os dados forem aprovados, ele será publicado automaticamente na página inicial.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center rounded-xl bg-uva-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-uva-800"
+            >
+              Voltar para a página inicial
+            </Link>
+            <button
+              type="button"
+              onClick={() => setSubmittedPending(false)}
+              className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+            >
+              Cadastrar outro anúncio
+            </button>
+          </div>
+        </div>
+      </div>
     );
   }
 

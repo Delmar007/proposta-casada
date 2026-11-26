@@ -62,6 +62,7 @@ export interface PublicVehicle {
   condoFee?: number;
   iptu?: number;
   status: 'active' | 'negotiation_locked' | 'sold' | 'inactive';
+  moderationStatus?: 'pending' | 'approved' | 'paused';
   createdAt: string;
 }
 
