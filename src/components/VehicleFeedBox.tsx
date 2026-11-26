@@ -326,7 +326,7 @@ export function VehicleFeedBox({ vehicle, viewMode = 'horizontal' }: VehicleFeed
               { label: 'Marca', value: vehicle.brand },
               { label: 'Modelo', value: specs.model },
               { label: 'Versão', value: specs.version },
-              { label: 'Motor', value: specs.motor },
+              { label: 'Motor', value: specs.displacement },
               { label: 'KM', value: `${vehicle.mileage.toLocaleString('pt-BR')} km` },
               { label: 'Ano', value: String(vehicle.manufactureYear) },
             ].map((item) => (

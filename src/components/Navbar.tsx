@@ -665,7 +665,6 @@ export function Navbar() {
               aria-label="Sair"
             >
               <LogOut className="h-[19px] w-[19px]" />
-              <span className="hidden sm:inline">Sair</span>
             </button>
           )}
         </div>
