@@ -216,6 +216,18 @@ export default function VehicleDetailPage() {
   const totalTradeInOffer =
     (Number(declaredValue) || 0) + (Number(cashComplement) || 0);
 
+  useEffect(() => {
+    const selected = Boolean(
+      (selectedFipeBrandCode && selectedFipeModelCode) || (brand.trim() && model.trim())
+    );
+    window.sessionStorage.setItem('mp_permuta_model_selected', selected ? 'true' : 'false');
+    window.dispatchEvent(new Event('mp-profile-updated'));
+    return () => {
+      window.sessionStorage.removeItem('mp_permuta_model_selected');
+      window.dispatchEvent(new Event('mp-profile-updated'));
+    };
+  }, [selectedFipeBrandCode, selectedFipeModelCode, brand, model]);
+
   const formatBRL = (v: number) =>
     v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 

@@ -90,6 +90,7 @@ export function Navbar() {
   const [justApproved, setJustApproved] = useState(false);
   const [firstListingDone, setFirstListingDone] = useState(false);
   const [anunciarModelSelected, setAnunciarModelSelected] = useState(false);
+  const [permutaModelSelected, setPermutaModelSelected] = useState(false);
 
   useEffect(() => {
     const syncProfileStatus = () => {
@@ -100,6 +101,9 @@ export function Navbar() {
       setFirstListingDone(window.localStorage.getItem('mp_first_listing_done') === 'true');
       setAnunciarModelSelected(
         window.sessionStorage.getItem('mp_anunciar_model_selected') === 'true'
+      );
+      setPermutaModelSelected(
+        window.sessionStorage.getItem('mp_permuta_model_selected') === 'true'
       );
     };
     syncProfileStatus();
@@ -225,6 +229,12 @@ export function Navbar() {
                 {anunciarModelSelected
                   ? 'Adicione o KM/HORAS, Valor Pedido (R$), Valor mínimo aceito, Importe as fotos, Marque os Acessórios e para finalizar, Publicar Anúncio.'
                   : 'Escolha: Categoria (carro), Subcategoria (sedã), Tipo de Negócio (aceito carro de menor valor). Selecione: Marca e Versão.'}
+              </span>
+            ) : pathname?.startsWith('/vehicles/') ? (
+              <span className="tutorial-text-shine">
+                {permutaModelSelected
+                  ? 'Em seguida KM, nº de proprietários, Valor ofertado na diferença, Adicione as fotos, dê nota para o seu carro e Envie para a análise.'
+                  : 'Escolha a Marca e a Versão.'}
               </span>
             ) : null}
           </div>
