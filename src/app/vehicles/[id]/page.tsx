@@ -213,8 +213,23 @@ export default function VehicleDetailPage() {
     }
   };
 
+  const parseCurrencyBRL = (raw: string): number => {
+    const digits = raw.replace(/\D/g, '');
+    if (!digits) return 0;
+    return Number(digits) / 100;
+  };
+
+  const formatCurrencyInput = (raw: string): string => {
+    const digits = raw.replace(/\D/g, '');
+    if (!digits) return '';
+    return (Number(digits) / 100).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    });
+  };
+
   const totalTradeInOffer =
-    (Number(declaredValue) || 0) + (Number(cashComplement) || 0);
+    (Number(declaredValue) || 0) + parseCurrencyBRL(cashComplement);
 
   useEffect(() => {
     const selected = Boolean(
@@ -267,7 +282,7 @@ export default function VehicleDetailPage() {
                 state: stateUF || vehicle?.state || 'MS',
                 declaredValue: Number(declaredValue) || fipeReferencePrice || 1,
               },
-              cashComplement: Number(cashComplement),
+              cashComplement: parseCurrencyBRL(cashComplement),
               messageText: [
                 `Nº de proprietário: ${ownerCount} • Avaliação do veículo (0 a 10): Lata ${ratingLata}/10 • Motor ${ratingMotor}/10 • Interna ${ratingInterna}/10 • Pneus ${ratingPneus}/10`,
                 tradeInMessage.trim(),
@@ -745,12 +760,12 @@ export default function VehicleDetailPage() {
                         Valor ofertado na diferença
                       </label>
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
                         required
-                        min={0}
                         value={cashComplement}
-                        onChange={(e) => setCashComplement(e.target.value)}
-                        placeholder="Informe o valor em R$"
+                        onChange={(e) => setCashComplement(formatCurrencyInput(e.target.value))}
+                        placeholder="R$ 0,00"
                         className="h-[42px] w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold focus:border-uva-700 focus:outline-none"
                       />
                     </div>
