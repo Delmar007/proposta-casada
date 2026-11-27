@@ -655,7 +655,12 @@ export default function VehicleDetailPage() {
                           required
                           value={mileage}
                           onChange={(e) => setMileage(e.target.value)}
-                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                          className={`w-full rounded-lg border px-3 py-2 text-sm transition ${
+                            (selectedFipeBrandCode && selectedFipeModelCode) ||
+                            (brand.trim() && model.trim())
+                              ? 'border-logo-green bg-logo-green/20 font-semibold text-slate-900'
+                              : 'border-slate-200 bg-white'
+                          }`}
                         />
                       </div>
                       <div>
