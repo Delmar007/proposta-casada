@@ -253,7 +253,7 @@ export default function VehicleDetailPage() {
                 color: `Tração ${traction}`,
                 city: city || vehicle?.city || 'Não informada',
                 state: stateUF || vehicle?.state || 'MS',
-                declaredValue: Number(declaredValue),
+                declaredValue: Number(declaredValue) || fipeReferencePrice || 1,
               },
               cashComplement: Number(cashComplement),
               messageText: [
@@ -722,48 +722,20 @@ export default function VehicleDetailPage() {
                       </div>
                     </div>
 
-                    {/* Valores — Alinhados horizontalmente */}
-                    <div className="grid grid-cols-1 items-end gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
-                      <div>
-                        <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          Preço para negócio
-                        </label>
-                        <input
-                          type="number"
-                          required
-                          min={1}
-                          value={declaredValue}
-                          onChange={(e) => setDeclaredValue(e.target.value)}
-                          placeholder="Valor do veículo"
-                          className="h-[42px] w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          Complemento em dinheiro
-                        </label>
-                        <input
-                          type="number"
-                          required
-                          min={0}
-                          value={cashComplement}
-                          onChange={(e) => setCashComplement(e.target.value)}
-                          placeholder="Diferença em dinheiro"
-                          className="h-[42px] w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold"
-                        />
-                      </div>
-
-                      <div>
-                        <span className="mb-1 block text-xs font-semibold text-slate-700">
-                          Total do pagamento
-                        </span>
-                        <div className="flex h-[42px] w-full items-center rounded-lg bg-logo-purple px-3 text-white shadow-xs">
-                          <span className="text-sm font-bold">
-                            {formatBRL(totalTradeInOffer)}
-                          </span>
-                        </div>
-                      </div>
+                    {/* Valor ofertado na diferença */}
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <label className="mb-1 block text-xs font-semibold text-slate-700">
+                        Valor ofertado na diferença
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        min={0}
+                        value={cashComplement}
+                        onChange={(e) => setCashComplement(e.target.value)}
+                        placeholder="Informe o valor em R$"
+                        className="h-[42px] w-full rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold focus:border-uva-700 focus:outline-none"
+                      />
                     </div>
 
                     <TradeInPhotoUploader photos={photos} onChange={setPhotos} title="" hint="" />
