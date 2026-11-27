@@ -58,13 +58,28 @@ export default function NegotiationDetailPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Chat bottom composer
-  const [messageText, setMessageText] = useState('');
-  const [isCounteroffer, setIsCounteroffer] = useState(false);
-  const [counterTradeIn, setCounterTradeIn] = useState('');
-  const [counterCash, setCounterCash] = useState('');
+  // Chat bottom composer (Contraproposta em Reais para fechamento)
+  const [counterClosingValue, setCounterClosingValue] = useState('');
   const [sending, setSending] = useState(false);
   const [feedback, setFeedback] = useState('');
+
+  const parseReaisValue = (raw: string): number => {
+    const digits = raw.replace(/\D/g, '');
+    if (!digits) return 0;
+    return Number(digits) / 100;
+  };
+
+  const handleCounterValueChange = (raw: string) => {
+    const digits = raw.replace(/\D/g, '');
+    if (!digits) {
+      setCounterClosingValue('');
+      return;
+    }
+    const numeric = Number(digits) / 100;
+    setCounterClosingValue(
+      numeric.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    );
+  };
 
   // Seller separate evaluation
   const [evalTradeInValue, setEvalTradeInValue] = useState('');
@@ -129,11 +144,13 @@ export default function NegotiationDetailPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageText.trim()) return;
+    const closingAmount = parseReaisValue(counterClosingValue);
+    if (closingAmount <= 0) return;
     setSending(true);
     setFeedback('');
 
     try {
+      const formattedAmount = formatBRL(closingAmount);
       const res = await fetch(`/api/negotiations/${params.id}/messages`, {
         method: 'POST',
         headers: {
@@ -141,21 +158,17 @@ export default function NegotiationDetailPage() {
           'x-user-id': userId,
         },
         body: JSON.stringify({
-          messageText,
-          messageType: isCounteroffer ? 'counteroffer' : 'message',
-          proposedTradeInValue:
-            isCounteroffer && counterTradeIn ? Number(counterTradeIn) : undefined,
-          proposedCashComplement:
-            isCounteroffer && counterCash ? Number(counterCash) : undefined,
+          messageText: `Contraproposta para fechamento no valor de ${formattedAmount}.`,
+          messageType: 'counteroffer',
+          proposedCashComplement: closingAmount,
         }),
       });
       const json = await res.json();
       if (!res.ok) {
-        setFeedback(json.error ?? 'Erro ao enviar.');
+        setFeedback(json.error ?? 'Erro ao enviar contraproposta.');
       } else {
-        setMessageText('');
-        setIsCounteroffer(false);
-        setFeedback('Mensagem enviada com status AGUARDANDO MODERAÇÃO.');
+        setCounterClosingValue('');
+        setFeedback(`Contraproposta de ${formattedAmount} enviada com status AGUARDANDO MODERAÇÃO.`);
         await loadData();
         await refreshNotifications();
       }
@@ -424,73 +437,51 @@ export default function NegotiationDetailPage() {
               )}
             </div>
 
-            {/* ÁREA INFERIOR: Caixa de texto e botão Enviar para Moderação */}
+            {/* ÁREA INFERIOR: Contraproposta em Reais para fechamento */}
             <form
               onSubmit={handleSendMessage}
               className="border-t border-slate-200 bg-white p-5"
             >
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={isCounteroffer}
-                    onChange={(e) => setIsCounteroffer(e.target.checked)}
-                    className="rounded border-slate-300"
-                  />
-                  Enviar como Contraproposta com novos valores
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <label className="text-xs font-extrabold uppercase tracking-wide text-slate-800">
+                  Contraproposta — Valor para fechamento (R$)
                 </label>
-                <span className="text-[11px] text-slate-400">
-                  {messageText.length}/1000 caracteres
-                </span>
+                {offer?.totalOfferValue ? (
+                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">
+                    Proposta atual: {formatBRL(offer.totalOfferValue)}
+                  </span>
+                ) : null}
               </div>
 
-              {isCounteroffer && (
-                <div className="mb-3 grid gap-2 sm:grid-cols-2">
-                  <input
-                    type="number"
-                    placeholder="Novo valor veículo permuta (R$)"
-                    value={counterTradeIn}
-                    onChange={(e) => setCounterTradeIn(e.target.value)}
-                    className="rounded-lg border border-slate-200 px-3 py-2 text-xs"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Novo valor em dinheiro (R$)"
-                    value={counterCash}
-                    onChange={(e) => setCounterCash(e.target.value)}
-                    className="rounded-lg border border-slate-200 px-3 py-2 text-xs"
-                  />
-                </div>
-              )}
-
-              <textarea
-                rows={3}
-                maxLength={1000}
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                placeholder="Escreva sua mensagem ou contraproposta..."
-                className="w-full rounded-xl border border-slate-200 p-3 text-sm focus:border-uva-700 focus:outline-none"
-              />
-
-              {feedback && (
-                <p className="mt-2 text-xs font-semibold text-purple-700">{feedback}</p>
-              )}
-
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                <p className="max-w-lg text-[11px] leading-relaxed text-slate-500">
-                  Para sua segurança, todas as mensagens passam por nossa equipe de moderação.
-                  Seus dados pessoais não serão compartilhados com a outra parte durante a
-                  negociação.
-                </p>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  required
+                  value={counterClosingValue}
+                  onChange={(e) => handleCounterValueChange(e.target.value)}
+                  placeholder="R$ 0,00 (ex.: R$ 95.000,00)"
+                  className="h-12 flex-1 rounded-xl border border-slate-300 bg-slate-50 px-4 text-base font-extrabold text-slate-900 placeholder:font-normal placeholder:text-slate-400 focus:border-uva-700 focus:bg-white focus:outline-none"
+                />
                 <button
                   type="submit"
-                  disabled={sending || !messageText.trim()}
-                  className="inline-flex items-center gap-2 rounded-xl bg-uva-700 px-4 py-2 text-xs font-semibold text-white hover:bg-uva-600 disabled:opacity-50"
+                  disabled={sending || parseReaisValue(counterClosingValue) <= 0}
+                  className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-uva-700 px-5 text-xs font-extrabold text-white transition hover:bg-uva-600 disabled:opacity-50"
                 >
-                  <Send className="h-3.5 w-3.5" />
-                  Enviar para moderação
+                  <Send className="h-4 w-4" />
+                  Enviar contraproposta
                 </button>
               </div>
+
+              {feedback && (
+                <p className="mt-2.5 text-xs font-semibold text-purple-700">{feedback}</p>
+              )}
+
+              <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
+                Informe o valor em reais que você aceita para fechar o negócio. Para sua segurança,
+                a contraproposta passa por nossa moderação e seus dados pessoais permanecem
+                protegidos.
+              </p>
             </form>
           </div>
         </div>
