@@ -801,20 +801,6 @@ export default function VehicleDetailPage() {
                       </div>
                     </div>
 
-                    <div>
-                      <label className="mb-1 block text-xs font-semibold text-slate-700">
-                        Mensagem complementar da proposta (passa pela moderação antes do envio)
-                      </label>
-                      <textarea
-                        required
-                        rows={3}
-                        value={tradeInMessage}
-                        onChange={(e) => setTradeInMessage(e.target.value)}
-                        placeholder="Condições de pagamento ou observações da negociação (sem telefone, WhatsApp ou links)..."
-                        className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-uva-700 focus:outline-none"
-                      />
-                    </div>
-
                     <div className="flex items-start gap-2 rounded-xl border border-purple-200 bg-purple-50 p-3 text-xs text-purple-900">
                       <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                       <span>
