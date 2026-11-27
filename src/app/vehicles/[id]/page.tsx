@@ -263,7 +263,9 @@ export default function VehicleDetailPage() {
               modality: 'cash_only',
               vehicleId: params.id,
               cashAmount: Number(cashOnlyAmount),
-              messageText: cashOnlyMessage,
+              messageText:
+                cashOnlyMessage.trim() ||
+                `Proposta somente em dinheiro no valor de ${formatBRL(Number(cashOnlyAmount) || 0)}.`,
             }
           : {
               modality: 'trade_in_plus_cash',
@@ -531,19 +533,6 @@ export default function VehicleDetailPage() {
                         min={1}
                         value={cashOnlyAmount}
                         onChange={(e) => setCashOnlyAmount(e.target.value)}
-                        className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-uva-700 focus:outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-semibold text-slate-700">
-                        Mensagem explicando a proposta (enviada para moderação)
-                      </label>
-                      <textarea
-                        required
-                        rows={4}
-                        value={cashOnlyMessage}
-                        onChange={(e) => setCashOnlyMessage(e.target.value)}
-                        placeholder="Descreva sua proposta sem incluir telefone, WhatsApp, e-mail ou links..."
                         className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm focus:border-uva-700 focus:outline-none"
                       />
                     </div>
