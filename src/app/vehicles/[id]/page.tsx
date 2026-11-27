@@ -251,8 +251,8 @@ export default function VehicleDetailPage() {
                 fuel,
                 transmission,
                 color: `Tração ${traction}`,
-                city,
-                state: stateUF,
+                city: city || vehicle?.city || 'Não informada',
+                state: stateUF || vehicle?.state || 'MS',
                 declaredValue: Number(declaredValue),
               },
               cashComplement: Number(cashComplement),
@@ -370,20 +370,62 @@ export default function VehicleDetailPage() {
               <p className="text-xs leading-relaxed text-slate-600">{vehicle.description}</p>
             </div>
           </div>
+
+          {/* Caixa de cálculo FIPE: Anunciado - Troca = Diferença em dinheiro */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+            <div className="space-y-2.5 text-sm">
+              <div className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3.5 py-2.5">
+                <span className="text-xs font-semibold text-slate-600">
+                  Preço FIPE do carro anunciado
+                </span>
+                <span className="font-extrabold text-slate-900">
+                  {formatBRL(vehicle.fipePrice)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3.5 py-2.5">
+                <span className="text-xs font-semibold text-slate-600">
+                  Preço FIPE da troca
+                </span>
+                <span className="font-extrabold text-logo-purple">
+                  {fipeReferencePrice !== null ? formatBRL(fipeReferencePrice) : '—'}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-3">
+                <div>
+                  <span className="block text-xs font-extrabold text-emerald-900">
+                    Diferença em dinheiro
+                  </span>
+                  {fipeReferencePrice === null && (
+                    <span className="text-[11px] text-emerald-700/80">
+                      Selecione marca, modelo e ano da troca na FIPE
+                    </span>
+                  )}
+                  {fipeReferencePrice !== null && vehicle.fipePrice - fipeReferencePrice < 0 && (
+                    <span className="text-[11px] text-emerald-700/90">
+                      Veículo da troca acima da FIPE do anunciado
+                    </span>
+                  )}
+                </div>
+                <span className="text-base font-black text-emerald-800">
+                  {fipeReferencePrice !== null
+                    ? formatBRL(vehicle.fipePrice - fipeReferencePrice)
+                    : '—'}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Coluna Direita: Modalidades de Negociação */}
         <div className="lg:col-span-7">
           <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <div className="mb-6 flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+            <div className="mb-5 flex items-center justify-between gap-4 border-b border-slate-100 pb-3">
               <div>
                 <h2 className="text-lg font-bold text-slate-900">
                   Modalidades de Negociação
                 </h2>
-                <p className="text-xs text-slate-500">
-                  Escolha livremente entre proposta somente em dinheiro ou veículo na permuta +
-                  complemento.
-                </p>
               </div>
               <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-semibold text-purple-700">
                 <ShieldCheck className="h-3.5 w-3.5" />
@@ -408,17 +450,17 @@ export default function VehicleDetailPage() {
                   <button
                     type="button"
                     onClick={() => setModality('cash_only')}
-                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition ${
+                    className={`flex items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left transition ${
                       modality === 'cash_only'
                         ? 'border-uva-700 bg-uva-700 text-white'
                         : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50'
                     }`}
                   >
-                    <Banknote className="mt-0.5 h-5 w-5 shrink-0" />
-                    <div>
-                      <p className="text-sm font-bold">A) Somente em dinheiro</p>
+                    <Banknote className="mt-0.5 h-4 w-4 shrink-0" />
+                    <div className="leading-tight">
+                      <p className="text-xs font-bold">A) Somente em dinheiro</p>
                       <p
-                        className={`mt-0.5 text-xs ${
+                        className={`mt-0.5 text-[11px] ${
                           modality === 'cash_only' ? 'text-slate-300' : 'text-slate-500'
                         }`}
                       >
@@ -430,17 +472,17 @@ export default function VehicleDetailPage() {
                   <button
                     type="button"
                     onClick={() => setModality('trade_in_plus_cash')}
-                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition ${
+                    className={`flex items-start gap-2.5 rounded-xl border px-3 py-2.5 text-left transition ${
                       modality === 'trade_in_plus_cash'
                         ? 'border-uva-700 bg-uva-700 text-white'
                         : 'border-slate-200 bg-white text-slate-800 hover:bg-slate-50'
                     }`}
                   >
-                    <Repeat className="mt-0.5 h-5 w-5 shrink-0" />
-                    <div>
-                      <p className="text-sm font-bold">B) Veículo na permuta + dinheiro</p>
+                    <Repeat className="mt-0.5 h-4 w-4 shrink-0" />
+                    <div className="leading-tight">
+                      <p className="text-xs font-bold">B) Veículo na permuta + dinheiro</p>
                       <p
-                        className={`mt-0.5 text-xs ${
+                        className={`mt-0.5 text-[11px] ${
                           modality === 'trade_in_plus_cash' ? 'text-slate-300' : 'text-slate-500'
                         }`}
                       >
@@ -677,56 +719,6 @@ export default function VehicleDetailPage() {
                             </option>
                           ))}
                         </select>
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          UF
-                        </label>
-                        <select
-                          required
-                          value={stateUF}
-                          onChange={(e) => {
-                            const nextUf = e.target.value;
-                            setStateUF(nextUf);
-                            setCity('');
-                          }}
-                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
-                        >
-                          <option value="">Selecione a UF...</option>
-                          {BRAZIL_STATES.map((st) => (
-                            <option key={st.uf} value={st.uf}>
-                              {st.uf}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="mb-1 block text-xs font-semibold text-slate-700">
-                          Cidade
-                        </label>
-                        {stateUF && getCitiesByUF(stateUF).length > 0 ? (
-                          <select
-                            required
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-900"
-                          >
-                            <option value="">Selecione a cidade...</option>
-                            {getCitiesByUF(stateUF).map((c) => (
-                              <option key={c} value={c}>
-                                {c}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            required
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            placeholder="Selecione a UF ao lado..."
-                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                          />
-                        )}
                       </div>
                     </div>
 
