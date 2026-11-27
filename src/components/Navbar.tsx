@@ -495,7 +495,7 @@ export function Navbar() {
 
         {/* LADO DIREITO — Apenas palavras e ícones (sem caixas/bordas de botão) */}
         <div className="order-2 flex shrink-0 items-center gap-4 sm:order-4 sm:ml-4">
-          {/* 1. Engrenagem (Configurações / Central Admin) */}
+          {/* 1. Engrenagem (Acesso Administrativo — independente de perfil, somente senha) */}
           <div className="relative">
             <button
               type="button"
@@ -509,53 +509,11 @@ export function Navbar() {
                 setShowAdminPasswordModal(true);
               }}
               className="inline-flex items-center gap-1.5 py-1 text-sm font-semibold text-logo-purple transition hover:text-logo-purple-light sm:text-xs"
-              title="Acesso Administrativo"
-              aria-label="Configurações"
+              title="Acesso Administrativo (somente senha)"
+              aria-label="Acesso Administrativo"
             >
               <Settings className="h-[19px] w-[19px]" />
             </button>
-
-            {showSettingsMenu && (
-              <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-3.5 shadow-xl">
-                <p className="text-xs font-bold text-slate-900">
-                  Configurações & Moderação
-                </p>
-                <p className="mt-0.5 text-[11px] text-slate-500">
-                  Alterne o perfil de simulação ou acesse a Central de Negociações.
-                </p>
-
-                <div className="mt-3 space-y-1.5">
-                  <label className="block text-[11px] font-semibold text-slate-600">
-                    Perfil ativo na sessão:
-                  </label>
-                  <select
-                    value={userId}
-                    onChange={(e) => {
-                      setUserId(e.target.value);
-                      login(e.target.value);
-                    }}
-                    className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-900"
-                  >
-                    {DEMO_USERS.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.label} ({u.roleLabel})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mt-3 flex flex-col gap-1.5 border-t border-slate-100 pt-2.5 text-xs">
-                  <Link
-                    href="/admin/negociacoes"
-                    onClick={() => setShowSettingsMenu(false)}
-                    className="flex items-center justify-between rounded-lg bg-logo-green px-3 py-2 font-bold text-logo-purple-950 hover:bg-logo-green-hover"
-                  >
-                    <span>Central de Moderação (Admin)</span>
-                    <Settings className="h-3.5 w-3.5 text-logo-purple" />
-                  </Link>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* 2. Entrar / Perfil (após login, Entrar vira ícone de Perfil) */}
@@ -591,8 +549,15 @@ export function Navbar() {
                   {currentUser.label.trim().charAt(0).toUpperCase()}
                 </span>
               )}
-              <span className="max-w-[110px] truncate">
-                {currentUser.label.split(' ')[0]}
+              <span className="flex flex-col items-end leading-tight">
+                <span className="max-w-[110px] truncate">
+                  {currentUser.label.split(' ')[0]}
+                </span>
+                {profileCompleted && (
+                  <span className="text-right text-[9px] font-bold text-emerald-600">
+                    Cadastro concluído
+                  </span>
+                )}
               </span>
             </Link>
           )}

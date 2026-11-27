@@ -80,7 +80,10 @@ const SUBMENUS: Array<{ key: SubmenuKey; label: string }> = [
 ];
 
 export default function AdminNegotiationsCenterPage() {
-  const { userId, refreshNotifications } = useActiveUser();
+  const { refreshNotifications } = useActiveUser();
+  const [unlocked, setUnlocked] = useState(false);
+  const [adminPassword, setAdminPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [submenu, setSubmenu] = useState<SubmenuKey>('pending');
   const [dashboard, setDashboard] = useState<AdminDashboardPayload | null>(null);
   const [error, setError] = useState('');
@@ -90,11 +93,20 @@ export default function AdminNegotiationsCenterPage() {
   const [editedTexts, setEditedTexts] = useState<Record<string, string>>({});
   const [actionFeedback, setActionFeedback] = useState('');
 
+  useEffect(() => {
+    if (window.sessionStorage.getItem('mp_admin_unlocked') === 'true') {
+      setUnlocked(true);
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
   const loadDashboard = useCallback(async () => {
     setError('');
+    setLoading(true);
     try {
       const res = await fetch('/api/admin/negotiations', {
-        headers: { 'x-user-id': userId },
+        headers: { 'x-user-id': 'admin-1' },
       });
       const json = await res.json();
       if (!res.ok) {
@@ -108,11 +120,13 @@ export default function AdminNegotiationsCenterPage() {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
-    loadDashboard();
-  }, [loadDashboard]);
+    if (unlocked) {
+      loadDashboard();
+    }
+  }, [unlocked, loadDashboard]);
 
   const handleAction = async (messageId: string, action: ModerationAction) => {
     setActionFeedback('');
@@ -126,7 +140,7 @@ export default function AdminNegotiationsCenterPage() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': userId,
+        'x-user-id': 'admin-1',
       },
       body: JSON.stringify({
         messageId,
@@ -150,6 +164,52 @@ export default function AdminNegotiationsCenterPage() {
     v !== undefined
       ? v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
       : '-';
+
+  if (!unlocked) {
+    return (
+      <div className="mx-auto mt-8 max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex items-center gap-2 text-logo-purple">
+          <Lock className="h-5 w-5" />
+          <h1 className="text-base font-extrabold">Acesso Administrativo</h1>
+        </div>
+        <p className="mt-1 text-xs text-slate-500">
+          Área restrita por senha (independente de login de usuário).
+        </p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (adminPassword === 'admin123') {
+              window.sessionStorage.setItem('mp_admin_unlocked', 'true');
+              setUnlocked(true);
+              setPasswordError('');
+            } else {
+              setPasswordError('Senha incorreta.');
+            }
+          }}
+          className="mt-4 space-y-3"
+        >
+          <input
+            type="password"
+            autoFocus
+            value={adminPassword}
+            onChange={(e) => {
+              setAdminPassword(e.target.value);
+              if (passwordError) setPasswordError('');
+            }}
+            placeholder="Digite a senha"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-logo-purple focus:bg-white focus:outline-none"
+          />
+          {passwordError && <p className="text-xs font-semibold text-red-600">{passwordError}</p>}
+          <button
+            type="submit"
+            className="w-full rounded-xl bg-logo-purple px-4 py-2.5 text-xs font-bold text-white transition hover:bg-logo-purple-light"
+          >
+            Entrar
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

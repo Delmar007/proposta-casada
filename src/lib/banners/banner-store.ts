@@ -12,6 +12,9 @@ export interface BannerItem {
 }
 
 const STORAGE_KEY = 'mp_custom_banners';
+const IDB_NAME = 'mp_banners_db';
+const IDB_STORE = 'banners_store';
+const IDB_KEY = 'all_banners';
 export const BANNERS_UPDATED_EVENT = 'mp-banners-updated';
 
 export const BANNER_TRANSITION_LABELS: Record<BannerTransitionType, string> = {
@@ -19,6 +22,60 @@ export const BANNER_TRANSITION_LABELS: Record<BannerTransitionType, string> = {
   'side-to-side': 'De um lado para o outro',
   fade: 'Suave (Fade)',
 };
+
+function openBannerDb(): Promise<IDBDatabase | null> {
+  if (typeof window === 'undefined' || !('indexedDB' in window)) {
+    return Promise.resolve(null);
+  }
+  return new Promise((resolve) => {
+    try {
+      const req = window.indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE);
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+async function loadBannersFromIdb(): Promise<BannerItem[]> {
+  const db = await openBannerDb();
+  if (!db) return [];
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+      req.onsuccess = () => {
+        const val = req.result;
+        resolve(Array.isArray(val) ? val : []);
+      };
+      req.onerror = () => resolve([]);
+    } catch {
+      resolve([]);
+    }
+  });
+}
+
+async function saveBannersToIdb(banners: BannerItem[]): Promise<void> {
+  const db = await openBannerDb();
+  if (!db) return;
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put(banners, IDB_KEY);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    } catch {
+      resolve();
+    }
+  });
+}
 
 export function loadStoredBanners(): BannerItem[] {
   if (typeof window === 'undefined') return [];
@@ -38,8 +95,78 @@ export function loadStoredBanners(): BannerItem[] {
 
 export function saveStoredBanners(banners: BannerItem[]): void {
   if (typeof window === 'undefined') return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(banners));
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(banners));
+  } catch {
+    // Ignora QuotaExceededError do localStorage quando houver muitos banners;
+    // a persistência principal ilimitada fica no servidor (/api/banners) + IndexedDB.
+  }
   window.dispatchEvent(new Event(BANNERS_UPDATED_EVENT));
+}
+
+/**
+ * Carrega banners persistidos (API do servidor + IndexedDB ilimitado + migração de localStorage).
+ * Garante que os banners nunca desapareçam ao reabrir o site e suporta quantidade ilimitada.
+ */
+export async function fetchPersistedBanners(): Promise<BannerItem[]> {
+  let serverBanners: BannerItem[] = [];
+  try {
+    const res = await fetch('/api/banners', { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.banners)) {
+        serverBanners = data.banners;
+      }
+    }
+  } catch {
+    // Fallback para IndexedDB/localStorage se offline
+  }
+
+  const idbBanners = await loadBannersFromIdb();
+  const legacyBanners = loadStoredBanners();
+
+  if (serverBanners.length > 0) {
+    await saveBannersToIdb(serverBanners);
+    return serverBanners;
+  }
+
+  const localFallback = idbBanners.length > 0 ? idbBanners : legacyBanners;
+  if (localFallback.length > 0) {
+    // Restaura no servidor e no IndexedDB para permanecerem sempre ativos
+    await saveBannersToIdb(localFallback);
+    try {
+      await fetch('/api/banners', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ banners: localFallback }),
+      });
+    } catch {
+      // ignora erro de rede temporário
+    }
+    return localFallback;
+  }
+
+  return [];
+}
+
+/**
+ * Salva banners de forma ilimitada no IndexedDB e sincroniza no servidor (/api/banners).
+ */
+export async function savePersistedBanners(banners: BannerItem[]): Promise<void> {
+  await saveBannersToIdb(banners);
+  saveStoredBanners(banners);
+  try {
+    await fetch('/api/banners', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ banners }),
+    });
+  } catch {
+    // IndexedDB já garantiu a persistência local sem limite de 5MB
+  }
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(BANNERS_UPDATED_EVENT));
+  }
 }
 
 /**

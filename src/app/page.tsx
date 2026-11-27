@@ -9,7 +9,7 @@ import { VehicleFeedBox } from '@/components/VehicleFeedBox';
 import {
   BANNERS_UPDATED_EVENT,
   BannerItem,
-  loadStoredBanners,
+  fetchPersistedBanners,
 } from '@/lib/banners/banner-store';
 
 export default function MarketplaceHomePage() {
@@ -38,15 +38,19 @@ export default function MarketplaceHomePage() {
   }, []);
 
   useEffect(() => {
-    const syncBanners = () => {
-      const active = loadStoredBanners().filter((b) => b.active && b.imageUrl);
+    let activeMount = true;
+    const syncBanners = async () => {
+      const all = await fetchPersistedBanners();
+      if (!activeMount) return;
+      const active = all.filter((b) => b.active && b.imageUrl);
       setCustomBanners(active);
       setBannerIndex((prev) => (active.length > 0 ? prev % active.length : 0));
     };
-    syncBanners();
+    void syncBanners();
     window.addEventListener(BANNERS_UPDATED_EVENT, syncBanners);
     window.addEventListener('storage', syncBanners);
     return () => {
+      activeMount = false;
       window.removeEventListener(BANNERS_UPDATED_EVENT, syncBanners);
       window.removeEventListener('storage', syncBanners);
     };

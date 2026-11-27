@@ -303,8 +303,8 @@ export async function compareSelfieWithCnhImage(
     }
   }
 
-  const matched = bestDistance <= 0.62;
   const similarityPercent = Math.max(0, Math.min(100, Math.round((1 - bestDistance) * 100)));
+  const matched = similarityPercent >= 50;
 
   return {
     matched,
@@ -312,6 +312,6 @@ export async function compareSelfieWithCnhImage(
     distance: Number(bestDistance.toFixed(4)),
     message: matched
       ? `Identidade facial confirmada (${similarityPercent}% de compatibilidade com a CNH).`
-      : `Compatibilidade baixa (${similarityPercent}%). Tente fotografar novamente com boa iluminação frontal.`,
+      : `Compatibilidade de ${similarityPercent}% (mínimo exigido: 50%). Tire a foto novamente com boa iluminação frontal.`,
   };
 }

@@ -21,6 +21,7 @@ import {
 } from './types';
 import { detectPIIAndContactLeaks } from '@/lib/privacy/pii-detector';
 import { processTradeInImageDataUrl } from '@/lib/privacy/image-processor';
+import type { BannerItem } from '@/lib/banners/banner-store';
 
 export interface MarketplaceState {
   profiles: Record<string, UserProfile>;
@@ -34,6 +35,7 @@ export interface MarketplaceState {
   safeMeetingLocations: Record<string, SafeMeetingLocation>;
   safeMeetingAppointments: Record<string, SafeMeetingAppointment>;
   notifications: NegotiationNotification[];
+  banners?: BannerItem[];
   negotiationCounter: number;
 }
 
@@ -1235,6 +1237,16 @@ export class MarketplaceStore {
     return this.state.notifications
       .filter((n) => n.userId === userId)
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  public getBanners(): BannerItem[] {
+    return Array.isArray(this.state.banners) ? this.state.banners : [];
+  }
+
+  public saveBanners(banners: BannerItem[]): BannerItem[] {
+    this.state.banners = Array.isArray(banners) ? banners : [];
+    this.saveState();
+    return this.state.banners;
   }
 
   public getAdminProposals() {

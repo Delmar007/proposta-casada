@@ -36,10 +36,10 @@ import {
   BANNER_TRANSITION_LABELS,
   BannerItem,
   BannerTransitionType,
-  loadStoredBanners,
+  fetchPersistedBanners,
   readBannerFileAsDataUrl,
   renderPositionedBannerToDataUrl,
-  saveStoredBanners,
+  savePersistedBanners,
 } from '@/lib/banners/banner-store';
 
 type AdminTab =
@@ -245,7 +245,7 @@ export default function AdminDashboardPage() {
     if (window.sessionStorage.getItem('mp_admin_unlocked') === 'true') {
       setUnlocked(true);
     }
-    setBanners(loadStoredBanners());
+    void fetchPersistedBanners().then((loaded) => setBanners(loaded));
   }, []);
 
   useEffect(() => {
@@ -259,7 +259,7 @@ export default function AdminDashboardPage() {
 
   const persistBanners = (next: BannerItem[]) => {
     setBanners(next);
-    saveStoredBanners(next);
+    void savePersistedBanners(next);
   };
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1357,11 +1357,13 @@ export default function AdminDashboardPage() {
                     key={b.id}
                     className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3 sm:flex-row sm:items-center"
                   >
-                    <img
-                      src={b.imageUrl}
-                      alt={b.title}
-                      className="h-20 w-full shrink-0 rounded-lg border border-slate-200 object-cover sm:w-48"
-                    />
+                    <div className="flex h-11 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-900 sm:h-[42px] sm:w-[172px]">
+                      <img
+                        src={b.imageUrl}
+                        alt={b.title}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
 
                     <div className="min-w-0 flex-1 space-y-2">
                       <div className="flex flex-wrap items-center justify-between gap-2">

@@ -241,6 +241,13 @@ export default function PerfilPage() {
       setSaveError('Informe seu número de telefone (WhatsApp) com DDD antes de salvar.');
       return;
     }
+    const faceApproved = Boolean(faceResult?.matched && (faceResult.similarityPercent ?? 0) >= 50);
+    if (!faceApproved) {
+      setSaveError(
+        'Reconhecimento facial obrigatório com mínimo de 50% de compatibilidade. Tire a foto novamente; abaixo de 50% o cadastro não é aceito.'
+      );
+      return;
+    }
     setSaving(true);
     setSaveMessage('');
     setSaveError('');
@@ -624,24 +631,38 @@ export default function PerfilPage() {
                 {faceResult && !comparingFaces && (
                   <div
                     className={`rounded-xl border p-3.5 text-xs font-semibold ${
-                      faceResult.matched
+                      faceResult.matched && faceResult.similarityPercent >= 50
                         ? 'border-emerald-300 bg-emerald-50 text-emerald-900'
-                        : 'border-amber-300 bg-amber-50 text-amber-900'
+                        : 'border-red-300 bg-red-50 text-red-900'
                     }`}
                   >
                     <div className="flex items-center gap-2 font-extrabold">
-                      {faceResult.matched ? (
+                      {faceResult.matched && faceResult.similarityPercent >= 50 ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                       ) : (
-                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                        <AlertTriangle className="h-4 w-4 text-red-600" />
                       )}
                       <span>
-                        {faceResult.matched
-                          ? 'Reconhecimento Facial Aprovado'
-                          : 'Verificação Pendente'}
+                        {faceResult.matched && faceResult.similarityPercent >= 50
+                          ? `Reconhecimento Facial Aprovado (${faceResult.similarityPercent}%)`
+                          : `Não Aprovado (${faceResult.similarityPercent}% — mínimo 50%)`}
                       </span>
                     </div>
                     <p className="mt-1">{faceResult.message}</p>
+                    {(!faceResult.matched || faceResult.similarityPercent < 50) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelfieDataUrl('');
+                          setFaceResult(null);
+                          void handleStartCamera();
+                        }}
+                        className="mt-2.5 inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-extrabold text-white transition hover:bg-red-700"
+                      >
+                        <Camera className="h-3.5 w-3.5" />
+                        Tirar foto novamente
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -688,9 +709,18 @@ export default function PerfilPage() {
                 Preencha seu número de telefone (WhatsApp com DDD) para liberar o salvamento.
               </p>
             )}
+            {!(faceResult?.matched && (faceResult.similarityPercent ?? 0) >= 50) && (
+              <p className="text-xs font-semibold text-red-700">
+                Reconhecimento facial obrigatório (mínimo 50% de compatibilidade com a CNH) para salvar.
+              </p>
+            )}
             <button
               type="submit"
-              disabled={saving || whatsapp.replace(/\D/g, '').length < 10}
+              disabled={
+                saving ||
+                whatsapp.replace(/\D/g, '').length < 10 ||
+                !(faceResult?.matched && (faceResult.similarityPercent ?? 0) >= 50)
+              }
               className="inline-flex items-center gap-2 rounded-xl bg-logo-green px-6 py-3.5 text-[15px] font-extrabold text-logo-purple-950 shadow-xs transition hover:bg-logo-green-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Save className="h-4 w-4" />
